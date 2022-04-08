@@ -6,7 +6,7 @@ const AppFooter = () => {
             <div className="float-right d-none d-sm-block">
             <b>Version</b> 1.0.0
             </div>
-            <strong>Copyright © 2021 <a href="https://amexpert.pro/" target="_blank" style={{color: `black`}}>Amexpert</a>.</strong> Tous droits réservés.
+            <strong>Copyright © 2021 <a href="https://amexpert.pro/" rel="noopener noreferrer" target="_blank" style={{color: `black`}}>Amexpert</a>.</strong> Tous droits réservés.
         </footer>
     )
 }
