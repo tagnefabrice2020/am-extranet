@@ -112,7 +112,8 @@ const ListOfAppointments = ({ fetchAppointments, appointments, setAppointmentPag
                                                     <th></th>
                                                     <th>Lieu</th>
                                                     <th>Agent</th>
-                                                    <th>Client</th>
+                                                    <th>Bailleure</th>
+                                                    <th>Locataire</th>
                                                     <th></th>
                                                 </tr>
                                             </thead>
@@ -129,7 +130,14 @@ const ListOfAppointments = ({ fetchAppointments, appointments, setAppointmentPag
                                                                     <span>{appointment.lanlord_email}</span>
                                                                 </Content>
                                                             </Tooltip>
-
+                                                        </td>
+                                                        <td style={{ position: `relative` }}>
+                                                            <Tooltip>
+                                                                {appointment.tenant_first_name} {appointment.tenant_last_name}
+                                                                <Content>
+                                                                    <span>{appointment.tenant_email}</span>
+                                                                </Content>
+                                                            </Tooltip>
                                                         </td>
                                                         <td><Link to={`/modifier/${appointment.uuid}/rendez-vous`}><i className="bi bi-pencil-square" style={{ color: `#000` }}></i></Link></td>
                                                     </tr>
