@@ -27,44 +27,6 @@ const Export = () => {
         resolver: yupResolver(exportInfo),
     });
 
-    const DataSet = [
-        {
-            column: [
-                {title: 'Ref Lot'}, {title: 'Ref RDV EDL'}, {title: 'Type d\'intervention'}, {title: 'Nature du bien'}, {title: 'Date et heure'}, {title: 'Client'}, 
-                {title: 'Nom du passeur'}, {title: 'Nom de L\'agent ratacheé'}, {title: 'Nom du Locataire'}, {title: 'Prenom du Locataire'}, {title: 'Numéro de téléphone'}, 
-                {title: 'Email'}, {title: 'Identité de l\'ancien Locataire'}, {title: 'Surface du bien mettre carré'}, {title: 'Type'}, {title: 'Etage'}, {title: 'N° Logement'}, {title: 'N° Cave'}, 
-                {title: 'Adresse'}, {title: 'Complément d\'adresse'}, {title: 'Code postal'}, {title: 'ville'}, {title: 'Nom du propriétaire'}, {title: 'Prénom du propriétaire'}, {title: 'Email du propriétaire'}, 
-                {title: 'Référence'}, {title: 'Liste des doculents a récuérer'}, {title: 'Consignes particulères'}, {title: 'Informations diverses'}
-            ],
-            data: exportData.map((data) => [
-                {value: data.ref_lot},
-                {value: data.ref_rdv_edl},
-                {value: data.type},
-                {value: data.property_category},
-                {value: data.date_rdv},
-                {value: data.first_name},
-                {value: data.nom_du_passeur},
-                {value: data.agent},
-                {value: data.tenant_last_name},
-                {value: data.tenant_first_name},
-                {value: data.tenant_contact},
-                {value: data.tenant_email},
-                {value: data.aceint_tenant_info},
-                {value: data.property_surface_area},
-                {value: data.property_type},
-                {value: data.property_floor_number},
-                {value: data.property_housing_number},
-                {value: data.property_cave_number},
-                {value: data.property_addresse},
-                {value: data.property_postal_code},
-                {value: data.property_city},
-                {value: data.date},
-                {value: data.lanlord_last_name},
-                {value: data.lanlord_first_name},
-            ])
-        }
-    ];
-
     const { errors, isSubmitting } = formState;
 
     const toMinDate = watch('from');
@@ -152,7 +114,7 @@ const Export = () => {
                                                         <input
                                                             type="date"
                                                             min={toMinDate}
-                                                            disabled={toMinDate == 'undefined' || toMinDate == null ? true : false }
+                                                            disabled={toMinDate === 'undefined' || toMinDate === null ? true : false }
                                                             className={"form-control " + (errors.to && `is-border-red`)}
                                                             {...register('to')}
                                                         />
@@ -179,11 +141,7 @@ const Export = () => {
                                     <div className="card-footer">
                                         <button type="submit" className="btn btn-primary" disabled={isSubmitting}>{isSubmitting ? 'Chargement en cours...' : 'Charger'}</button>
                                         {!loading && exportData.length > 0 && <ExportCSV csvData={exportData} fileName={new Date()} />}
-                                        {/**!loading && exportData.length > 0 && <ExcelFile 
-                                            filename={new Date()} 
-                                            element={<button type="button">Télécharger</button>}>
-                                                <ExcelSheet dataSet={DataSet} name='rdv' />
-                                        </ExcelFile>**/}
+                                       
                                     </div>
                                 </form>
                             </div>
