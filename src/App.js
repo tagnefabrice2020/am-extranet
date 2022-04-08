@@ -4,7 +4,7 @@ import { AppSpinner } from "./components";
 import "../src/assets/dist/css/adminlte.css";
 import "../src/assets/plugins/fontawesome-free/css/all.min.css";
 //import "../src/assets/plugins/bootstrap/js/bootstrap.bundle.min.js";
-//import "../public/adminlte.js";
+//import "../src/assets/dist/js/adminlte.js";
 import { Provider } from "react-redux"; 
 import {store} from './store';
 import GuestRoutes from "./config/GuestRoutes";
