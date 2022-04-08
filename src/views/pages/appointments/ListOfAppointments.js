@@ -26,6 +26,37 @@ const ListOfAppointments = ({ fetchAppointments, appointments, setAppointmentPag
         return () => clearTimeout(timer);
     }, [appointments.searchValue, appointments.currentPage, appointments.perPage, searchAppointments]);
 
+    const getColor = (title) => {
+        let style = {
+            backgroundColor: '',
+            color: ''
+        };
+        
+        if (title === 'constat sortant') {
+            style.backgroundColor = '#9b30ff';
+            style.color = '#fff';
+        } else if (title === 'constat entrant') {
+            style.backgroundColor = '#0b86aa';
+            style.color = '#fff';
+        } else if (title === 'constat avant travaux') {
+            style.backgroundColor = '#6e6767';
+            style.color = '#fff';
+        } else if (title === 'constat après travaux') {
+            style.backgroundColor = '#0d9f3f';
+            style.color = '#fff';
+        } else if (title === 'constat entrant meublé') {
+            style.backgroundColor = '#fcafac';
+            style.color = '#fff';
+        } else if (title === 'constat sortant meublé') {
+            style.backgroundColor = '#8c1567';
+            style.color = '#fff';
+        } else if (title === 'visite conseil') {
+            style.backgroundColor = '#bf9053';
+            style.color = '#fff';
+        }
+        return style;
+    }
+
     return (
 
         <div className="content-wrapper">
@@ -111,6 +142,7 @@ const ListOfAppointments = ({ fetchAppointments, appointments, setAppointmentPag
                                                 <tr>
                                                     <th></th>
                                                     <th>Lieu</th>
+                                                    <th>Type d'intervention</th>
                                                     <th>Agent</th>
                                                     <th>Bailleure</th>
                                                     <th>Locataire</th>
@@ -121,6 +153,7 @@ const ListOfAppointments = ({ fetchAppointments, appointments, setAppointmentPag
                                                 {appointments.appointments.map((appointment, key) =>
                                                     <tr key={key}>
                                                         <td>{((appointments.currentPage * appointments.perPage) - appointments.perPage) + key + 1}</td>
+                                                        <td><span className="tag" style={getColor(appointment.intervention)}>{}</span></td>
                                                         <td>{appointment.property_adresse}, {appointment.property_postal_code} {appointment.property_city}</td>
                                                         <td>{appointment.a_first_name} {appointment.a_first_name}</td>
                                                         <td style={{ position: `relative` }}>
