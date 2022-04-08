@@ -53,13 +53,13 @@ const AppSidebar = ({ user }) => {
                                         <li className="nav-item">
                                             <Link to="/ajouter/un/rendez-vous" className={location.pathname === '/ajouter/un/rendez-vous' ? 'nav-link nav-active' : 'nav-link'}>
                                                 <i className="far fa-calendar-plus nav-icon"></i>
-                                                <p>Ajoutez un RDV</p>
+                                                <p>Ajoutez un rendez-vous</p>
                                             </Link>
                                         </li>
                                         <li className="nav-item">
                                             <Link to="/rendez-vous" className={location.pathname === '/rendez-vous' ? 'nav-link nav-active' : 'nav-link'}>
                                                 <i className="far fa-calendar nav-icon"></i>
-                                                <p>RDV</p>
+                                                <p>Liste des rendez-vous</p>
                                             </Link>
                                         </li>
                                     </ul>
@@ -81,7 +81,7 @@ const AppSidebar = ({ user }) => {
                                         <li className="nav-item">
                                             <Link to="/utilisateurs" className={location.pathname === '/utilisateurs' ? 'nav-link nav-active' : 'nav-link'}>
                                                 <i className="fas fa-list nav-icon"></i>
-                                                <p>Utilisateurs</p>
+                                                <p>Liste d'utilisateurs</p>
                                             </Link>
                                         </li>
                                     </ul>

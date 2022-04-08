@@ -36,12 +36,12 @@ const ListOfUsers = ({ fetchUsers, users, searchUsers, setUsersPerPage, setPage,
                 <div className="container-fluid">
                     <div className="row mb-2">
                         <div className="col-sm-6">
-                            <h1 className="m-0">Listes d'utilisateurs</h1>
+                            <h1 className="m-0">Liste d'utilisateurs</h1>
                         </div> {/* /.col */}
                         <div className="col-sm-6">
                             <ol className="breadcrumb float-sm-right">
                                 <li className="breadcrumb-item">Utilisateurs</li>
-                                <li className="breadcrumb-item active">List</li>
+                                <li className="breadcrumb-item active">Liste</li>
                             </ol>
                         </div> {/* /.col */}
                     </div> {/* /.row */}

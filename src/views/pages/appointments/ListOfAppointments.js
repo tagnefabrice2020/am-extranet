@@ -65,12 +65,12 @@ const ListOfAppointments = ({ fetchAppointments, appointments, setAppointmentPag
                 <div className="container-fluid">
                     <div className="row mb-2">
                         <div className="col-sm-6">
-                            <h1 className="m-0">Listes des rendez-vous</h1>
+                            <h1 className="m-0">Liste des rendez-vous</h1>
                         </div> {/* /.col */}
                         <div className="col-sm-6">
                             <ol className="breadcrumb float-sm-right">
-                                <li className="breadcrumb-item"><Link to="/">Rendez-vous</Link></li>
-                                <li className="breadcrumb-item active">List</li>
+                                <li className="breadcrumb-item"><Link to="/rendez-vous">Rendez-vous</Link></li>
+                                <li className="breadcrumb-item active">Liste</li>
                             </ol>
                         </div> {/* /.col */}
                     </div> {/* /.row */}
@@ -144,7 +144,7 @@ const ListOfAppointments = ({ fetchAppointments, appointments, setAppointmentPag
                                                     <th>Lieu</th>
                                                     <th>Type d'intervention</th>
                                                     <th>Agent</th>
-                                                    <th>Bailleure</th>
+                                                    <th>Bailleur</th>
                                                     <th>Locataire</th>
                                                     <th></th>
                                                 </tr>
