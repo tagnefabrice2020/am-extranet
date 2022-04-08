@@ -154,7 +154,7 @@ const ListOfAppointments = ({ fetchAppointments, appointments, setAppointmentPag
                                                     <tr key={key}>
                                                         <td>{((appointments.currentPage * appointments.perPage) - appointments.perPage) + key + 1}</td>
                                                         <td>{appointment.property_adresse}, {appointment.property_postal_code} {appointment.property_city}</td>
-                                                        <td><span className="badge" style={getColor(appointment.intervention)}>{appointment.intervention}</span></td>
+                                                        <td className="text-center"><span className="badge" style={getColor(appointment.intervention)}>{appointment.intervention}</span></td>
                                                         <td>{appointment.a_first_name} {appointment.a_first_name}</td>
                                                         <td style={{ position: `relative` }}>
                                                             <Tooltip>

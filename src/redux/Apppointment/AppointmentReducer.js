@@ -30,11 +30,11 @@ export const appointmentReducer = (state = initialState, action) => {
         case FETCH_APPOINTMENT_SUCCESS:
             return {
                 ...state,
-                loading: false,
                 appointments: action.payload,
                 initialAppointments: action.payload,
                 initialTotalPages: state.totalPages !== null ? state.totalPages : null,
                 initialCurrentPage: state.currentPage !== null ? state.currentPage : null,
+                loading: false,
             };
         case APPOINTMENT_CURRENT_PAGE:
             return {
@@ -45,8 +45,8 @@ export const appointmentReducer = (state = initialState, action) => {
             return {
                 ...state,
                 searching: false,
-                loading: false,
                 appointments: action.payload,
+                loading: false,
             };
         case APPOINTMENT_PER_PAGE:
             return {
@@ -105,9 +105,9 @@ export const appointmentReducer = (state = initialState, action) => {
         case SEARCH_APPOINTMENTS_SUCCESS:
             return {
                 ...state,
+                appointments: action.payload,
                 searching: false,
                 loading: false,
-                appointments: action.payload
             };
         default:
             return state;
