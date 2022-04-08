@@ -17,8 +17,8 @@ const AppSidebar = ({ user }) => {
     return (
         <aside className="main-sidebar sidebar-dark-primary elevation-4">
             {/* Brand Logo */}
-            <Link to="index3.html" className="brand-link" style={{ display: 'block', textAlign: 'center', margin: 'auto' }}>
-                <span className="brand-text">Amexpert Extranet</span>
+            <Link to="/" className="brand-link" style={{ display: 'block', textAlign: 'center', margin: 'auto' }}>
+                <span className="brand-text">Amexpert Commande</span>
             </Link>
 
             {/* Sidebar */}

@@ -48,7 +48,7 @@ const Login = ({ loginData, authenticate }) => {
             {/* /.login-logo */}
             <div className="card">
                 <div className="card-body login-card-body">
-                    <p className="login-box-msg">Connecter vous pour débuter une nouvelle session</p>
+                    <p className="login-box-msg">Connectez-vous</p>
 
                     <form onSubmit={handleSubmit(loginAction)}>
                         <div className="input-group mb-1">
