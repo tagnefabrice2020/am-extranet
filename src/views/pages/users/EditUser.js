@@ -141,7 +141,7 @@ const EditUser = ({ users, fetchOneUser, updateUser }) => {
                                                 <select
                                                     className={"form-control " + (errors.role && `is-border-red`)}
                                                     {...register('role')}
-                                                    defaultValue={users.oneUser.role_id}
+                                                    value={users.oneUser.role_id}
                                                 >
                                                     <option value="1">Administrateur</option>
                                                     <option value="3">Client</option>

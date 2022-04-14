@@ -5,10 +5,10 @@ import { useParams } from "react-router-dom";
 import { fetchOneAppointment, updateAppointment } from "../../../redux/Apppointment/AppointmentActionCreators";
 import { useForm } from "react-hook-form";
 import axios from 'axios';
-import { API_URL } from "../../../config";
+import { API_URL, getISOStringWithoutSecsAndMillisecs } from "../../../config";
 import { date, mixed, number, object, string } from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-
+ 
 const updateAppointementSchema = object({
     ref_lot: string().typeError('Veuillez des character alpha-numérique'),
     ref_rdv_edl: string().typeError('Veuillez des character alpha-numérique'),
@@ -210,7 +210,7 @@ function EditAppointment({ fetchOneAppointment, appointments, updateAppointment 
                                                         <select 
                                                             className={"form-control " + (errors.type_of_intervention && ` is-border-red`)} 
                                                             {...register('type_of_intervention')}
-                                                            defaultValue={appointments.oneAppointment.type_of_intervention}
+                                                            value={appointments.oneAppointment.type_of_intervention}
                                                             >
                                                             {!interventionsLoading && interventions.map((intervention, idx) => <option key={idx} value={intervention.id}>{intervention.type}</option>)}
                                                         </select>
@@ -225,7 +225,7 @@ function EditAppointment({ fetchOneAppointment, appointments, updateAppointment 
                                                         <select 
                                                             className={"form-control " + (errors.type_of_property && ` is-border-red`)} 
                                                             {...register('type_of_property')}
-                                                            defaultValue={appointments.oneAppointment.type_of_property}
+                                                            value={appointments.oneAppointment.type_of_property}
                                                             >
                                                             {!propertyTypesLoading && propertyTypes.map((propertyType, idx) => <option key={idx} value={propertyType.id}>{propertyType.type}</option>)}
                                                         </select>
@@ -246,7 +246,7 @@ function EditAppointment({ fetchOneAppointment, appointments, updateAppointment 
                                                             disabled
                                                             className={"form-control " + (errors.client_id && ` is-border-red`)} 
                                                             {...register('client_id')}
-                                                            defaultValue={appointments.oneAppointment.client_id}
+                                                            value={appointments.oneAppointment.client_id}
                                                             >
                                                             {!clientsLoading && clients.map((client, idx) => <option key={idx} value={client.id}>{client.first_name} {client.last_name}</option>)}
                                                         </select>
@@ -258,7 +258,8 @@ function EditAppointment({ fetchOneAppointment, appointments, updateAppointment 
                                                         <label htmlFor="exampleInputEmail1">Date et Heure</label>
                                                         <input
                                                             type="datetime-local"
-                                                            min={new Date().toISOString()}
+                                                            min={getISOStringWithoutSecsAndMillisecs(new Date())}
+                                                            defaultValue={getISOStringWithoutSecsAndMillisecs(appointments.oneAppointment.date_rdv)}
                                                             className={"form-control " + (errors.date_rdv && ` is-border-red`)}
                                                             {...register('date_rdv')}
                                                         />
@@ -281,7 +282,7 @@ function EditAppointment({ fetchOneAppointment, appointments, updateAppointment 
                                                         <label htmlFor="exampleInputEmail1">Nom de l'agent Amexpert rattaché</label>
                                                         <select 
                                                             className={"form-control " + (errors.agent_id && ` is-border-red`)} 
-                                                            defaultValue={appointments.oneAppointment.agent_id}
+                                                            value={appointments.oneAppointment.agent_id}
                                                             {...register('agent_id')}>
                                                             {!agentLoading && agents.map((agent, idx) => <option key={idx} value={agent.id}>{agent.first_name} {agent.last_name}</option>)}
                                                         </select>
@@ -386,7 +387,7 @@ function EditAppointment({ fetchOneAppointment, appointments, updateAppointment 
                                                         <select
                                                             className={"form-control " + (errors.property_type && ` is-border-red`)}
                                                             {...register('property_type')}
-                                                            defaultValue={appointments.oneAppointment.property_type}
+                                                            value={appointments.oneAppointment.property_type}
                                                             >
                                                             <option value="T1">F1</option>
                                                             <option value="T2">F2</option>

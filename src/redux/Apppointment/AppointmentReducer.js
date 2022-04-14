@@ -25,6 +25,7 @@ export const appointmentReducer = (state = initialState, action) => {
         case FETCH_APPOINTMENT_REQUEST:
             return {
                 ...state,
+                appointments: {},
                 loading: true
             };
         case FETCH_APPOINTMENT_SUCCESS:
@@ -35,6 +36,7 @@ export const appointmentReducer = (state = initialState, action) => {
                 initialTotalPages: state.totalPages !== null ? state.totalPages : null,
                 initialCurrentPage: state.currentPage !== null ? state.currentPage : null,
                 loading: false,
+                oneAppointment:{},
             };
         case APPOINTMENT_CURRENT_PAGE:
             return {
@@ -77,6 +79,7 @@ export const appointmentReducer = (state = initialState, action) => {
                 oneAppointment: action.payload,
                 oneAppointmentLoading: false,
                 oneAppointmentLoadingError: false,
+                appointments: [],
             };
         case FETCH_ONE_APPOINTMENT_ERROR:
             return {
