@@ -28,6 +28,7 @@ export const UserReducers = (state = initialState, action) => {
             return {
                 ...state,
                 users: [],
+                oneUser: {},
                 loading: true,
             };
         case FETCH_USERS_SUCCESS:

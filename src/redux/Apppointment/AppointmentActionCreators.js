@@ -135,8 +135,8 @@ export const searchAppointments = (page, perPage) => {
         if (appointments.searchValue.length > 0) {
             AppointementService.search(appointments.searchValue, page, perPage) 
                 .then((response) => {
-                    console.log(response); 
-                    console.log(appointments);
+                    // console.log(response); 
+                    // console.log(appointments);
                     const totalPage = Math.ceil(response.total / response.per_page); 
                     dispatch(setAppointmentPage(response.current_page)); 
                     dispatch(setAppointmentsPerPage(response.per_page));

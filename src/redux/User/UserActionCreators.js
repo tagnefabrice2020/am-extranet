@@ -200,7 +200,6 @@ export const fetchOneUser = (user) => {
         UserService.fetchOneUser(user)
             .then((user) => {
                 dispatch(fetchOneUserRequestSucces(user));
-                console.log(user)
                 return Promise.resolve();
             }, error => {
                 dispatch(fetchSingleUserFailed());

@@ -26,6 +26,7 @@ export const appointmentReducer = (state = initialState, action) => {
             return {
                 ...state,
                 appointments: {},
+                oneAppointment: {},
                 loading: true
             };
         case FETCH_APPOINTMENT_SUCCESS:
