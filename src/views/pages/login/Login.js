@@ -99,7 +99,7 @@ const Login = ({ loginData, authenticate }) => {
                         <div className="row">
                             <div className="col">
                                 <ReCAPTCHA
-                                    sitekey="6LeEYXMfAAAAAFVUq4HuvOqXMeJIByLScI0v4wfe"
+                                    sitekey="6Lf_g3MfAAAAAL5E_M7X9ZjuJMJANjXIye4WgjUI"
                                     onChange={verifyRecaptchaCallback}
                                     
                                 />
