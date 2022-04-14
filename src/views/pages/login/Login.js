@@ -101,6 +101,7 @@ const Login = ({ loginData, authenticate }) => {
                                 <ReCAPTCHA
                                     sitekey="6Lf_g3MfAAAAAL5E_M7X9ZjuJMJANjXIye4WgjUI"
                                     onChange={verifyRecaptchaCallback}
+                                    type="image"
                                     
                                 />
                             </div>
