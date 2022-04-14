@@ -1,4 +1,4 @@
-import { FETCH_ONE_USER_SUCCESS, FETCH_USERS_REQUEST, FETCH_USERS_SUCCESS, FETCH_USER_FAILURE, FETCH_ONE_USER_ERROR, ONE_USER_REQUEST, RESET, RESET_FORM, SEARCHING, SEARCH_SUCCESS, STORING_USER, SWITCH_STATUS, TOTAL_PAGES, USERS_CURRENT_PAGE, USERS_PER_PAGE } from "./UserActionTypes"
+import { FETCH_ONE_USER_SUCCESS, FETCH_USERS_REQUEST, FETCH_USERS_SUCCESS, CHANGE_BULK_STATUS_ACTIONS, FETCH_USER_FAILURE, FETCH_ONE_USER_ERROR, ONE_USER_REQUEST, RESET, RESET_FORM, SEARCHING, SEARCH_SUCCESS, STORING_USER, SWITCH_STATUS, TOTAL_PAGES, USERS_CURRENT_PAGE, USERS_PER_PAGE, SELECT_USERS } from "./UserActionTypes"
 
 const initialState = {
     loading: true,
@@ -16,6 +16,8 @@ const initialState = {
     users: [],
     initialUsers: [],
     initialTotalPages: null,
+    selectedUsers: [],
+    changeBulkStatusLoading: false,
     error: '',
     totalPages: null
 }
@@ -129,7 +131,22 @@ export const UserReducers = (state = initialState, action) => {
                 oneUser: {},
                 oneUserLoadingError: true
             };
+        case SELECT_USERS:
+            return {
+                ...state,
+                selectedUsers: action.payload
+            }
+        case CHANGE_BULK_STATUS_ACTIONS:
+            return {
+                ...state,
+                changeBulkStatusLoading: action.payload
+            };
         default:
-            return state;
+            return {
+                ...state, 
+                oneUser: {},
+                users: [],
+                initialUsers: []
+            };
     }
 }

@@ -36,3 +36,51 @@
     transform: rotate(360deg);
   }
 }
+.checkmark-box {
+  position: relative;
+  display: block;
+  justify-content: center;
+  align-items: center;
+}
+
+.checkmark {
+  position: relative;
+  /*top: 20px;*/
+  height: 16px;
+  width: 16px;
+  background-color: #eee;
+  border-radius: 2px;
+}
+
+
+.checkmark.checked {
+  background-color: #a39d9a;
+}
+
+.checkmark:hover {
+  background-color: #ccc;
+}
+
+.checkmark.checked:hover {
+  background-color: #24f2c7;
+}
+
+.checkmark.checked::after {
+  display: block;
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 2px;
+  width: 5px;
+  height: 10px;
+
+  border: solid white;
+    border-top-width: medium;
+    border-right-width: medium;
+    border-bottom-width: medium;
+    border-left-width: medium;
+  border-width: 0 2px 2px 0;
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg);
+}              

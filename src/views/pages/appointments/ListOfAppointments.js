@@ -142,7 +142,7 @@ const ListOfAppointments = ({ fetchAppointments, appointments, setAppointmentPag
                                                 <tr>
                                                     <th></th>
                                                     <th>Lieu</th>
-                                                    <th>Type d'intervention</th>
+                                                    <th className="text-center">Type d'intervention</th>
                                                     <th>Agent</th>
                                                     <th>Bailleur</th>
                                                     <th>Locataire</th>

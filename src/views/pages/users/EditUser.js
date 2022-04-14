@@ -35,7 +35,7 @@ const EditUser = ({ users, fetchOneUser, updateUser }) => {
     });
 
     useEffect(() => {
-        fetchOneUser(uuid);
+         fetchOneUser(uuid);
     }, [uuid, fetchOneUser]);
 
     const { isSubmitting, errors } = formState;
@@ -144,8 +144,8 @@ const EditUser = ({ users, fetchOneUser, updateUser }) => {
                                                     defaultValue={users.oneUser.role_id}
                                                 >
                                                     <option value="1">Administrateur</option>
-                                                    <option value="2">Client</option>
-                                                    <option value="3">Agent</option>
+                                                    <option value="3">Client</option>
+                                                    <option value="2">Agent</option>
                                                     <option value="4">Salarié</option>
                                                 </select>
                                                 {errors.role && <small className="form-text text-muted is-danger">{errors.role.message}</small>}

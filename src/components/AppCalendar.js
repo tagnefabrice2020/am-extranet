@@ -47,7 +47,7 @@ const AppCalendar = () => {
     }
 
     function renderEventContent(eventInfo) {
-        console.log(eventInfo)
+        //console.log(eventInfo)
         let backgroundColor, textColor;
         const title = JSON.parse(eventInfo.event.title);
         if (title.title === 'constat sortant') {

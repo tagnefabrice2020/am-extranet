@@ -1,6 +1,6 @@
 import { toast } from "react-toastify";
 import AuthService from "../../services/AuthService";
-import { AUTHENTICATED, AUTHENTICATING, AUTHENTICATION_FAILED, LOGOUT } from "./AuthActionTypes";
+import { AUTHENTICATED, AUTHENTICATING, AUTHENTICATION_FAILED, LOGOUT, UPDATE_PROFILE } from "./AuthActionTypes";
 
 export const authenticating = () => {
     return {
@@ -18,6 +18,13 @@ export const authenticationFailed = (error) => {
 export const authenticated = (user) => {
     return {
         type: AUTHENTICATED,
+        payload: user
+    }
+}
+
+export const updateProfileSuccess = (user) => {
+    return {
+        type: UPDATE_PROFILE,
         payload: user
     }
 }
@@ -47,3 +54,4 @@ export const logout = () => {
         });
     }
 }
+

@@ -1,5 +1,5 @@
 import AuthService from "../../services/AuthService";
-import { AUTHENTICATED, AUTHENTICATING, AUTHENTICATION_FAILED, LOGOUT } from "./AuthActionTypes";
+import { AUTHENTICATED, AUTHENTICATING, AUTHENTICATION_FAILED, LOGOUT, UPDATE_PROFILE } from "./AuthActionTypes";
 
 
 const user = localStorage.getItem('user');
@@ -39,6 +39,11 @@ export const AuthReducer = (state = initialState, action) => {
                 isLogin: false,
                 authUser: {}
             };
+        case UPDATE_PROFILE:
+            return {
+                ...state,
+                authUser: JSON.stringify(action.payload)
+            }
         default:
             return state;
     }

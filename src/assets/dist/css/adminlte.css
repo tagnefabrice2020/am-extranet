@@ -36591,3 +36591,15 @@ a.fc-event:hover {
 .menu-open ul {
   display: block!important;
 }
+
+.bi-person-circle::before {
+  display: block;
+  text-align: center;
+}
+
+.box-body {
+    border-radius: 6px;
+    padding: 10px;
+    background: #fff;
+    border-top: 3px solid #2c2c2c;
+}

@@ -46,6 +46,14 @@ class UserService {
             })
     } 
 
+    switchUserBulkStatus (data) {
+        let newData = {uuids: data};
+        return axios.patch(API_URL + `/users/switchStatuses`, newData)
+            .then((response) => {
+                return response
+            })
+    }
+
 }
 
 export default new UserService();

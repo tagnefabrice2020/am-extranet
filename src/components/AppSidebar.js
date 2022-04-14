@@ -28,7 +28,7 @@ const AppSidebar = ({ user }) => {
                         {/* Sidebar user panel (optional) */}
                         <div className="user-panel mt-3 pb-3 mb-3 d-flex justify-content-center align-items-center">
                             <div className="info">
-                                <Link to="/" className="d-block text-decoration-underline">Bienvenue, {userInfo.last_name ? userInfo.last_name : null}</Link>
+                                <Link to="/profil" className="d-block text-decoration-underline">Bienvenue, {userInfo.last_name ? userInfo.last_name : null}</Link>
                             </div>
                         </div>
 
@@ -81,7 +81,7 @@ const AppSidebar = ({ user }) => {
                                         <li className="nav-item">
                                             <Link to="/utilisateurs" className={location.pathname === '/utilisateurs' ? 'nav-link nav-active' : 'nav-link'}>
                                                 <i className="fas fa-list nav-icon"></i>
-                                                <p>Liste d'utilisateurs</p>
+                                                <p>Liste des utilisateurs</p>
                                             </Link>
                                         </li>
                                     </ul>

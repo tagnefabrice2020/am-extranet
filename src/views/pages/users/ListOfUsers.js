@@ -1,12 +1,12 @@
-import React, { useEffect } from "react"
-import { connect } from "react-redux"
-import { Link } from "react-router-dom"
-import Pagination from "../../../components/Pagination"
-import TableLoader from "../../../components/TableLoader"
-import { fetchUsers, searching, searchUsers, setPage, setUsersPerPage, switchUserStatus, test } from "../../../redux/User/UserActionCreators"
+import React, { useEffect } from "react";
+import { connect } from "react-redux";
+import { Link } from "react-router-dom";
+import Pagination from "../../../components/Pagination";
+import TableLoader from "../../../components/TableLoader";
+import { fetchUsers, searching, searchUsers, selectUsers, setPage, setUsersPerPage, switchUserStatus, changeBulkStatus } from "../../../redux/User/UserActionCreators";
 
 
-const ListOfUsers = ({ fetchUsers, users, searchUsers, setUsersPerPage, setPage, searching, switchUserStatus, test }) => {
+const ListOfUsers = ({ fetchUsers, users, searchUsers, setUsersPerPage, setPage, searching, switchUserStatus, selectUsers, changeBulkStatus }) => {
    
     useEffect(() => {
         if (users.searchValue.length > 0) {
@@ -29,6 +29,20 @@ const ListOfUsers = ({ fetchUsers, users, searchUsers, setUsersPerPage, setPage,
         switchUserStatus(uuid);
     }
 
+    const switchSelected = (uuid) => {
+        let selectedUsers = users.selectedUsers;
+        let userIdx = selectedUsers.findIndex((user) => {
+            return user === uuid
+        });
+        if (userIdx === -1) {
+            selectedUsers.push(uuid);
+            selectUsers(selectedUsers);
+        } else {
+            selectedUsers.splice(userIdx, 1);
+            selectUsers(selectedUsers);
+        }
+    }
+
     return (
         <div className="content-wrapper">
             {/* Content Header (Page header) */}
@@ -45,6 +59,11 @@ const ListOfUsers = ({ fetchUsers, users, searchUsers, setUsersPerPage, setPage,
                             </ol>
                         </div> {/* /.col */}
                     </div> {/* /.row */}
+                    <div className="row ">
+                        <div className="col">
+                            <button className="btn btn-sm btn-info" onClick={() => changeBulkStatus(true)}>{users.changeBulkStatusLoading ? "Changement en cours..." : "Changer leurs status"}</button>
+                        </div>
+                    </div>
                 </div> {/* /.container-fluid */}
             </div>
             {/* /.content-header */}
@@ -113,6 +132,7 @@ const ListOfUsers = ({ fetchUsers, users, searchUsers, setUsersPerPage, setPage,
                                             <thead>
                                                 <tr>
                                                     <th></th>
+                                                    <th></th>
                                                     <th><em>Nom</em></th>
                                                     <th>Email</th>
                                                     <th>Role</th>
@@ -124,6 +144,7 @@ const ListOfUsers = ({ fetchUsers, users, searchUsers, setUsersPerPage, setPage,
 
                                                 {users.users.map((user, key) =>
                                                     <tr key={key}>
+                                                        <td className="checkmark-box"><div className={users.selectedUsers.includes(user.uuid) ? "checkmark checked": "checkmark"} onClick={() => switchSelected(user.uuid)}></div></td>
                                                         <td>{((users.currentPage * users.perPage) - users.perPage) + key + 1}</td>
                                                         <td>{user.first_name} {user.last_name}</td>
                                                         <td>{user.email}</td>
@@ -182,7 +203,8 @@ const mapDispatchToProps = (dispatch) => {
         searching: (value) => dispatch(searching(value)),
         searchUsers: (currentPage, perPage) => dispatch(searchUsers(currentPage, perPage)),
         switchUserStatus: (uuid) => dispatch(switchUserStatus(uuid)),
-        test: () => dispatch(test())
+        selectUsers: (uuid) => dispatch(selectUsers(uuid)),
+        changeBulkStatus: (status) => dispatch(changeBulkStatus(status)),
     };
 }
 

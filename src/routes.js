@@ -9,6 +9,7 @@ const PageNotFound = lazy(() => import('./views/pages/pageNotFound/PageNotFound'
 const EditUser = lazy(() => import('./views/pages/users/EditUser'));
 const EditAppointment = lazy(() => import('./views/pages/appointments/EditAppointment'));
 const Exporter = lazy(() => import('./views/pages/exporter/exporter'));
+const Profile = lazy(() => import('./views/pages/profile/profile'));
 
 const routes = [
     {
@@ -25,6 +26,7 @@ const routes = [
     {path: '/ajouter/un/rendez-vous', auth: true, name: 'Ajouter un rendez-vous', element: NewAppointment},
     {path: '/modifier/:uuid/rendez-vous', auth: true, name: 'modifier le rendez-vous', element: EditAppointment},
     {path: '/exporter', auth: true, name: 'exporter', element: Exporter},
+    {path: '/profil', auth: true, name: 'profil', element: Profile},
     {path:'*', name: 'Page not Found', element: PageNotFound}
 ];
 

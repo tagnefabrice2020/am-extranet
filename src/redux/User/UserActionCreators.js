@@ -1,7 +1,6 @@
-
 import { toast } from 'react-toastify';
 import UserService from "../../services/UserService";
-import { FETCH_ONE_USER_ERROR, FETCH_ONE_USER_SUCCESS, FETCH_USERS_REQUEST, FETCH_USERS_SUCCESS, FETCH_USER_FAILURE, ONE_USER_REQUEST, RESET, RESET_FORM, SEARCHING, SEARCH_SUCCESS, STORE_USER_ERROR, STORING_USER, SWITCH_STATUS, TOTAL_PAGES, USERS_CURRENT_PAGE, USERS_PER_PAGE } from "./UserActionTypes"
+import { CHANGE_BULK_STATUS_ACTIONS, FETCH_ONE_USER_ERROR, FETCH_ONE_USER_SUCCESS, FETCH_USERS_REQUEST, FETCH_USERS_SUCCESS, FETCH_USER_FAILURE, ONE_USER_REQUEST, RESET, RESET_FORM, SEARCHING, SEARCH_SUCCESS, SELECT_USERS, STORE_USER_ERROR, STORING_USER, SWITCH_STATUS, TOTAL_PAGES, USERS_CURRENT_PAGE, USERS_PER_PAGE } from "./UserActionTypes"
 
 export const fetchUsersRequest = () => {
     return {
@@ -89,6 +88,21 @@ export const switchStatus = (uuid) => {
     return {
         type: SWITCH_STATUS,
         payload: uuid
+    };
+}
+
+
+export const selectUsers = (uuid) => {
+    return {
+        type: SELECT_USERS,
+        payload: uuid
+    };
+}
+
+export const changeBulkStatus = (status) => {
+    return {
+        type: CHANGE_BULK_STATUS_ACTIONS,
+        payload: status
     };
 }
 
@@ -186,6 +200,7 @@ export const fetchOneUser = (user) => {
         UserService.fetchOneUser(user)
             .then((user) => {
                 dispatch(fetchOneUserRequestSucces(user));
+                console.log(user)
                 return Promise.resolve();
             }, error => {
                 dispatch(fetchSingleUserFailed());
@@ -221,6 +236,21 @@ export const updateUser = (user, uuid) => {
     }
 }
 
+export const switchBulkUserStatus = () => {
+    return (dispatch, getState) => {
+        let state = getState();
+        let selectedUuids = state.users.selectedUsers;
+        UserService.switchUserBulkStatus(selectedUuids)
+            .then((response) => {
+                if (response.status === 200) {
+                    toast.success('Les différents status on été modifier avec succèss.');
+                    dispatch(fetchUsers(state.users.current_page, state.users.perPage));
+                }
+            }, error => {
+                console.log(error);
+            })
+    }
+}
 
 export const test = (user) => {
     return (dispatch, getState) => {
