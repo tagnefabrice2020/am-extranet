@@ -1,13 +1,12 @@
 import React, { useEffect } from "react";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
-import styled from "styled-components";
-import AppCalendar from "../../../components/AppCalendar";
+// import styled from "styled-components";
+// import AppCalendar from "../../../components/AppCalendar";
 import { loadStats } from "../../../redux/DashBoardCard/DashboardCardActionCreators";
 
-const Dashboard = ({ stats, loadStats, loginData }) => {
+const Dashboard = ({ stats, loadStats }) => {
     useEffect(() => {
-        console.log(stats)
         loadStats();
     }, [loadStats]);
     return (
@@ -138,53 +137,53 @@ const Dashboard = ({ stats, loadStats, loginData }) => {
     )
 }
 
-const DashboardCardLoaderBox = styled.div`
-    display: flex;
-    flex-wrap: wrap;
-    margin-right: -7.5px;
-    margin-left: -7.5px;
-    height: 165px;
-    &>div {
-        @media (min-width: 992px) {
-            flex: 0 0 25%;
-            max-width: 25%;
-        }
-        padding: 0px 7.5px;
-    }
-    &>div:nth-child(1) > div {
-        animation: skeleton-loading 1s linear infinite alternate;
-        animation-delay: 50ms;
-    }
-    &>div:nth-child(2) > div {
-        animation: skeleton-loading 1s linear infinite alternate;
-        animation-delay: 150ms;
-    }
-    &>div:nth-child(3) > div {
-        animation: skeleton-loading 1s linear infinite alternate;
-        animation-delay: 200ms;
-    }
-    &>div:nth-child(4) > div {
-        animation: skeleton-loading 1s linear infinite alternate;
-        animation-delay: 250ms;
-    }
-`
+// const DashboardCardLoaderBox = styled.div`
+//     display: flex;
+//     flex-wrap: wrap;
+//     margin-right: -7.5px;
+//     margin-left: -7.5px;
+//     height: 165px;
+//     &>div {
+//         @media (min-width: 992px) {
+//             flex: 0 0 25%;
+//             max-width: 25%;
+//         }
+//         padding: 0px 7.5px;
+//     }
+//     &>div:nth-child(1) > div {
+//         animation: skeleton-loading 1s linear infinite alternate;
+//         animation-delay: 50ms;
+//     }
+//     &>div:nth-child(2) > div {
+//         animation: skeleton-loading 1s linear infinite alternate;
+//         animation-delay: 150ms;
+//     }
+//     &>div:nth-child(3) > div {
+//         animation: skeleton-loading 1s linear infinite alternate;
+//         animation-delay: 200ms;
+//     }
+//     &>div:nth-child(4) > div {
+//         animation: skeleton-loading 1s linear infinite alternate;
+//         animation-delay: 250ms;
+//     }
+// `
 
-const DashboardCardLoader = styled.div`
-    height: 145px;
-    padding: 0px 7.5px;
-    border-radius: 30px;
-    bordr-radius: 30px;
-    margin-bottom: 20px;
+// const DashboardCardLoader = styled.div`
+//     height: 145px;
+//     padding: 0px 7.5px;
+//     border-radius: 30px;
+//     bordr-radius: 30px;
+//     margin-bottom: 20px;
     
-    @keyframes skeleton-loading {
-        0% {
-            background-color: hsl(200, 10%, 80%);
-        }
-        100% {
-            background-color:  hsl(200, 20%, 95%);
-        }
-    }
-`
+//     @keyframes skeleton-loading {
+//         0% {
+//             background-color: hsl(200, 10%, 80%);
+//         }
+//         100% {
+//             background-color:  hsl(200, 20%, 95%);
+//         }
+//     }
+// `
 const mapStateToProps = (state) => {
     return {
         stats: state.stats,

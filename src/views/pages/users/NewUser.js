@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from '@hookform/resolvers/yup';
 import { storeUser } from "../../../redux/User/UserActionCreators";
 import { connect } from "react-redux";
-import { userAdminSchema, userAgentSchema, userClientSchema } from "../../../validationRules/userSchema";
+import { userAdminSchema } from "../../../validationRules/userSchema";
 
 
 const NewUser = ({ storeUser, users }) => {
