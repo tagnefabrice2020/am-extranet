@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 import AppLogo from "../../../components/AppLogo";
@@ -7,8 +7,6 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { connect } from "react-redux";
 import { authenticate } from "../../../redux/Auth/AuthActionCreators";
 import { useTitle } from "../../../config/useTitle";
-import ReCAPTCHA from "react-google-recaptcha";
-import { toast } from "react-toastify";
 
 const loginSchema = object({
     username: string().required('L\'email est obligatoire.').typeError('Veuillez saisir un adresse mail correct.'),
@@ -19,15 +17,6 @@ const Login = ({ loginData, authenticate }) => {
 
     useTitle('Authentifier vous!')
 
-    const [verified, setVerified] = useState(false);
-
-    useEffect(() => {
-    }, [])
-
-    /*const onChange = (value) => {
-        console.log(value)
-    }*/
-
     const { register, handleSubmit, formState } = useForm({
         mode: 'unTouched',
         resolver: yupResolver(loginSchema)
@@ -36,18 +25,8 @@ const Login = ({ loginData, authenticate }) => {
     const { errors, isSubmitting, isDirty, isValid } = formState;
 
     const loginAction = (data) => {
-        if (verified) {
-            authenticate(data)
-        } else {
-            toast.error('L\'operation ne peut pas continuer, car vous n\'avez pas été verifier par le recaptha.');
-        }
-        //window.location.reload();
-        //console.log(loginData.authUser)
+        authenticate(data)
     }
-
-    const verifyRecaptchaCallback = (response) => {
-        if(response) setVerified(true)
-    } 
 
     return (
         <div className="login-box mx-auto mt-5" style={{ transform: `translate(0%,18%)` }}>
@@ -57,7 +36,6 @@ const Login = ({ loginData, authenticate }) => {
             <div className="login-logo">
                 <Link to="/login"><b>AMEXPERT-EXTRANET</b></Link>
             </div>
-            {/* /.login-logo */}
             <div className="card">
                 <div className="card-body login-card-body">
                     <p className="login-box-msg">Connectez-vous</p>
@@ -96,35 +74,19 @@ const Login = ({ loginData, authenticate }) => {
                                 <Link to="/lost-password" style={{ fontSize: `.8rem`, color: `#bf7b0c` }}>Mot de passe oublié ?</Link>
                             </p>
                         </div>
-                        <div className="row">
-                            <div className="col">
-                                <ReCAPTCHA
-                                    sitekey="6LeEYXMfAAAAAFVUq4HuvOqXMeJIByLScI0v4wfe"
-                                    onChange={verifyRecaptchaCallback}
-                                    type="image"
-                                    // https://www.google.com/recaptcha/admin/site/527655300/setup
-                                    // https://www.google.com/recaptcha/admin/site/527664127/setup
-                                />
-                            </div>
-                        </div>
                         <div className="row mt-2 mb-3">
                             <div className="col-12">
                                 <button
                                     type="submit"
                                     className="btn btn-primary btn-block g-recaptcha"
-                                    disabled={isSubmitting || (!isValid && !isDirty) || !verified}>
+                                    disabled={isSubmitting || (!isValid && !isDirty)}>
                                     {loginData.loading && `Connexion en cours...`} {!loginData.loading && `Connexion`}
-
                                 </button>
                             </div>
-                            {/* /.col */}
                         </div>
                     </form>
                 </div>
-                {/* /.login-card-body */}
             </div>
-
-            {/* /.login-box */}
         </div>
     );
 }
