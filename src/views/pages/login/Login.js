@@ -55,7 +55,7 @@ const Login = ({ loginData, authenticate }) => {
                 <AppLogo />
             </div>
             <div className="login-logo">
-                <Link to="/login"><b>AMEXPERT-EXTRANET TEST</b></Link>
+                <Link to="/login"><b>AMEXPERT-EXTRANET</b></Link>
             </div>
             {/* /.login-logo */}
             <div className="card">
