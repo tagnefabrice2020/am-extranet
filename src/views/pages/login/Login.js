@@ -67,7 +67,7 @@ const Login = ({ loginData, authenticate }) => {
                             <input
                                 type="text"
                                 className="form-control"
-                                placeholder="Email ou identifiant"
+                                placeholder="Identifiant"
                                 {...register('username')}
                             />
                             <div className="input-group-append">
