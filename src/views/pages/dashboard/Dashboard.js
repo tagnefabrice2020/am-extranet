@@ -7,6 +7,7 @@ import { loadStats } from "../../../redux/DashBoardCard/DashboardCardActionCreat
 
 const Dashboard = ({ stats, loadStats, loginData }) => {
     useEffect(() => {
+        console.log(stats)
         loadStats();
     }, [loadStats]);
     return (
@@ -17,40 +18,38 @@ const Dashboard = ({ stats, loadStats, loginData }) => {
                     <div className="row mb-2">
                         <div className="col-sm-6">
                             <h1 className="m-0">Tableau de bord</h1>
-                        </div> {/* /.col */}
+                        </div> 
+                       
                         <div className="col-sm-6">
                             <ol className="breadcrumb float-sm-right">
                                 <li className="breadcrumb-item active"><Link to="/" className="text-decoration-underline text-dark">Tableau de bord</Link></li>
                             </ol>
-                        </div> {/* /.col */}
-                    </div> {/* /.row */}
-                </div> {/* /.container-fluid */}
+                        </div> 
+                    </div> 
+                </div> 
             </div>
             {/* /.content-header */}
 
             {/* Main content*/}
             <section className="content">
                 <div className="container-fluid">
-                    {/* Small boxes (Stat box) */}
                     {stats && !stats.loading &&
                         <div className="row">
                             <div className="col-lg-3 col-6">
-                                {/* small box */}
+                                
                                 <div className="small-box bg-1">
                                     <div className="inner">
                                         <h3>{stats.totalUsers}</h3>
-
                                         <p>NOMBRE D’UTILISATEURS</p>
                                     </div>
                                     <div className="icon">
                                         <i className="fas fa-users"></i>
                                     </div>
-                                    {/*<Link to="/" className="small-box-footer">Plus d'info <i className="fas fa-arrow-circle-right"></i></Link>*/}
                                 </div>
                             </div>
                             {/* ./col */}
                             <div className="col-lg-3 col-6">
-                                {/* small box */}
+                              
                                 <div className="small-box bg-2">
                                     <div className="inner">
                                         <h3>{stats.totalAppointments}</h3>
@@ -60,7 +59,6 @@ const Dashboard = ({ stats, loadStats, loginData }) => {
                                     <div className="icon">
                                         <i className="ion ion-stats-bars"></i>
                                     </div>
-                                    {/*<Link to="/" className="small-box-footer">Plus d'info <i className="fas fa-arrow-circle-right"></i></Link>*/}
                                 </div>
                             </div>
                             {/* ./col */}
@@ -75,29 +73,24 @@ const Dashboard = ({ stats, loadStats, loginData }) => {
                                     <div className="icon">
                                         <i className="ion ion-person-add"></i>
                                     </div>
-                                    {/*<Link to="/" className="small-box-footer">Plus d'info <i className="fas fa-arrow-circle-right"></i></Link>*/}
                                 </div>
                             </div>
-                            {/* ./col */}
                             <div className="col-lg-3 col-6">
-                                {/* small box */}
                                 <div className="small-box bg-4">
                                     <div className="inner">
                                         <h3>0</h3>
-
                                         <p>MOYENNE DE RDV REALISES/(JOURS)</p>
                                     </div>
                                     <div className="icon">
                                         <i className="ion ion-pie-graph"></i>
                                     </div>
-                                    {/*<Link to="/" className="small-box-footer">Plus d'info <i className="fas fa-arrow-circle-right"></i></Link>*/}
                                 </div>
                             </div>
-                            {/* ./col */}
+                           
                         </div>
                     }
                     {/* /.row */}
-                    {stats.loading &&
+                    {/* {stats.loading &&
                         <div className="container-fluid">
                             <DashboardCardLoaderBox>
                                 <div>
@@ -114,7 +107,7 @@ const Dashboard = ({ stats, loadStats, loginData }) => {
                                 </div>
                             </DashboardCardLoaderBox>
                         </div>
-                    }
+                    } */}
 
                     <div className="row">
                         <div className="col">
@@ -132,7 +125,7 @@ const Dashboard = ({ stats, loadStats, loginData }) => {
                                     </div>
                                 </div>
                                 <div className="card-body">
-                                    <AppCalendar />
+                                    {/* <AppCalendar /> */}
                                 </div>
                                 {/* /.card */}
                             </div>

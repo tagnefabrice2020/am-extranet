@@ -28,7 +28,7 @@ const AppSidebar = ({ user }) => {
                         {/* Sidebar user panel (optional) */}
                         <div className="user-panel mt-3 pb-3 mb-3 d-flex justify-content-center align-items-center">
                             <div className="info">
-                                <Link to="/profil" className="d-block text-decoration-underline">Bienvenue, {userInfo.last_name ? userInfo.last_name : null}</Link>
+                                <Link to="/profil" className="d-block text-decoration-underline">Bienvenue, {userInfo.prenom ? userInfo.nom : null}</Link>
                             </div>
                         </div>
 

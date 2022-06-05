@@ -41,14 +41,10 @@ const Export = () => {
                 setExportDate(response.data);
                 setLoading(false);
             })
-
     }
 
     return (
         <div className="content-wrapper">
-            {/* Content Wrapper. Contains page content */}
-            {/* Content Header (Page header) */}
-
             <section className="content-header">
                 <div className="container-fluid">
                     <div className="row mb-2">
@@ -61,7 +57,7 @@ const Export = () => {
                             </ol>
                         </div>
                     </div>
-                </div>{/* /.container-fluid */}
+                </div>
             </section>
 
             {/* Main content */}
@@ -75,8 +71,6 @@ const Export = () => {
                                 <div className="card-header">
                                     <h3 className="card-title">Exporter</h3>
                                 </div>
-                                {/* /.card-header */}
-                                {/* form start */}
                                 <form onSubmit={handleSubmit(exportAppointment)}>
 
                                     <div className="card-body">
@@ -91,9 +85,6 @@ const Export = () => {
                                                 {/*<option value="daily">Journalier</option>*/}
                                             </select>
                                         </div>
-
-
-
                                         {dateType === 'interval' &&
                                             <div className="row">
                                                 <div className="col">

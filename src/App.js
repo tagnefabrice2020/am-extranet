@@ -25,7 +25,7 @@ const Login = lazy(() => import('./views/pages/login/Login'));
 // login page layout
 const LostPassword = lazy(() => import('./views/pages/login/LostPassword'));
 
-function App({ auth }) {
+function App() {
   return (
     <Provider store={store}>
       <BrowserRouter>

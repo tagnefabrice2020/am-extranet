@@ -45,33 +45,28 @@ const ListOfUsers = ({ fetchUsers, users, searchUsers, setUsersPerPage, setPage,
 
     return (
         <div className="content-wrapper">
-            {/* Content Header (Page header) */}
             <div className="content-header">
                 <div className="container-fluid">
                     <div className="row mb-2">
                         <div className="col-sm-6">
                             <h1 className="m-0">Liste d'utilisateurs</h1>
-                        </div> {/* /.col */}
+                        </div> 
                         <div className="col-sm-6">
                             <ol className="breadcrumb float-sm-right">
                                 <li className="breadcrumb-item">Utilisateurs</li>
                                 <li className="breadcrumb-item active">Liste</li>
                             </ol>
-                        </div> {/* /.col */}
-                    </div> {/* /.row */}
+                        </div> 
+                    </div> 
                     <div className="row ">
                         <div className="col">
                             <button className="btn btn-sm btn-info" onClick={() => changeBulkStatus(true)}>{users.changeBulkStatusLoading ? "Changement en cours..." : "Changer leurs status"}</button>
                         </div>
                     </div>
-                </div> {/* /.container-fluid */}
+                </div> 
             </div>
-            {/* /.content-header */}
-
-            {/* Main content*/}
             <section className="content">
                 <div className="container-fluid">
-                    {/* Small boxes (Stat box) */}
                     <div className="row">
                         <div className="col-12">
                             <div className="card">
@@ -122,7 +117,6 @@ const ListOfUsers = ({ fetchUsers, users, searchUsers, setUsersPerPage, setPage,
                                         </div>
                                     </div>
                                 </div>
-                                {/* /.card-header */}
                                 <div className="card-body table-responsive p-0">
                                     {users.loading &&
                                         <TableLoader />
@@ -148,7 +142,7 @@ const ListOfUsers = ({ fetchUsers, users, searchUsers, setUsersPerPage, setPage,
                                                         <td>{((users.currentPage * users.perPage) - users.perPage) + key + 1}</td>
                                                         <td>{user.first_name} {user.last_name}</td>
                                                         <td>{user.email}</td>
-                                                        <td> {/**{`badge ${user.role === 'adminitrateur' ? } `} **/}
+                                                        <td>
                                                             <span className={`badge ${user.role === 'administrateur' ? "badge-primary" : user.role === 'agent' ? "badge-info" :  user.role === 'client' ? "badge-success" : user.role === 'salarié' ? "badge-dark" : null} `}>
                                                                 {user.role}
                                                             </span>
@@ -168,9 +162,7 @@ const ListOfUsers = ({ fetchUsers, users, searchUsers, setUsersPerPage, setPage,
                                         </div>
                                     }
                                 </div>
-                                {/* /.card-body */}
                             </div>
-                            {/* /.card */}
                             {!users.loading && users.users.length > 0 &&
                                 <Pagination
                                     currentPage={users.currentPage}
@@ -181,10 +173,8 @@ const ListOfUsers = ({ fetchUsers, users, searchUsers, setUsersPerPage, setPage,
                             }
                         </div>
                     </div>
-                    {/* /.row (main row) */}
-                </div>{/* /.container-fluid */}
+                </div>
             </section>
-            {/* /.content */}
         </div>
     )
 }

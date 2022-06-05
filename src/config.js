@@ -1,4 +1,4 @@
-export const API_URL = 'http://admission.fobanginstitutes.org/public/api/v1';
+export const API_URL = 'http://195.15.228.250'
 
 export const getISOStringWithoutSecsAndMillisecs = (date) => {
     const dateAndTime = new Date(date).toISOString().split('T')

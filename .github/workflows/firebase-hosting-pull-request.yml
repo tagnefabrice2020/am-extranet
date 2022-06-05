@@ -13,5 +13,5 @@ jobs:
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
-          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_EXTRANET_AMEP }}'
-          projectId: extranet-amep
+          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_EXTRANET_AMEXPERT }}'
+          projectId: extranet-amexpert

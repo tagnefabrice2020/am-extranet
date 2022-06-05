@@ -135,7 +135,7 @@ export const fetchUsers = (page, perPage) => {
             UserService.fetchUsers(page, perPage)
                 .then((users) => {
                     //console.log(users)
-                    const totalPage = Math.ceil(users.total / users.per_page);
+                    const totalPage = Math.ceil(users.count / users.per_page);
                     dispatch(setPage(users.current_page));
                     dispatch(setUsersPerPage(users.per_page));
                     dispatch(setTotalPage(totalPage));
@@ -180,7 +180,8 @@ export const storeUser = (user) => {
         dispatch(storingUser());
         UserService.store(user)
             .then((response) => {
-                if(typeof(response.data) === 'string' && response.data === 'success') {
+                console.log(response.status)
+                if(response.status === 200) {
                     dispatch(resetForm());
                     toast.success('Utilisateur ajouter avec sucèss.');
                     return Promise.resolve();

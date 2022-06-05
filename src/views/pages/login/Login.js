@@ -11,18 +11,18 @@ import ReCAPTCHA from "react-google-recaptcha";
 import { toast } from "react-toastify";
 
 const loginSchema = object({
-    email: string().email('Veuillez saisir un adresse mail correct.').required('L\'email est obligatoire.').typeError('Veuillez saisir un adresse mail correct.'),
+    username: string().required('L\'email est obligatoire.').typeError('Veuillez saisir un adresse mail correct.'),
     password: string().required('Le mot de passe est obligation.').min(6, 'Le mot de passe doit être de six charactères minimum.')
 });
 
 const Login = ({ loginData, authenticate }) => {
 
-    useTitle('Authentifier vous!');
+    useTitle('Authentifier vous!')
 
     const [verified, setVerified] = useState(false);
 
     useEffect(() => {
-    }, []);
+    }, [])
 
     /*const onChange = (value) => {
         console.log(value)
@@ -46,7 +46,7 @@ const Login = ({ loginData, authenticate }) => {
     }
 
     const verifyRecaptchaCallback = (response) => {
-        if(response) setVerified(true);
+        if(response) setVerified(true)
     } 
 
     return (
@@ -55,7 +55,7 @@ const Login = ({ loginData, authenticate }) => {
                 <AppLogo />
             </div>
             <div className="login-logo">
-                <Link to="/login"><b>AMEXPERT</b></Link>
+                <Link to="/login"><b>AMEXPERT-EXTRANET TEST</b></Link>
             </div>
             {/* /.login-logo */}
             <div className="card">
@@ -68,7 +68,7 @@ const Login = ({ loginData, authenticate }) => {
                                 type="text"
                                 className="form-control"
                                 placeholder="Email ou identifiant"
-                                {...register('email')}
+                                {...register('username')}
                             />
                             <div className="input-group-append">
                                 <div className="input-group-text">
@@ -76,7 +76,7 @@ const Login = ({ loginData, authenticate }) => {
                                 </div>
                             </div>
                         </div>
-                        {errors.email && <small className="form-text is-red">{errors.email.message}</small>}
+                        {errors.username && <small className="form-text is-red">{errors.username.message}</small>}
                         <div className="input-group mb-1 mt-3">
                             <input
                                 type="password"
@@ -141,4 +141,4 @@ const mapDispatchToProps = dispatch => {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Login);
+export default connect(mapStateToProps, mapDispatchToProps)(Login)

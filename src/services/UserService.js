@@ -3,14 +3,39 @@ import { API_URL } from "../config";
 
 class UserService {
     fetchUsers (page, perPage) {
-        return axios.get(API_URL + `/users?page=${page}&perPage=${perPage}`)
+        return axios.get(API_URL + `/admin_app/admin?limit=${perPage}`)
             .then((response) => {
+                console.log(response)
                 const users = response.data.data;
                 return users;
             })
     }
 
     store (user) {
+        switch (user.role) {
+            case "1":
+                console.log(user.role);
+                return axios.post(API_URL + '/admin_app/admin/', user)
+                    .then((response) => {
+                        return response;
+                    })
+            case "2":
+                console.log(user.role);
+                return axios.post(API_URL + '/agent_app/agent/', user)
+                    .then((response) => {
+                        return response;
+                    })
+            case "3":
+                return axios.post(API_URL + '/client_app/client/', user)
+                    .then((response) => {
+                        return response;
+                    })
+            case 4:
+                break
+            default:
+                return null
+        }
+
         return axios.post(API_URL + '/users', user)
             .then((response) => {
                 return response;
