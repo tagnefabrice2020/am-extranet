@@ -22,7 +22,7 @@ export const userAdminSchema = object({
     mdp: string()
         .required('Veuillez entre le mot de passe')
         .typeError('Veuillez entrer un mot de passe valid.'),
-    role: mixed().oneOf(['1', '2', '3'], 'Veuillez choisir parmis les roles proposer.').required('Veuillez choisir parmis les roles proposer.')
+    role: mixed().oneOf(['1', '2', '3', '4'], 'Veuillez choisir parmis les roles proposer.').required('Veuillez choisir parmis les roles proposer.')
 });
 
 export const userAgentSchema =  object({

@@ -9,7 +9,7 @@ class AuthService {
             .then((response) => {
                 const user = response.data.user;
                 const token = response.data.tokens.access;
-               
+            
                 if(token && user) {
                     localStorage.setItem('user', JSON.stringify(user));
                     localStorage.setItem('authToken', token);

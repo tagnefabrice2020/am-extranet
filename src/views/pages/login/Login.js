@@ -18,7 +18,7 @@ const Login = ({ loginData, authenticate }) => {
     useTitle('Authentifier vous!')
 
     const { register, handleSubmit, formState } = useForm({
-        mode: 'unTouched',
+        mode: 'onChange',
         resolver: yupResolver(loginSchema)
     })
 
@@ -69,21 +69,24 @@ const Login = ({ loginData, authenticate }) => {
                             </div>
                         </div>
                         {errors.password && <small className="form-text is-red">{errors.password.message}</small>}
-                        <div className="row">
-                            <p className="mb-1 col">
-                                <Link to="/lost-password" style={{ fontSize: `.8rem`, color: `#bf7b0c` }}>Mot de passe oublié ?</Link>
-                            </p>
-                        </div>
-                        <div className="row mt-2 mb-3">
+                       
+                        <div className="row mt-4 mb-3">
                             <div className="col-12">
                                 <button
                                     type="submit"
                                     className="btn btn-primary btn-block g-recaptcha"
-                                    disabled={isSubmitting || (!isValid && !isDirty)}>
+                                    disabled={isSubmitting || (!isValid)}>
                                     {loginData.loading && `Connexion en cours...`} {!loginData.loading && `Connexion`}
                                 </button>
                             </div>
                         </div>
+
+                         <div className="row">
+                            <p className="mb-1 col">
+                                <Link to="/lost-password" style={{ fontSize: `.8rem`, color: `#bf7b0c` }}>Mot de passe oublié ?</Link>
+                            </p>
+                        </div>
+
                     </form>
                 </div>
             </div>

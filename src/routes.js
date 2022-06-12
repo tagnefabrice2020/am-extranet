@@ -22,7 +22,7 @@ const routes = [
     {path: '/utilisateurs', auth: true, name:'List des utilisateurs', element: ListOfUsers},
     {path: '/rendez-vous', auth: true, name:'List des Rendez-vous', element: ListOfAppointment},
     {path: '/ajouter/utilisateur', auth: true, name:'Ajouter un utilisateur', element: NewUser},
-    {path: '/modifier/:uuid/utilisateur', auth: true, name: 'Modifier un utilisateur', element: EditUser},
+    {path: '/modifier/:uuid/:type/utilisateur', auth: true, name: 'Modifier un utilisateur', element: EditUser},
     {path: '/ajouter/un/rendez-vous', auth: true, name: 'Ajouter un rendez-vous', element: NewAppointment},
     {path: '/modifier/:uuid/rendez-vous', auth: true, name: 'modifier le rendez-vous', element: EditAppointment},
     {path: '/exporter', auth: true, name: 'exporter', element: Exporter},
