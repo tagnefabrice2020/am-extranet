@@ -143,6 +143,7 @@ export const fetchSingleUserFailed = () => {
 };
 
 export const fetchUsers = (page, perPage) => {
+  console.log(page, perPage);
   return (dispatch, getState) => {
     const state = getState();
     const users = state.users;
@@ -150,12 +151,11 @@ export const fetchUsers = (page, perPage) => {
     if (users.searchValue.length <= 0) {
       UserService.fetchUsers(page, perPage).then(
         (users) => {
-          const totalPage = Math.ceil(users.count / perPage);
-          console.log(totalPage)
-          dispatch(setPage(users.current_page));
-          dispatch(setUsersPerPage(users.per_page));
+          const totalPage = Math.ceil(users.count / 10);
+          dispatch(setPage(page));
+          dispatch(setUsersPerPage(perPage));
           dispatch(setTotalPage(totalPage));
-          dispatch(fetchUsersSuccess(users.results, users.last_page));
+          dispatch(fetchUsersSuccess(users.results));
           return Promise.resolve();
         },
         (error) => {
@@ -215,7 +215,7 @@ export const storeUser = (user) => {
 
 export const fetchOneUser = (user, type) => {
   return (dispatch) => {
-      console.log(user)
+    console.log(user);
     dispatch(fetchOneUserRequest());
     UserService.fetchOneUser(user, type).then(
       (user) => {
@@ -256,6 +256,7 @@ export const updateUser = (user, uuid) => {
       },
       (error) => {
         console.log(error);
+        toast.error("La modification de l'utilisateur a échouée.");
       }
     );
   };
@@ -287,4 +288,3 @@ export const test = (user) => {
     console.log(state);
   };
 };
-

@@ -77,9 +77,20 @@ class UserService {
     });
   }
 
-  updateUser(user, uuid) {
+  updateUser(user, id) {
+    let url;
+    if (user.role === "1") {
+      url = `/admin_app/admin/${id}`;
+    } else if (user.role === "2") {
+      console.log(user.type);
+      url = `/agent_app/agent/${id}`;
+    } else if (user.role === "3") {
+      url = `/client_app/client/${id}`;
+    } else if (user.role === "4") {
+      url = `/salarie_app/salarie/${id}`;
+    }
     return axios
-      .patch(API_URL + `/users/${uuid}/update`, user)
+      .put(API_URL + `${url}`, user)
       .then((response) => {
         return response;
       });

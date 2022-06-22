@@ -44,13 +44,15 @@ const ListOfUsers = ({
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      searchUsers(users.currentPage, parseInt(users.perPage));
+      if (users.searchValue.length > 0) {
+        searchUsers(users.currentPage, parseInt(users.perPage));
+      }
     }, 1500);
     return () => clearTimeout(timer);
   }, [users.searchValue, users.currentPage, searchUsers, users.perPage]);
 
   useEffect(() => {
-    // console.log(users)
+    console.log(users.loading, users.initialUsers);
   });
 
   const setStatus = (uuid) => {
@@ -84,18 +86,6 @@ const ListOfUsers = ({
                 <li className="breadcrumb-item">Utilisateurs</li>
                 <li className="breadcrumb-item active">Liste</li>
               </ol>
-            </div>
-          </div>
-          <div className="row ">
-            <div className="col">
-              <button
-                className="btn btn-sm btn-info"
-                onClick={() => changeBulkStatus(true)}
-              >
-                {users.changeBulkStatusLoading
-                  ? "Changement en cours..."
-                  : "Changer leurs status"}
-              </button>
             </div>
           </div>
         </div>
@@ -167,7 +157,7 @@ const ListOfUsers = ({
                             <em>Nom</em>
                           </th>
                           <th>Email</th>
-                          <th>Role</th>
+                          <th className="text-center">Role</th>
                           <th></th>
                           <th></th>
                         </tr>
@@ -176,17 +166,12 @@ const ListOfUsers = ({
                         {users.users.map((user, key) => (
                           <tr key={key}>
                             {/* <td className="checkmark-box"><div className={users.selectedUsers.includes(user.uuid) ? "checkmark checked": "checkmark"} onClick={() => switchSelected(user.uuid)}></div></td> */}
-                            <td>
-                              {users.currentPage * users.perPage -
-                                users.perPage +
-                                key +
-                                1}
-                            </td>
+                            <td>{users.currentPage * 10 - 10 + key + 1}</td>
                             <td>
                               {user.first_name} {user.last_name}
                             </td>
                             <td>{user.email}</td>
-                            <td>
+                            <td className="text-center">
                               {user.groups.map((group, idx) => {
                                 let role = group.group.toLowerCase();
                                 if (role === "administrateur") {

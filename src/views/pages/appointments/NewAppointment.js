@@ -60,16 +60,18 @@ const NewAppointment = ({ storeAppointment, appointments }) => {
 
   useEffect(() => {
     async function fetchInterventions() {
-      await axios.get(API_URL + `/interventions`)
+      await axios.get(API_URL + `/config_app/intervention`)
         .then((response) => {
+          console.log(response)
           setInterventions(response.data);
           setInterventionLoading(false);
         })
     }
 
     async function fetchPropertyTypes() {
-      await axios.get(API_URL + `/property_types`)
+      await axios.get(API_URL + `/config_app/propriete/`)
         .then((response) => {
+          console.log(response)
           setPropertyTypes(response.data);
           setPropertyTypesLoading(false);
         })
