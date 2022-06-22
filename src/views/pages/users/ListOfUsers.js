@@ -22,8 +22,7 @@ const ListOfUsers = ({
   setPage,
   searching,
   switchUserStatus,
-  selectUsers,
-  changeBulkStatus,
+  selectUsers
 }) => {
   useEffect(() => {
     if (users.searchValue.length > 0) {
@@ -57,20 +56,6 @@ const ListOfUsers = ({
 
   const setStatus = (uuid) => {
     switchUserStatus(uuid);
-  };
-
-  const switchSelected = (uuid) => {
-    let selectedUsers = users.selectedUsers;
-    let userIdx = selectedUsers.findIndex((user) => {
-      return user === uuid;
-    });
-    if (userIdx === -1) {
-      selectedUsers.push(uuid);
-      selectUsers(selectedUsers);
-    } else {
-      selectedUsers.splice(userIdx, 1);
-      selectUsers(selectedUsers);
-    }
   };
 
   return (
