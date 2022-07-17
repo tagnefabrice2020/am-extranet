@@ -22,7 +22,7 @@ const Login = ({ loginData, authenticate }) => {
         resolver: yupResolver(loginSchema)
     })
 
-    const { errors, isSubmitting, isDirty, isValid } = formState;
+    const { errors, isSubmitting, isValid } = formState;
 
     const loginAction = (data) => {
         authenticate(data)

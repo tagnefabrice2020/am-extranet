@@ -1,5 +1,5 @@
 import { yupResolver } from "@hookform/resolvers/yup";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { object, string, mixed } from "yup";
 import axios from "axios";
@@ -14,6 +14,7 @@ import styled from "styled-components";
 
 const EditUser = ({ users, fetchOneUser, updateUser }) => {
   const { uuid, type } = useParams();
+  const [userId, setUserId] = useState(null);
 
   const userSchema = object({
     prenom: string()
@@ -33,26 +34,68 @@ const EditUser = ({ users, fetchOneUser, updateUser }) => {
         "check-if-user-exist",
         "Il exist déjà un client avec cette email.",
         async (value) => {
-          console.log(value);
           value = value?.length === 0 ? "empty" : value;
-          const result = await axios.get(
-            API_URL + `/manager_app/checker/?email=/${value}&id/${uuid}`
-          );
-          return result.data !== 1;
+          let result
+          if (userId) {
+            result = await axios.get(
+              API_URL + `/manager_app/checker?email=${value}&id=${userId}`
+            );
+            if (result.data.status === "good" ) return true;
+          } else {
+            return true
+          }
         }
       ),
-    role: mixed()
-      .oneOf(
-        ["1", "3", "2", "4"],
-        "Vous devez choisir parmis les options prescrit."
-      )
-      .required("Veuillez choisir une option.")
-      .typeError("Vous devez choisir parmis les options prescrit."),
-    telephone: string().required("Veuillez saisir le numero de téléphone."),
+    role: mixed().oneOf(
+      ["1", "2", "3", "4"],
+      "Veuillez choisir parmis les roles proposer."
+    ),
+    fonction: string().when("role", {
+      is: (type) => type === "salarie",
+      then: string()
+        .required("Veuillez choisir parmis les roles proposer.")
+        .typeError("Veuillez entrer les chaine de charactères"),
+    }),
+    titre: string().when("role", {
+      is: (type) => type === "salarie",
+      then: string()
+        .required("Veuillez choisir parmis les roles proposer.")
+        .typeError("Veuillez entrer les chaine de charactères"),
+    }),
+    trigramme: string().when("role", {
+      is: (type) => type === "agent",
+      then: string()
+        .required("Veuillez saisir le trigramme.")
+        .typeError("Veuillez entrer les chaine de charactères"),
+    }),
+    mobile: string().when("role", {
+      is: (type) => type === "salarie",
+      then: string()
+        .required("Veuillez choisir parmis les roles proposer.")
+        .typeError("Veuillez entrer les chaine de charactères"),
+    }),
+    agent: string().when("role", {
+      is: (type) => type === "salarie",
+      then: string()
+        .required("Veuillez choisir parmis les roles proposer.")
+        .typeError("Veuillez entrer les chaine de charactères"),
+    }),
+    telephone: string().when("role", {
+      is: (type) => type === "administrateur",
+      then: string()
+        .required("Veuillez saisir le numéro de téléphone.")
+        .typeError("Veuillez entrer les chaine de charactères"),
+    }),
+    adresse: string().when("role", {
+      is: (type) => type !== "salarie",
+      then: string()
+        .required("Veuillez entrer l'adresse.")
+        .typeError("Veuillez entrer les chaine de charactères"),
+    }),
   });
 
   const { register, formState, handleSubmit } = useForm({
-    mode: "onChange",
+    mode: "onTouched",
     resolver: yupResolver(userSchema),
   });
 
@@ -60,9 +103,16 @@ const EditUser = ({ users, fetchOneUser, updateUser }) => {
     fetchOneUser(uuid, type);
   }, [uuid, type, fetchOneUser]);
 
+  useEffect(() => {
+    if (!users.oneUserLoading) {
+      setUserId(users?.oneUser?.user?.id);
+    }
+  });
+
   const { isSubmitting, errors, isValid } = formState;
 
   const editUser = (data) => {
+    console.log(data);
     updateUser(data, uuid);
   };
 
@@ -141,7 +191,7 @@ const EditUser = ({ users, fetchOneUser, updateUser }) => {
                                   "form-control " +
                                   (errors.login && ` is-border-red`)
                                 }
-                                value={users.oneUser.user.login}
+                                defaultValue={users.oneUser.user.login}
                                 placeholder="Le login"
                                 {...register("login")}
                               />
@@ -161,7 +211,7 @@ const EditUser = ({ users, fetchOneUser, updateUser }) => {
                                   "form-control " +
                                   (errors.prenom && ` is-border-red`)
                                 }
-                                value={users.oneUser.user.prenom}
+                                defaultValue={users.oneUser.user.prenom}
                                 placeholder="Prénom de l'utilisateur"
                                 {...register("prenom")}
                               />
@@ -184,7 +234,7 @@ const EditUser = ({ users, fetchOneUser, updateUser }) => {
                                   "form-control " +
                                   (errors.nom && `is-border-red`)
                                 }
-                                value={users.oneUser.user.nom}
+                                defaultValue={users.oneUser.user.nom}
                                 placeholder="Nom de l'utilisateur"
                                 {...register("nom")}
                               />
@@ -204,7 +254,7 @@ const EditUser = ({ users, fetchOneUser, updateUser }) => {
                                   "form-control " +
                                   (errors.email && `is-border-red`)
                                 }
-                                value={users.oneUser.user.email}
+                                defaultValue={users.oneUser.user.email}
                                 placeholder="Entre votre email"
                                 {...register("email")}
                               />
@@ -218,59 +268,162 @@ const EditUser = ({ users, fetchOneUser, updateUser }) => {
                         </div>
 
                         <div className="row">
-                          <div className="col">
-                            <div className="form-group">
-                              <label htmlFor="adresse">Adresse</label>
-                              <input
-                                type="text"
-                                className={
-                                  "form-control " +
-                                  (errors.adresse && `is-border-red`)
-                                }
-                                value={users.oneUser.adresse}
-                                placeholder="Entre votre adresse"
-                                {...register("adresse")}
-                              />
-                              {errors.adresse && (
-                                <small className="form-text is-red">
-                                  {errors.adresse.message}
-                                </small>
-                              )}
+                          {type !== "salarie" && (
+                            <div className="col">
+                              <div className="form-group">
+                                <label htmlFor="adresse">Adresse</label>
+                                <input
+                                  type="text"
+                                  className={
+                                    "form-control " +
+                                    (errors.adresse && `is-border-red`)
+                                  }
+                                  {...register("adresse")}
+                                  defaultValue={users.oneUser.adresse}
+                                  placeholder="Entre votre adresse"
+                                />
+                                {errors.adresse && (
+                                  <small className="form-text is-red">
+                                    {errors.adresse.message}
+                                  </small>
+                                )}
+                              </div>
                             </div>
-                          </div>
-                          <div className="col">
-                            {" "}
-                            <div className="form-group">
-                              <label htmlFor="exampleInputEmail1">
-                                Téléphone
-                              </label>
-                              <input
-                                type="text"
-                                className={
-                                  "form-control " +
-                                  (errors.telephone && `is-border-red`)
-                                }
-                                value={users.oneUser.telephone}
-                                placeholder="Entre le numéro de telephone"
-                                {...register("telephone")}
-                              />
-                              {errors.telephone && (
-                                <small className="form-text is-red">
-                                  {errors.telephone.message}
-                                </small>
-                              )}
+                          )}
+                           {type === "agent" && (
+                            <div className="col">
+                              <div className="form-group">
+                                <label htmlFor="trigramme">Trigramme</label>
+                                <input
+                                  type="text"
+                                  className={
+                                    "form-control " +
+                                    (errors.trigramme && `is-border-red`)
+                                  }
+                                  {...register("trigramme")}
+                                  defaultValue={users.oneUser.trigramme}
+                                  placeholder="Entre le trigramme"
+                                />
+                                {errors.trigramme && (
+                                  <small className="form-text is-red">
+                                    {errors.trigramme.message}
+                                  </small>
+                                )}
+                              </div>
                             </div>
-                          </div>
-                        </div>
+                          )}
+                          {type === "administrateur" && (
+                            <div className="col">
+                              <div className="form-group">
+                                <label htmlFor="exampleInputEmail1">
+                                  Téléphone
+                                </label>
+                                <input
+                                  type="text"
+                                  className={
+                                    "form-control " +
+                                    (errors.telephone && `is-border-red`)
+                                  }
+                                  defaultValue={users.oneUser.telephone}
+                                  placeholder="Entre le numéro de telephone"
+                                  {...register("telephone")}
+                                />
+                                {errors.telephone && (
+                                  <small className="form-text is-red">
+                                    {errors.telephone.message}
+                                  </small>
+                                )}
+                              </div>
+                            </div>
+                          )}
 
+                          {type === "salarie" && (
+                            <div className="col">
+                              <div className="form-group">
+                                <label htmlFor="Mobile">Mobile</label>
+                                <input
+                                  defaultValue={users.oneUser?.mobile}
+                                  className={
+                                    "form-control " +
+                                    (errors.mobile && `is-border-red`)
+                                  }
+                                  {...register("mobile")}
+                                />
+                                {errors.mobile && (
+                                  <small className="form-text is-red">
+                                    {errors.mobile.message}
+                                  </small>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                        {type === "salarie" && (
+                          <div className="row">
+                            <div className="col">
+                              <div className="form-group">
+                                <label htmlFor="Titre">Titre</label>
+                                <input
+                                  defaultValue={users.oneUser?.titre}
+                                  className={
+                                    "form-control " +
+                                    (errors.titre && `is-border-red`)
+                                  }
+                                  {...register("titre")}
+                                />
+                                {errors.titre && (
+                                  <small className="form-text is-red">
+                                    {errors.titre.message}
+                                  </small>
+                                )}
+                              </div>
+                            </div>
+                            <div className="col">
+                              <div className="form-group">
+                                <label htmlFor="fonction">Fonction</label>
+                                <input
+                                  defaultValue={users.oneUser?.fonction}
+                                  className={
+                                    "form-control " +
+                                    (errors.fonction && `is-border-red`)
+                                  }
+                                  {...register("fonction")}
+                                />
+                                {errors.fonction && (
+                                  <small className="form-text is-red">
+                                    {errors.fonction.message}
+                                  </small>
+                                )}
+                              </div>
+                            </div>
+
+                            <div className="col">
+                              <div className="form-group">
+                                <label htmlFor="Agent">Agent</label>
+                                <input
+                                  defaultValue={1}
+                                  className={
+                                    "form-control " +
+                                    (errors.agent && `is-border-red`)
+                                  }
+                                  {...register("agent")}
+                                />
+                                {errors.agent && (
+                                  <small className="form-text is-red">
+                                    {errors.agent.message}
+                                  </small>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        )}
                         <div className="form-group">
                           <label htmlFor="role">Role</label>
                           <select
                             className={
                               "form-control " + (errors.role && `is-border-red`)
                             }
-                            {...register("role")}
-                            value={
+                            defaultValue={
                               users.oneUser.user.group.toLowerCase() ===
                               "administrateur"
                                 ? 1
@@ -285,6 +438,7 @@ const EditUser = ({ users, fetchOneUser, updateUser }) => {
                                 ? 4
                                 : null
                             }
+                            {...register("role")}
                           >
                             <option value="1">Administrateur</option>
                             <option value="2">Agent</option>
@@ -303,7 +457,7 @@ const EditUser = ({ users, fetchOneUser, updateUser }) => {
                         <button
                           type="submit"
                           className="btn btn-primary"
-                          disabled={isSubmitting || !isValid}
+                          disabled={isSubmitting}
                         >
                           {isSubmitting
                             ? "Sauvegarde en cours..."
@@ -361,7 +515,6 @@ const FormBlockAnimation = styled.div`
       0% {
         background-color: hsl(200, 10%, 80%);
       }
-
       100% {
         background-color: hsl(200, 20%, 95%);
       }
@@ -378,7 +531,6 @@ const FormBlockAnimation = styled.div`
       0% {
         background-color: hsl(200, 10%, 80%);
       }
-
       100% {
         background-color: hsl(200, 20%, 95%);
       }

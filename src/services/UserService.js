@@ -58,21 +58,15 @@ class UserService {
   fetchOneUser(id, type) {
     let url;
     if (type === "administrateur") {
-      console.log(type);
       url = `/admin_app/admin/${id}`;
     } else if (type === "agent") {
-      console.log(type);
       url = `/agent_app/agent/${id}`;
     } else if (type === "client") {
-      console.log(type);
       url = `/client_app/client/${id}`;
     } else if (type === "salarie") {
-      console.log(type);
       url = `/salarie_app/salarie/${id}`;
     }
-    console.log(url, type, id);
     return axios.get(API_URL + url).then((response) => {
-      console.log(response.data[0]);
       return response.data[0];
     });
   }
@@ -89,11 +83,12 @@ class UserService {
     } else if (user.role === "4") {
       url = `/salarie_app/salarie/${id}`;
     }
-    return axios
-      .put(API_URL + `${url}`, user)
-      .then((response) => {
-        return response;
-      });
+    console.log(API_URL + `${url}`)
+    delete user['role']
+    console.log(user)
+    return axios.put(API_URL + `${url}`, user).then((response) => {
+      return response;
+    });
   }
 
   switchUserBulkStatus(data) {

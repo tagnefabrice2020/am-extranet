@@ -143,7 +143,6 @@ export const fetchSingleUserFailed = () => {
 };
 
 export const fetchUsers = (page, perPage) => {
-  console.log(page, perPage);
   return (dispatch, getState) => {
     const state = getState();
     const users = state.users;
@@ -215,7 +214,6 @@ export const storeUser = (user) => {
 
 export const fetchOneUser = (user, type) => {
   return (dispatch) => {
-    console.log(user);
     dispatch(fetchOneUserRequest());
     UserService.fetchOneUser(user, type).then(
       (user) => {
@@ -253,6 +251,7 @@ export const updateUser = (user, uuid) => {
         if (response.status === 200) {
           toast.success("L'utilisateur enregistrer avec sucess.");
         }
+        console.log(response)
       },
       (error) => {
         console.log(error);

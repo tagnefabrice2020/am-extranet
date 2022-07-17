@@ -50,10 +50,6 @@ const ListOfUsers = ({
     return () => clearTimeout(timer);
   }, [users.searchValue, users.currentPage, searchUsers, users.perPage]);
 
-  useEffect(() => {
-    console.log(users.loading, users.initialUsers);
-  });
-
   const setStatus = (uuid) => {
     switchUserStatus(uuid);
   };

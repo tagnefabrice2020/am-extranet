@@ -144,9 +144,9 @@ export const UserReducers = (state = initialState, action) => {
     case FETCH_ONE_USER_SUCCESS:
       return {
         ...state,
-        oneUserLoading: false,
-        oneUserLoadingError: false,
         oneUser: action.payload,
+        oneUserLoadingError: false,
+        oneUserLoading: false,
       };
     case FETCH_ONE_USER_ERROR:
       return {
