@@ -12,8 +12,8 @@ import {
 import { connect } from "react-redux";
 import styled from "styled-components";
 
-const EditUser = ({ users, fetchOneUser, updateUser }) => {
-  const { uuid, type } = useParams();
+const EditAgent = ({ users, fetchOneUser, updateUser }) => {
+  const { uuid } = useParams();
   const [userId, setUserId] = useState(null);
 
   const userSchema = object({
@@ -35,63 +35,27 @@ const EditUser = ({ users, fetchOneUser, updateUser }) => {
         "Il exist déjà un client avec cette email.",
         async (value) => {
           value = value?.length === 0 ? "empty" : value;
-          let result
+          let result;
           if (userId) {
             result = await axios.get(
               API_URL + `/manager_app/checker?email=${value}&id=${userId}`
             );
-            if (result.data.status === "good" ) return true;
+            if (result.data.status === "good") return true;
           } else {
-            return true
+            return true;
           }
         }
       ),
+    adresse: string()
+      .required("Veuillez saisir l'adresse")
+      .typeError("Veuillez saisir des characters alphabetic."),
+    trigramme: string()
+      .required("Veuillez saisir le trigramme")
+      .typeError("Veuillez saisir des characters alphabetic."),
     role: mixed().oneOf(
       ["1", "2", "3", "4"],
       "Veuillez choisir parmis les roles proposer."
     ),
-    fonction: string().when("role", {
-      is: (type) => type === "salarie",
-      then: string()
-        .required("Veuillez choisir parmis les roles proposer.")
-        .typeError("Veuillez entrer les chaine de charactères"),
-    }),
-    titre: string().when("role", {
-      is: (type) => type === "salarie",
-      then: string()
-        .required("Veuillez choisir parmis les roles proposer.")
-        .typeError("Veuillez entrer les chaine de charactères"),
-    }),
-    trigramme: string().when("role", {
-      is: (type) => type === "agent",
-      then: string()
-        .required("Veuillez saisir le trigramme.")
-        .typeError("Veuillez entrer les chaine de charactères"),
-    }),
-    mobile: string().when("role", {
-      is: (type) => type === "salarie",
-      then: string()
-        .required("Veuillez choisir parmis les roles proposer.")
-        .typeError("Veuillez entrer les chaine de charactères"),
-    }),
-    agent: string().when("role", {
-      is: (type) => type === "salarie",
-      then: string()
-        .required("Veuillez choisir parmis les roles proposer.")
-        .typeError("Veuillez entrer les chaine de charactères"),
-    }),
-    telephone: string().when("role", {
-      is: (type) => type === "administrateur",
-      then: string()
-        .required("Veuillez saisir le numéro de téléphone.")
-        .typeError("Veuillez entrer les chaine de charactères"),
-    }),
-    adresse: string().when("role", {
-      is: (type) => type !== "salarie",
-      then: string()
-        .required("Veuillez entrer l'adresse.")
-        .typeError("Veuillez entrer les chaine de charactères"),
-    }),
   });
 
   const { register, formState, handleSubmit } = useForm({
@@ -100,16 +64,16 @@ const EditUser = ({ users, fetchOneUser, updateUser }) => {
   });
 
   useEffect(() => {
-    fetchOneUser(uuid, type);
-  }, [uuid, type, fetchOneUser]);
+    fetchOneUser(uuid, "agent");
+  }, [uuid, fetchOneUser]);
 
   useEffect(() => {
     if (!users.oneUserLoading) {
       setUserId(users?.oneUser?.user?.id);
     }
-  });
+  }, [users.oneUserLoading, users?.oneUser?.user?.id]);
 
-  const { isSubmitting, errors, isValid } = formState;
+  const { isSubmitting, errors } = formState;
 
   const editUser = (data) => {
     console.log(data);
@@ -215,7 +179,7 @@ const EditUser = ({ users, fetchOneUser, updateUser }) => {
                                 placeholder="Prénom de l'utilisateur"
                                 {...register("prenom")}
                               />
-                              {errors.firstname && (
+                              {errors.prenom && (
                                 <small className="form-text is-red">
                                   {errors.prenom.message}
                                 </small>
@@ -238,7 +202,7 @@ const EditUser = ({ users, fetchOneUser, updateUser }) => {
                                 placeholder="Nom de l'utilisateur"
                                 {...register("nom")}
                               />
-                              {errors.lastname && (
+                              {errors.nom && (
                                 <small className="form-text is-red">
                                   {errors.nom.message}
                                 </small>
@@ -265,161 +229,57 @@ const EditUser = ({ users, fetchOneUser, updateUser }) => {
                               )}
                             </div>
                           </div>
+                          <div className="col">
+                            <div className="form-group">
+                              <label htmlFor="exampleInputEmail1">
+                                Trigramme
+                              </label>
+                              <input
+                                type="text"
+                                className={
+                                  "form-control " +
+                                  (errors.trigramme && `is-border-red`)
+                                }
+                                defaultValue={users.oneUser.trigramme}
+                                placeholder="Entre le trigramme"
+                                {...register("trigramme")}
+                              />
+                              {errors.trigramme && (
+                                <small className="form-text is-red">
+                                  {errors.trigramme.message}
+                                </small>
+                              )}
+                            </div>
+                          </div>
                         </div>
 
                         <div className="row">
-                          {type !== "salarie" && (
-                            <div className="col">
-                              <div className="form-group">
-                                <label htmlFor="adresse">Adresse</label>
-                                <input
-                                  type="text"
-                                  className={
-                                    "form-control " +
-                                    (errors.adresse && `is-border-red`)
-                                  }
-                                  {...register("adresse")}
-                                  defaultValue={users.oneUser.adresse}
-                                  placeholder="Entre votre adresse"
-                                />
-                                {errors.adresse && (
-                                  <small className="form-text is-red">
-                                    {errors.adresse.message}
-                                  </small>
-                                )}
-                              </div>
-                            </div>
-                          )}
-                           {type === "agent" && (
-                            <div className="col">
-                              <div className="form-group">
-                                <label htmlFor="trigramme">Trigramme</label>
-                                <input
-                                  type="text"
-                                  className={
-                                    "form-control " +
-                                    (errors.trigramme && `is-border-red`)
-                                  }
-                                  {...register("trigramme")}
-                                  defaultValue={users.oneUser.trigramme}
-                                  placeholder="Entre le trigramme"
-                                />
-                                {errors.trigramme && (
-                                  <small className="form-text is-red">
-                                    {errors.trigramme.message}
-                                  </small>
-                                )}
-                              </div>
-                            </div>
-                          )}
-                          {type === "administrateur" && (
-                            <div className="col">
-                              <div className="form-group">
-                                <label htmlFor="exampleInputEmail1">
-                                  Téléphone
-                                </label>
-                                <input
-                                  type="text"
-                                  className={
-                                    "form-control " +
-                                    (errors.telephone && `is-border-red`)
-                                  }
-                                  defaultValue={users.oneUser.telephone}
-                                  placeholder="Entre le numéro de telephone"
-                                  {...register("telephone")}
-                                />
-                                {errors.telephone && (
-                                  <small className="form-text is-red">
-                                    {errors.telephone.message}
-                                  </small>
-                                )}
-                              </div>
-                            </div>
-                          )}
-
-                          {type === "salarie" && (
-                            <div className="col">
-                              <div className="form-group">
-                                <label htmlFor="Mobile">Mobile</label>
-                                <input
-                                  defaultValue={users.oneUser?.mobile}
-                                  className={
-                                    "form-control " +
-                                    (errors.mobile && `is-border-red`)
-                                  }
-                                  {...register("mobile")}
-                                />
-                                {errors.mobile && (
-                                  <small className="form-text is-red">
-                                    {errors.mobile.message}
-                                  </small>
-                                )}
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                        {type === "salarie" && (
-                          <div className="row">
-                            <div className="col">
-                              <div className="form-group">
-                                <label htmlFor="Titre">Titre</label>
-                                <input
-                                  defaultValue={users.oneUser?.titre}
-                                  className={
-                                    "form-control " +
-                                    (errors.titre && `is-border-red`)
-                                  }
-                                  {...register("titre")}
-                                />
-                                {errors.titre && (
-                                  <small className="form-text is-red">
-                                    {errors.titre.message}
-                                  </small>
-                                )}
-                              </div>
-                            </div>
-                            <div className="col">
-                              <div className="form-group">
-                                <label htmlFor="fonction">Fonction</label>
-                                <input
-                                  defaultValue={users.oneUser?.fonction}
-                                  className={
-                                    "form-control " +
-                                    (errors.fonction && `is-border-red`)
-                                  }
-                                  {...register("fonction")}
-                                />
-                                {errors.fonction && (
-                                  <small className="form-text is-red">
-                                    {errors.fonction.message}
-                                  </small>
-                                )}
-                              </div>
-                            </div>
-
-                            <div className="col">
-                              <div className="form-group">
-                                <label htmlFor="Agent">Agent</label>
-                                <input
-                                  defaultValue={1}
-                                  className={
-                                    "form-control " +
-                                    (errors.agent && `is-border-red`)
-                                  }
-                                  {...register("agent")}
-                                />
-                                {errors.agent && (
-                                  <small className="form-text is-red">
-                                    {errors.agent.message}
-                                  </small>
-                                )}
-                              </div>
+                          <div className="col">
+                            <div className="form-group">
+                              <label htmlFor="adresse">Adresse</label>
+                              <input
+                                type="text"
+                                className={
+                                  "form-control " +
+                                  (errors.adresse && `is-border-red`)
+                                }
+                                {...register("adresse")}
+                                defaultValue={users.oneUser.adresse}
+                                placeholder="Entre votre adresse"
+                              />
+                              {errors.adresse && (
+                                <small className="form-text is-red">
+                                  {errors.adresse.message}
+                                </small>
+                              )}
                             </div>
                           </div>
-                        )}
+                        </div>
+
                         <div className="form-group">
-                          <label htmlFor="role">Role</label>
+                          {/* <label htmlFor="role">Role</label> */}
                           <select
+                            hidden
                             className={
                               "form-control " + (errors.role && `is-border-red`)
                             }
@@ -538,4 +398,4 @@ const FormBlockAnimation = styled.div`
   }
 `;
 
-export default connect(mapStateToProps, mapDispatchToProps)(EditUser);
+export default connect(mapStateToProps, mapDispatchToProps)(EditAgent);
