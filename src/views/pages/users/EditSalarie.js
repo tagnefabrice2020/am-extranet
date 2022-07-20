@@ -78,7 +78,7 @@ const EditSalarie = ({ users, fetchOneUser, updateUser }) => {
 
   useEffect(() => {
     if (!users.oneUserLoading) {
-      console.log(users.oneUser.agent_rattache.id);
+      console.log(users.oneUser?.agent_rattache?.id);
     }
   });
 
