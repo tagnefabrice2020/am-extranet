@@ -60,7 +60,7 @@ const NewAppointment = ({ storeAppointment, appointments }) => {
 
   useEffect(() => {
     async function fetchInterventions() {
-      await axios.get(API_URL + `/config_app/intervention`)
+      await axios.get(API_URL + `/config_app/intervention/`)
         .then((response) => {
           console.log(response)
           setInterventions(response.data);
@@ -78,7 +78,7 @@ const NewAppointment = ({ storeAppointment, appointments }) => {
     }
 
     async function fetchAgents() {
-      await axios.get(API_URL + `/user_types/agent`)
+      await axios.get(API_URL + `/user_types/agent/`)
         .then((response) => {
           setAgents(response.data);
           setAgentsLoading(false);
@@ -86,7 +86,7 @@ const NewAppointment = ({ storeAppointment, appointments }) => {
     }
 
     async function fetchClients() {
-      await axios.get(API_URL + `/user_types/client`)
+      await axios.get(API_URL + `/user_types/client/`)
         .then((response) => {
           setClients(response.data);
           setClientsLoading(false);
