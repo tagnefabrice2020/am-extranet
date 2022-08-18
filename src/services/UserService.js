@@ -42,8 +42,9 @@ class UserService {
 
   async search(value, page, perPage) {
     return axios
-      .get(API_URL + `/users/${value}/search?page=${page}&perPage=${perPage}`)
+      .get(API_URL + `/admin_app/users/?value=${value}&page=${page}&perPage=${perPage}`)
       .then((response) => {
+        console.log(response)
         const users = response.data.data;
         return users;
       });

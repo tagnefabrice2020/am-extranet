@@ -27,11 +27,11 @@ const ListOfUsers = ({
   useEffect(() => {
     if (users.searchValue.length > 0) {
       const timer = setTimeout(() => {
-        searchUsers(users.currentPage, parseInt(users.perPage));
+        searchUsers(users?.currentPage, parseInt(users?.perPage));
       }, 1500);
       return () => clearTimeout(timer);
     } else {
-      fetchUsers(users.currentPage, parseInt(users.perPage));
+      fetchUsers(users?.currentPage, parseInt(users?.perPage));
     }
   }, [
     users.perPage,
@@ -44,11 +44,11 @@ const ListOfUsers = ({
   useEffect(() => {
     const timer = setTimeout(() => {
       if (users.searchValue.length > 0) {
-        searchUsers(users.currentPage, parseInt(users.perPage));
+        searchUsers(users?.currentPage, parseInt(users?.perPage));
       }
     }, 1500);
     return () => clearTimeout(timer);
-  }, [users.searchValue, users.currentPage, searchUsers, users.perPage]);
+  }, [users.searchValue, users?.currentPage, searchUsers, users?.perPage]);
 
   const setStatus = (uuid) => {
     switchUserStatus(uuid);
@@ -78,21 +78,7 @@ const ListOfUsers = ({
               <div className="card">
                 <div className="card-header">
                   <h3 className="card-title">
-                    <select
-                      className="form-control"
-                      style={{
-                        padding: `0.175rem`,
-                        height: `calc(1.8125rem + 2px)`,
-                      }}
-                      onChange={(event) => {
-                        setUsersPerPage(event.target.value);
-                        setPage(1);
-                      }}
-                    >
-                      <option value="5">5</option>
-                      <option value="10">10</option>
-                      <option value="15">15</option>
-                    </select>
+                    
                   </h3>
 
                   <div className="card-tools">
@@ -297,8 +283,7 @@ const mapDispatchToProps = (dispatch) => {
     setUsersPerPage: (perPage) => dispatch(setUsersPerPage(perPage)),
     setPage: (page) => dispatch(setPage(page)),
     searching: (value) => dispatch(searching(value)),
-    searchUsers: (currentPage, perPage) =>
-      dispatch(searchUsers(currentPage, perPage)),
+    searchUsers: (currentPage, perPage) => dispatch(searchUsers(currentPage, perPage)),
     switchUserStatus: (uuid) => dispatch(switchUserStatus(uuid)),
     selectUsers: (uuid) => dispatch(selectUsers(uuid)),
     changeBulkStatus: (status) => dispatch(changeBulkStatus(status)),

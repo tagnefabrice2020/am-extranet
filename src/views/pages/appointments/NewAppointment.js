@@ -15,10 +15,11 @@ const newAppointementSchema = object({
   date_rdv: date().typeError('Veuillez choisir une date.'),
   agent_id: number().typeError('Veuillez choisir parmis les options.'),
 
-  tenant_contact: number().test('len', 'Le numéro de téléphone doit être 10 chiffres.', value => value.toString().length === 10).typeError('Veuillez saisir des charactères numériques').required('Le numéro de téléphone du locataire est obligatoire.'),
-  tenant_first_name: string().typeError('Veuillez saisir des charactères alphabetic.').required('Le Prénom du locataire est obligatoire.'),
-  tenant_last_name: string().typeError('Veuillez saisir des charactères alphabetic.').required('Le Nom du locataire est obligatoire.'),
-  tenant_email: string().email('Veuillez saisir un email valid.').required('l\'email du locataire est obligatoire.'),
+  telephone_locataire: number().test('len', 'Le numéro de téléphone doit être 10 chiffres.', value => value.toString().length === 10).typeError('Veuillez saisir des charactères numériques').required('Le numéro de téléphone du locataire est obligatoire.'),
+  prenom_locataire: string().typeError('Veuillez saisir des charactères alphabetic.').required('Le Prénom du locataire est obligatoire.'),
+  nom_locataire: string().typeError('Veuillez saisir des charactères alphabetic.').required('Le Nom du locataire est obligatoire.'),
+  email_locataire: string().email('Veuillez saisir un email valid.').required('l\'email du locataire est obligatoire.'),
+  
   aceint_tenant_info: string().typeError('Veuillez saisir des characteres alpha-numériques.').required('Veuillez saisir l\'identité de l\'ancien locataire'),
 
   property_surface_area: number().positive('Veuillez saisir un nombre positive.').required('Veuiller saisir le superficie du bien.').typeError('Veuillez saisir des charactères numériques.'),
@@ -32,10 +33,10 @@ const newAppointementSchema = object({
   property_city: string().typeError('Veuillez saisir des charactères alpha-numérique.').required('La ville ou est situé le bien en question est obligatoire.'),
   property_postal_code: number().test('len', 'Le postal doit etre de 5 chiffre.', value => value.toString().length === 5).required('Le code postal est du bien est obligatoire').typeError('Veuillez saisir des charactères numériques.'),
   property_complementary_adresse: string().typeError('Veuillez saisir des charactères alpha-numérique.'),
-  lanlord_first_name: string().typeError('Veuillez saisir des charactères alphabetic.').required('Le Prénom du propriétaire est obligatoire.'),
-  lanlord_last_name: string().typeError('Veuillez saisir des charactères alphabetic.').required('Le Nom du propriétaire est obligatoire.'),
-  lanlord_email: string().email('Veuillez saisir un email valid.').required('l\'email du propriétaire est obligatoire.'),
-  reference: string(),
+  prenom_bailleur: string().typeError('Veuillez saisir des charactères alphabetic.').required('Le Prénom du propriétaire est obligatoire.'),
+  nom_bailleur: string().typeError('Veuillez saisir des charactères alphabetic.').required('Le Nom du propriétaire est obligatoire.'),
+  email_bailleur: string().email('Veuillez saisir un email valid.').required('l\'email du propriétaire est obligatoire.'),
+  reference_bailleur: string(),
 
   list_of_documents: string().typeError('Veuillez saisir des charactères alpha-numérique.'),
   special_instructions: string().typeError('Veuillez saisir des charactères alpha-numérique.'),
@@ -62,8 +63,7 @@ const NewAppointment = ({ storeAppointment, appointments }) => {
     async function fetchInterventions() {
       await axios.get(API_URL + `/config_app/intervention/`)
         .then((response) => {
-          console.log(response)
-          setInterventions(response.data);
+          setInterventions(response.data.results);
           setInterventionLoading(false);
         })
     }
@@ -71,23 +71,24 @@ const NewAppointment = ({ storeAppointment, appointments }) => {
     async function fetchPropertyTypes() {
       await axios.get(API_URL + `/config_app/propriete/`)
         .then((response) => {
-          console.log(response)
-          setPropertyTypes(response.data);
+          setPropertyTypes(response.data.results);
           setPropertyTypesLoading(false);
         })
     }
 
     async function fetchAgents() {
-      await axios.get(API_URL + `/user_types/agent/`)
+      await axios.get(API_URL + `/agent_app/agent/?paginated=none`)
         .then((response) => {
+          console.log(response.data)
           setAgents(response.data);
           setAgentsLoading(false);
         })
     }
 
     async function fetchClients() {
-      await axios.get(API_URL + `/user_types/client/`)
+      await axios.get(API_URL + `/client_app/client?paginated=none`)
         .then((response) => {
+          console.log(response.data)
           setClients(response.data);
           setClientsLoading(false);
         })
@@ -106,6 +107,7 @@ const NewAppointment = ({ storeAppointment, appointments }) => {
   }, [appointments.reset.form, reset]);
 
   const newAppointment = (data) => {
+    console.log(data)
     const newData = {...data, date_rdv: data.date_rdv.toISOString().slice(0, 19).replace('T', ' ')};
     storeAppointment(newData);
     if (appointments.reset.form) {
@@ -156,7 +158,7 @@ const NewAppointment = ({ storeAppointment, appointments }) => {
                     <div className="row">
                       <div className="col">
                         <div className="form-group">
-                          <label htmlFor="exampleInputEmail1">Ref Lot</label>
+                          <label htmlFor="ref lot">Ref Lot</label>
                           <input
                             type="text"
                             className={"form-control " + (errors.ref_lot && ` is-border-red`)}
@@ -168,35 +170,35 @@ const NewAppointment = ({ storeAppointment, appointments }) => {
                       </div>
                       <div className="col">
                         <div className="form-group">
-                          <label htmlFor="exampleInputEmail1">Ref RDV EDL</label>
+                          <label htmlFor="ref_edl">Ref RDV EDL</label>
                           <input
                             type="number"
                             min="0"
-                            className={"form-control " + (errors.ref_rdv_edl && ` is-border-red`)}
+                            className={"form-control " + (errors.ref_edl && ` is-border-red`)}
                             placeholder="Entrer votre Ref RDV EDL"
-                            {...register('ref_rdv_edl')}
+                            {...register('ref_edl')}
                           />
-                          {errors.ref_rdv_edl && <small className="form-text is-red">{errors.ref_rdv_edl.message}</small>}
+                          {errors.ref_edl && <small className="form-text is-red">{errors.ref_edl.message}</small>}
                         </div>
                       </div>
                       <div className="col">
                         <div className="form-group">
-                          <label htmlFor="exampleInputEmail1">Type d'intervention *</label>
-                          <select className={"form-control " + (errors.type_of_intervention && ` is-border-red`)} {...register('type_of_intervention')}>
+                          <label htmlFor="intervention">Type d'intervention *</label>
+                          <select className={"form-control " + (errors.intervention && ` is-border-red`)} {...register('intervention')}>
                             {!interventionsLoading && interventions.map((intervention, idx) => <option key={idx} value={intervention.id}>{intervention.type}</option>)}
                           </select>
-                          {errors.type_of_intervention && <small className="form-text is-red">{errors.type_of_intervention.message}</small>}
+                          {errors.intervention && <small className="form-text is-red">{errors.intervention.message}</small>}
                         </div>
                       </div>
                     </div>
                     <div className="row">
                       <div className="col">
                         <div className="form-group">
-                          <label htmlFor="exampleInputEmail1">Nature du Bien</label>
-                          <select className={"form-control " + (errors.type_of_property && ` is-border-red`)} {...register('type_of_property')}>
+                          <label htmlFor="type de propriéte">Nature du Bien</label>
+                          <select className={"form-control " + (errors.type_propriete && ` is-border-red`)} {...register('type_propriete')}>
                             {!propertyTypesLoading && propertyTypes.map((propertyType, idx) => <option key={idx} value={propertyType.id}>{propertyType.type}</option>)}
                           </select>
-                          {errors.type_of_property && <small className="form-text is-red">{errors.type_of_property.message}</small>}
+                          {errors.type_propriete && <small className="form-text is-red">{errors.type_propriete.message}</small>}
                         </div>
                       </div>
                     </div>
@@ -210,7 +212,7 @@ const NewAppointment = ({ storeAppointment, appointments }) => {
                         <div className="form-group">
                           <label htmlFor="exampleInputEmail1">Client</label>
                           <select className={"form-control " + (errors.client_id && ` is-border-red`)} {...register('client_id')}>
-                            {!clientsLoading && clients.map((client, idx) => <option key={idx} value={client.id}>{client.first_name} {client.last_name}</option>)}
+                            {!clientsLoading && clients.map((client, idx) => <option key={idx} value={client.id}>{client.user.prenom} {client.user.nom}</option>)}
                           </select>
                           {errors.client_id && <small className="form-text is-red">{errors.client_id.message}</small>}
                         </div>
@@ -242,7 +244,7 @@ const NewAppointment = ({ storeAppointment, appointments }) => {
                         <div className="form-group">
                           <label htmlFor="exampleInputEmail1">Nom de l'agent Amexpert rattaché</label>
                           <select className={"form-control " + (errors.agent_id && ` is-border-red`)} {...register('agent_id')}>
-                            {!agentLoading && agents.map((agent, idx) => <option key={idx} value={agent.id}>{agent.first_name} {agent.last_name}</option>)}
+                            {!agentLoading && agents.map((agent, idx) => <option key={idx} value={agent.id}>{agent.user.prenom} {agent.user.nom}</option>)}
                           </select>
                           {errors.agent_id && <small className="form-text is-red">{errors.agent_id.message}</small>}
                         </div>
@@ -258,53 +260,53 @@ const NewAppointment = ({ storeAppointment, appointments }) => {
                     <div className="row">
                       <div className="col">
                         <div className="form-group">
-                          <label htmlFor="exampleInputEmail1">Nom</label>
+                          <label htmlFor="nom du locataire">Nom</label>
                           <input
                             type="text"
-                            className={"form-control " + (errors.tenant_last_name && ` is-border-red`)}
-                            {...register('tenant_last_name')}
+                            className={"form-control " + (errors.nom_locataire && ` is-border-red`)}
+                            {...register('nom_locataire')}
                           />
-                          {errors.tenant_last_name && <small className="form-text is-red">{errors.tenant_last_name.message}</small>}
+                          {errors.nom_locataire && <small className="form-text is-red">{errors.nom_locataire.message}</small>}
                         </div>
                       </div>
                       <div className="col">
                         <div className="form-group">
-                          <label htmlFor="exampleInputEmail1">Prénom</label>
+                          <label htmlFor="prenom du locataire">Prénom</label>
                           <input
                             type="text"
-                            className={"form-control " + (errors.tenant_first_name && ` is-border-red`)}
-                            {...register('tenant_first_name')}
+                            className={"form-control " + (errors.prenom_locataire && ` is-border-red`)}
+                            {...register('prenom_locataire')}
                           />
-                          {errors.tenant_first_name && <small className="form-text is-red">{errors.tenant_first_name.message}</small>}
+                          {errors.prenom_locataire && <small className="form-text is-red">{errors.prenom_locataire.message}</small>}
                         </div>
                       </div>
                       <div className="col">
                         <div className="form-group">
-                          <label htmlFor="exampleInputEmail1">Numéro de Téléphone</label>
+                          <label htmlFor="contact du locataire">Numéro de Téléphone</label>
                           <input
                             type="number"
                             min="0"
-                            className={"form-control " + (errors.tenant_contact && ` is-border-red`)}
-                            {...register('tenant_contact')}
+                            className={"form-control " + (errors.telephone_locataire && ` is-border-red`)}
+                            {...register('telephone_locataire')}
                           />
-                          {errors.tenant_contact && <small className="form-text is-red">{errors.tenant_contact.message}</small>}
+                          {errors.telephone_locataire && <small className="form-text is-red">{errors.telephone_locataire.message}</small>}
                         </div>
                       </div>
                     </div>
                     <div className="row">
                       <div className="col">
                         <div className="form-group">
-                          <label htmlFor="exampleInputEmail1">Email</label>
+                          <label htmlFor="email du locataire">Email</label>
                           <input
                             type="email"
-                            className={"form-control " + (errors.tenant_email && ` is-border-red`)}
-                            {...register('tenant_email')} />
-                          {errors.tenant_email && <small className="form-text is-red">{errors.tenant_email.message}</small>}
+                            className={"form-control " + (errors.email_locataire && ` is-border-red`)}
+                            {...register('email_locataire')} />
+                          {errors.email_locataire && <small className="form-text is-red">{errors.email_locataire.message}</small>}
                         </div>
                       </div>
                       <div className="col">
                         <div className="form-group">
-                          <label htmlFor="exampleInputEmail1">Identité de l'ancien locataire</label>
+                          <label htmlFor="identité de l'ancien locataire">Identité de l'ancien locataire</label>
                           <input type="text"
                             className={"form-control " + (errors.aceint_tenant_info && ` is-border-red`)}
                             {...register('aceint_tenant_info')}
@@ -323,18 +325,18 @@ const NewAppointment = ({ storeAppointment, appointments }) => {
                     <div className="row">
                       <div className="col">
                         <div className="form-group">
-                          <label htmlFor="exampleInputEmail1">Surface du bien - (m<sup>2</sup>)</label>
+                          <label htmlFor="surface du bien">Surface du bien - (m<sup>2</sup>)</label>
                           <input type="number"
                             min="0"
-                            className={"form-control " + (errors.property_surface_area && ` is-border-red`)}
-                            {...register('property_surface_area')}
+                            className={"form-control " + (errors.surface_propriete && ` is-border-red`)}
+                            {...register('surface_propriete')}
                           />
-                          {errors.property_surface_area && <small className="form-text is-red">{errors.property_surface_area.message}</small>}
+                          {errors.surface_propriete && <small className="form-text is-red">{errors.surface_propriete.message}</small>}
                         </div>
                       </div>
                       <div className="col">
                         <div className="form-group">
-                          <label htmlFor="exampleInputEmail1">Type</label>
+                          <label htmlFor="Type">Type</label>
                           <select
                             className={"form-control " + (errors.property_type && ` is-border-red`)}
                             {...register('property_type')}>
@@ -349,14 +351,14 @@ const NewAppointment = ({ storeAppointment, appointments }) => {
                       </div>
                       <div className="col">
                         <div className="form-group">
-                          <label htmlFor="exampleInputEmail1">Etage</label>
+                          <label htmlFor="etage">Etage</label>
                           <input
                             type="number"
                             min="0"
-                            className={"form-control " + (errors.property_floor_number && ` is-border-red`)}
-                            {...register('property_floor_number')}
+                            className={"form-control " + (errors.numero_sol_propriete && ` is-border-red`)}
+                            {...register('numero_sol_propriete')}
                           />
-                          {errors.property_floor_number && <small className="form-text is-red">{errors.property_floor_number.message}</small>}
+                          {errors.numero_sol_propriete && <small className="form-text is-red">{errors.numero_sol_propriete.message}</small>}
                         </div>
                       </div>
                     </div>
@@ -364,38 +366,38 @@ const NewAppointment = ({ storeAppointment, appointments }) => {
                     <div className="row">
                       <div className="col">
                         <div className="form-group">
-                          <label htmlFor="exampleInputEmail1">N° Logement</label>
+                          <label htmlFor="N° du logement">N° Logement</label>
                           <input
                             type="number"
                             min="0"
-                            className={"form-control " + (errors.property_housing_number && ` is-border-red`)}
-                            {...register('property_housing_number')}
+                            className={"form-control " + (errors.numero_propriete && ` is-border-red`)}
+                            {...register('numero_propriete')}
                           />
-                          {errors.property_housing_number && <small className="form-text is-red">{errors.property_housing_number.message}</small>}
+                          {errors.numero_propriete && <small className="form-text is-red">{errors.numero_propriete.message}</small>}
                         </div>
                       </div>
                       <div className="col">
                         <div className="form-group">
-                          <label htmlFor="exampleInputEmail1">N° Parking</label>
+                          <label htmlFor="numéro du parking">N° Parking</label>
                           <input
                             type="number"
                             min="0"
-                            className={"form-control " + (errors.property_parking_number && ` is-border-red`)}
-                            {...register('property_parking_number')}
+                            className={"form-control " + (errors.numero_parking_propriete && ` is-border-red`)}
+                            {...register('numero_parking_propriete')}
                           />
-                          {errors.property_parking_number && <small className="form-text is-red">{errors.property_parking_number.message}</small>}
+                          {errors.numero_parking_propriete && <small className="form-text is-red">{errors.numero_parking_propriete.message}</small>}
                         </div>
                       </div>
                       <div className="col">
                         <div className="form-group">
-                          <label htmlFor="exampleInputEmail1">N° Cave</label>
+                          <label htmlFor="numéro de la cave">N° Cave</label>
                           <input
                             type="number"
                             min="0"
-                            className={"form-control " + (errors.property_cave_number && ` is-border-red`)}
-                            {...register('property_cave_number')}
+                            className={"form-control " + (errors.numero_cave_propriete && ` is-border-red`)}
+                            {...register('numero_cave_propriete')}
                           />
-                          {errors.property_cave_number && <small className="form-text is-red">{errors.property_cave_number.message}</small>}
+                          {errors.numero_cave_propriete && <small className="form-text is-red">{errors.numero_cave_propriete.message}</small>}
                         </div>
                       </div>
                     </div>
@@ -409,49 +411,49 @@ const NewAppointment = ({ storeAppointment, appointments }) => {
                     <div className="row">
                       <div className="col">
                         <div className="form-group">
-                          <label htmlFor="exampleInputEmail1">Adresse</label>
+                          <label htmlFor="adresse de la propriéte">Adresse</label>
                           <input
                             type="text"
-                            className={"form-control " + (errors.property_adresse && ` is-border-red`)}
-                            {...register('property_adresse')}
+                            className={"form-control " + (errors.adresse_propriete && ` is-border-red`)}
+                            {...register('adresse_propriete')}
                           />
-                          {errors.property_adresse && <small className="form-text is-red">{errors.property_adresse.message}</small>}
+                          {errors.adresse_propriete && <small className="form-text is-red">{errors.adresse_propriete.message}</small>}
                         </div>
                       </div>
                       <div className="col">
                         <div className="form-group">
-                          <label htmlFor="exampleInputEmail1">Complément d'adresse</label>
+                          <label htmlFor="adresse complementaire">Complément d'adresse</label>
                           <input
                             type="text"
-                            className={"form-control " + (errors.property_complementary_adresse && ` is-border-red`)}
-                            {...register('property_complementary_adresse')}
+                            className={"form-control " + (errors.adresse_complementaire_propriete && ` is-border-red`)}
+                            {...register('adresse_complementaire_propriete')}
                           />
-                          {errors.property_complementary_adresse && <small className="form-text is-red">{errors.property_complementary_adresse.message}</small>}
+                          {errors.adresse_complementaire_propriete && <small className="form-text is-red">{errors.adresse_complementaire_propriete.message}</small>}
                         </div>
                       </div>
                     </div>
                     <div className="row">
                       <div className="col">
                         <div className="form-group">
-                          <label htmlFor="exampleInputEmail1">Code Postal</label>
+                          <label htmlFor="code postal">Code Postal</label>
                           <input
                             type="number"
                             min="0"
-                            className={"form-control " + (errors.property_postal_code && ` is-border-red`)}
-                            {...register('property_postal_code')}
+                            className={"form-control " + (errors.code_postal_propriete && ` is-border-red`)}
+                            {...register('code_postal_propriete')}
                           />
-                          {errors.property_postal_code && <small className="form-text is-red">{errors.property_postal_code.message}</small>}
+                          {errors.code_postal_propriete && <small className="form-text is-red">{errors.code_postal_propriete.message}</small>}
                         </div>
                       </div>
                       <div className="col">
                         <div className="form-group">
-                          <label htmlFor="exampleInputEmail1">Ville</label>
+                          <label htmlFor="Ville">Ville</label>
                           <input
                             type="text"
-                            className={"form-control " + (errors.property_city && ` is-border-red`)}
-                            {...register('property_city')}
+                            className={"form-control " + (errors.ville_propriete && ` is-border-red`)}
+                            {...register('ville_propriete')}
                           />
-                          {errors.property_city && <small className="form-text is-red">{errors.property_city.message}</small>}
+                          {errors.ville_propriete && <small className="form-text is-red">{errors.ville_propriete.message}</small>}
                         </div>
                       </div>
                     </div>
@@ -465,39 +467,39 @@ const NewAppointment = ({ storeAppointment, appointments }) => {
                     <div className="row">
                       <div className="col">
                         <div className="form-group">
-                          <label htmlFor="exampleInputEmail1">Nom</label>
-                          <input type="text" className={"form-control " + (errors.lanlord_last_name && ` is-border-red`)}  {...register('lanlord_last_name')} />
-                          {errors.lanlord_last_name && <small className="form-text is-red">{errors.lanlord_last_name.message}</small>}
+                          <label htmlFor="nom du bailleure">Nom</label>
+                          <input type="text" className={"form-control " + (errors.nom_bailleur && ` is-border-red`)}  {...register('nom_bailleur')} />
+                          {errors.nom_bailleur && <small className="form-text is-red">{errors.nom_bailleur.message}</small>}
                         </div>
                       </div>
                       <div className="col">
                         <div className="form-group">
-                          <label htmlFor="exampleInputEmail1">Prénom</label>
-                          <input type="text" className={"form-control " + (errors.lanlord_first_name && ` is-border-red`)}  {...register('lanlord_first_name')} />
-                          {errors.lanlord_first_name && <small className="form-text is-red">{errors.lanlord_first_name.message}</small>}
+                          <label htmlFor="prenom du bailleure">Prénom</label>
+                          <input type="text" className={"form-control " + (errors.prenom_bailleur && ` is-border-red`)}  {...register('prenom_bailleur')} />
+                          {errors.prenom_bailleur && <small className="form-text is-red">{errors.prenom_bailleur.message}</small>}
                         </div>
                       </div>
                     </div>
                     <div className="row">
                       <div className="col">
                         <div className="form-group">
-                          <label htmlFor="exampleInputEmail1">Email</label>
+                          <label htmlFor="email du bailleure">Email</label>
                           <input
                             type="email"
-                            className={"form-control " + (errors.lanlord_email && ` is-border-red`)}
-                            {...register('lanlord_email')} />
+                            className={"form-control " + (errors.email_bailleur && ` is-border-red`)}
+                            {...register('email_bailleur')} />
 
-                          {errors.lanlord_email && <small className="form-text is-red">{errors.lanlord_email.message}</small>}
+                          {errors.email_bailleur && <small className="form-text is-red">{errors.email_bailleur.message}</small>}
                         </div>
                       </div>
                       <div className="col">
                         <div className="form-group">
-                          <label htmlFor="exampleInputEmail1">Reférence</label>
+                          <label htmlFor="reference">Reférence</label>
                           <input type="text"
-                            className={"form-control " + (errors.reference && ` is-border-red`)}
-                            {...register('reference')}
+                            className={"form-control " + (errors.reference_bailleur && ` is-border-red`)}
+                            {...register('reference_bailleur')}
                           />
-                          {errors.reference && <small className="form-text is-red">{errors.reference.message}</small>}
+                          {errors.reference_bailleur && <small className="form-text is-red">{errors.reference_bailleur.message}</small>}
                         </div>
                       </div>
                     </div>

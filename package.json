@@ -16,6 +16,7 @@
     "@testing-library/react": "^12.1.2",
     "@testing-library/user-event": "^13.5.0",
     "axios": "^0.26.0",
+    "core-js-pure": "^3.24.0",
     "exceljs": "^4.3.0",
     "file-saver": "^2.0.5",
     "fullcalendar-interaction": "^5.3.3",
