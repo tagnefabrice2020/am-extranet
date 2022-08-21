@@ -17,7 +17,7 @@ const AppContent = (props) => {
                                 name={route.name}
                                 element={
                                     route.auth ?
-                                        <PrivateRoutes isLogin={props.auth.isLogin}>
+                                        <PrivateRoutes isLogin={props.auth.isLogin} roles={route.roles}>
                                             <route.element {...props} />
                                         </PrivateRoutes> : <route.element {...props} />
                             }

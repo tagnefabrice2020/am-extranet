@@ -115,9 +115,10 @@ export const fetchAppointments = (page, perPage) => {
             dispatch(fetchAppointmentsRequest()); // fetchingAppointments
             AppointementService.fetchAppointments(page, perPage)
                 .then((appointments) => {
-                    dispatch(setAppointmentTotalPages(appointments.last_page));
-                    dispatch(setAppointmentsPerPage(appointments.per_page));
-                    dispatch(fetchAppointmentSuccess(appointments.data));
+                    const totalPage = Math.ceil(appointments.count / 10);
+                    dispatch(setAppointmentPage(page));
+                    dispatch(setAppointmentTotalPages(totalPage));
+                    dispatch(fetchAppointmentSuccess(appointments.results));
                     return Promise.resolve();
                 }, () => {
                     toast.error('Une erreur est souvenue lors du chargement des rendez-vous.');
@@ -135,8 +136,6 @@ export const searchAppointments = (page, perPage) => {
         if (appointments.searchValue.length > 0) {
             AppointementService.search(appointments.searchValue, page, perPage) 
                 .then((response) => {
-                    // console.log(response); 
-                    // console.log(appointments);
                     const totalPage = Math.ceil(response.total / response.per_page); 
                     dispatch(setAppointmentPage(response.current_page)); 
                     dispatch(setAppointmentsPerPage(response.per_page));
@@ -161,7 +160,6 @@ export const fetchOneAppointment = (uuid) => {
         AppointementService.fetchOneAppointment(uuid)
             .then((appointment) => {
                 dispatch(fetchOneAppointmentRequestSuccess(appointment))
-                console.log(appointment);
                 return Promise.resolve();
             }, error => {
                 dispatch(fetchOneAppointmentRequestError());
@@ -176,12 +174,13 @@ export const updateAppointment = (appointment, uuid) => {
         AppointementService.update(appointment, uuid)
             .then((response) => {
                 console.log(response);
-                if(response.status === 200) {
+                if(response.status === 200 || response.status === 201) {
                     toast.success('Rendez-vous enregistrer avec success.');
                 }
             }, 
             error => {
                 console.log(error)
+                toast.error('Impossible de modifier le rendez-vous, veuillez contacter le service de maintenance.');
             })
     }
 }

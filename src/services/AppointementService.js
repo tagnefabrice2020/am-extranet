@@ -4,14 +4,13 @@ import { API_URL } from "../config";
 class AppontementService {
 
     fetchAppointments (page, perPage) {
-        return axios.get(API_URL + `/appointments?page=${page}&perPage=${perPage}`)
+        return axios.get(API_URL + `/rdv_app/rdv/`)
             .then((response) => {
-                return response.data.data;
+                return response.data;
             })
     }
 
     search (search, page, perPage) {
-        console.log(search)
         return axios.get(API_URL + `/appointments/${search}/search?page=${page}&perPage=${perPage}`)
             .then((response) => {
                 return response.data.data;
@@ -19,23 +18,21 @@ class AppontementService {
     }
 
     store (appointment) {
-        return axios.post(API_URL + `/appointments`, appointment)
+        return axios.post(API_URL + `/rdv_app/rdv/`, appointment)
             .then((response) => {
                 return response;
             })
     }
 
     fetchOneAppointment (uuid) {
-        return axios.get(API_URL + `/appointments/${uuid}/show`)
+        return axios.get(API_URL + `/rdv_app/rdv/${uuid}`)
             .then((response) => {
-                console.log(response.data)
-                return response.data.appointment;
+                return response.data[0];
             })
     }
 
     update (appointment, uuid) {
-        console.log(uuid);
-        return axios.patch(API_URL + `/appointments/${uuid}/update`, appointment)
+        return axios.put(API_URL + `/rdv_app/rdv/${uuid}`, appointment)
             .then((response) => {
                 return response
             })

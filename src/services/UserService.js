@@ -4,8 +4,8 @@ import { API_URL } from "../config";
 class UserService {
   async fetchUsers(page, perPage) {
     return axios
-      .get(API_URL + `/admin_app/users?limit=${perPage}&page=${page}`)
-      .then((response) => {
+      .get(API_URL + `/admin_app/users?page=${page}`)
+      .then((response) => { console.log(response)
         const users = response.data;
         return users;
       });

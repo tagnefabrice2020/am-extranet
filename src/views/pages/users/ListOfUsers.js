@@ -126,7 +126,7 @@ const ListOfUsers = ({
                           <th>Email</th>
                           <th className="text-center">Role</th>
                           <th></th>
-                          <th></th>
+                          {/* <th></th> */}
                         </tr>
                       </thead>
                       <tbody>
@@ -208,7 +208,7 @@ const ListOfUsers = ({
                                 ></i>
                               </Link>
                             </td>
-                            <td>
+                            {/* <td>
                               {user.active ? (
                                 <button
                                   className="btn btn-sm btn-danger"
@@ -224,7 +224,7 @@ const ListOfUsers = ({
                                   activer
                                 </button>
                               )}
-                            </td>
+                            </td> */}
                           </tr>
                         ))}
                       </tbody>
