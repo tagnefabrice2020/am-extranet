@@ -77,7 +77,7 @@ const EditAgent = ({ users, fetchOneUser, updateUser }) => {
 
   const editUser = (data) => {
     console.log(data);
-    updateUser(data, uuid);
+    updateUser({...data, is_active: true}, uuid);
   };
 
   return (
@@ -88,13 +88,13 @@ const EditAgent = ({ users, fetchOneUser, updateUser }) => {
         <div className="container-fluid">
           <div className="row mb-2">
             <div className="col-sm-6">
-              <h1>Modifier un Utilisateur</h1>
+              <h1>Modifier l'agent</h1>
             </div>
             <div className="col-sm-6">
               <ol className="breadcrumb float-sm-right">
-                <li className="breadcrumb-item active">Utilisateur</li>
+                <li className="breadcrumb-item active">Agent</li>
                 <li className="breadcrumb-item active">
-                  Modifier un Utilisateur
+                  Modifier l'agent
                 </li>
               </ol>
             </div>
@@ -112,7 +112,10 @@ const EditAgent = ({ users, fetchOneUser, updateUser }) => {
               {/* general form elements */}
               <div className="card">
                 <div className="card-header">
-                  <h3 className="card-title">Modifier l'utilisateur</h3>
+                  <h3 className="card-title">Modifier l'agent <b>{!users.oneUserLoading &&
+                      users.oneUserLoadingError === false &&
+                      users.oneUser.hasOwnProperty("id") &&
+                      `${users.oneUser.user.prenom.toUpperCase()}  ${users.oneUser.user.nom.toUpperCase()}`}</b> </h3>
                 </div>
                 {/* /.card-header */}
                 {/* form start */}

@@ -1,5 +1,5 @@
-import { yupResolver } from "@hookform/resolvers/yup";
 import React, { useEffect, useState } from "react";
+import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import { object, string, mixed } from "yup";
 import axios from "axios";
@@ -52,10 +52,7 @@ const EditUser = ({ users, fetchOneUser, updateUser }) => {
     telephone: string()
       .required("Veuillez saisir numéro de téléphone")
       .typeError("Veuillez saisir des characters alphabetic."),
-    role: mixed().oneOf(
-      ["1", "2", "3", "4"],
-      "Veuillez choisir parmis les roles proposer."
-    ),
+    is_active: mixed().oneOf(["1", "0"], "Veuillez choisir parmis les options").required('Veuillez choisir parmis les options')
   });
 
   const { register, formState, handleSubmit, watch } = useForm({
@@ -77,7 +74,8 @@ const EditUser = ({ users, fetchOneUser, updateUser }) => {
 
   const editUser = (data) => {
     console.log(data);
-    updateUser(data, uuid);
+    const { nom, prenom, is_active } = data;
+    updateUser({...data, trigramme: nom[0].toUpperCase() + prenom[0].toUpperCase(), is_active: is_active === "1" ? true : false}, uuid);
   };
 
   return (
@@ -112,7 +110,7 @@ const EditUser = ({ users, fetchOneUser, updateUser }) => {
               {/* general form elements */}
               <div className="card">
                 <div className="card-header">
-                  <h3 className="card-title">Modifier l'utilisateur</h3>
+                  <h3 className="card-title">{!users?.oneUser?.errorCode && !users.oneUserLoading && <>Modifier l'utilisateur</>} {!users.oneUserLoading && users.oneUserLoadingError && users?.oneUser?.errorCode === 401 && <span style={{color: 'red'}}>Vous n'êtes pas autorisé à visualiser ou modifier cette utilisateur</span>}</h3>
                 </div>
                 {/* /.card-header */}
                 {/* form start */}
@@ -256,6 +254,30 @@ const EditUser = ({ users, fetchOneUser, updateUser }) => {
                               )}
                             </div>
                           </div>
+                          
+                          <div className="col">
+                            <div className="form-group">
+                              <label htmlFor="adresse">Statut</label>
+                              <select
+                                type="text"
+                                className={
+                                  "form-control " +
+                                  (errors.is_active && `is-border-red`)
+                                }
+                                {...register("is_active")}
+                                defaultValue={users.oneUser.user.is_active & 1}
+                              >
+                                <option value="1">active</option>
+                                <option value="0">inactive</option>
+                              </select>
+                              {errors.adresse && (
+                                <small className="form-text is-red">
+                                  {errors.is_active.message}
+                                </small>
+                              )}
+                            </div>
+                          </div>
+                          
                         </div>
 
                         <div className="form-group">
@@ -308,6 +330,9 @@ const EditUser = ({ users, fetchOneUser, updateUser }) => {
                       </div>
                     </form>
                   )}
+                  {!users.oneUserLoading && users.oneUserLoadingError && users?.oneUser?.errorCode === 401 && <>
+                    <img src={require("../../../assets/dist/img/404.png")} alt="non-authorizer" style={{width: 'fit-content', margin: '10px auto'}} />
+                  </>}
               </div>
               {/* /.card */}
             </div>

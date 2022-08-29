@@ -152,7 +152,7 @@ export const UserReducers = (state = initialState, action) => {
       return {
         ...state,
         oneUserLoading: false,
-        oneUser: {},
+        oneUser: {errorCode: action.payload},
         oneUserLoadingError: true,
       };
     case SELECT_USERS:

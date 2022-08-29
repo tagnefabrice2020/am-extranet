@@ -5471,6 +5471,10 @@ input[type="button"].btn-block {
   box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.16);
 }
 
+.cursor {
+  cursor: pointer;
+}
+
 .bg-2 {
   border-radius: 30px;
   background: linear-gradient(#033cc7 0%, #002274 100%);
@@ -5480,7 +5484,7 @@ input[type="button"].btn-block {
 
 .bg-3 {
   border-radius: 30px;
-  background: #010001;
+  background: #970505;
   color: #fff;
 }
 

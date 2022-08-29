@@ -158,7 +158,7 @@ export const fetchOneAppointment = (uuid) => {
     return dispatch => {
         dispatch(fetchOneAppointmentRequest());
         AppointementService.fetchOneAppointment(uuid)
-            .then((appointment) => {
+            .then((appointment) => { console.log(appointment)
                 dispatch(fetchOneAppointmentRequestSuccess(appointment))
                 return Promise.resolve();
             }, error => {

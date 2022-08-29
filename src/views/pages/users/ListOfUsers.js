@@ -206,6 +206,28 @@ const ListOfUsers = ({
                                   className="bi bi-pencil-square"
                                   style={{ color: `#000` }}
                                 ></i>
+                              </Link> &nbsp;
+                              <Link
+                                to={`/voir/${
+                                  user.groups[0].group.toLowerCase() ===
+                                  "administrateur"
+                                    ? user.administrateur
+                                    : user.groups[0].group.toLowerCase() ===
+                                      "agent"
+                                    ? user.agent
+                                    : user.groups[0].group.toLowerCase() ===
+                                      "client"
+                                    ? user.client
+                                    : user.groups[0].group.toLowerCase() ===
+                                      "salarie"
+                                    ? user.salarie
+                                    : null
+                                }/${user.groups[0].group.toLowerCase()}/utilisateur`}
+                              >
+                                <i
+                                  className="bi bi-eye"
+                                  style={{ color: `#867` }}
+                                ></i>
                               </Link>
                             </td>
                             {/* <td>

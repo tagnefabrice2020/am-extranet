@@ -15,6 +15,8 @@ import styled from "styled-components";
 const EditSalarie = ({ users, fetchOneUser, updateUser }) => {
   const { uuid } = useParams();
   const [userId, setUserId] = useState(null);
+  const [agentsLoading, setAgentsLoading] = useState(true);
+  const [agents, setAgents] = useState([]);
 
   const userSchema = object({
     prenom: string()
@@ -77,10 +79,17 @@ const EditSalarie = ({ users, fetchOneUser, updateUser }) => {
   }, [uuid, fetchOneUser]);
 
   useEffect(() => {
-    if (!users.oneUserLoading) {
-      console.log(users.oneUser?.agent_rattache?.id);
+    async function fetchAgents() {
+      await axios
+        .get(API_URL + `/agent_app/agent?paginated=no`)
+        .then((response) => {
+          setAgents(response.data);
+          setAgentsLoading(false);
+        });
     }
-  });
+    fetchAgents();
+    return () => {};
+  }, []);
 
   useEffect(() => {
     if (!users.oneUserLoading) {
@@ -92,7 +101,8 @@ const EditSalarie = ({ users, fetchOneUser, updateUser }) => {
 
   const editUser = (data) => {
     console.log(data);
-    updateUser(data, uuid);
+    const newData = { ...data, is_active: true, mdp: "password" };
+    updateUser(newData, uuid);
   };
 
   return (
@@ -107,10 +117,8 @@ const EditSalarie = ({ users, fetchOneUser, updateUser }) => {
             </div>
             <div className="col-sm-6">
               <ol className="breadcrumb float-sm-right">
-                <li className="breadcrumb-item active">Utilisateur</li>
-                <li className="breadcrumb-item active">
-                  Modifier un Utilisateur
-                </li>
+                <li className="breadcrumb-item active">Salarié</li>
+                <li className="breadcrumb-item active">Modifier un Salarié</li>
               </ol>
             </div>
           </div>
@@ -127,7 +135,13 @@ const EditSalarie = ({ users, fetchOneUser, updateUser }) => {
               {/* general form elements */}
               <div className="card">
                 <div className="card-header">
-                  <h3 className="card-title">Modifier l'utilisateur</h3>
+                  <h3 className="card-title">
+                    Modifier les information du salarié{" "} <b>
+                    {!users.oneUserLoading &&
+                      users.oneUserLoadingError === false &&
+                      users.oneUser.hasOwnProperty("id") &&
+                      `${users.oneUser.user.prenom.toUpperCase()}  ${users.oneUser.user.nom.toUpperCase()}`}</b>
+                  </h3>
                 </div>
                 {/* /.card-header */}
                 {/* form start */}
@@ -227,16 +241,17 @@ const EditSalarie = ({ users, fetchOneUser, updateUser }) => {
                           <div className="col">
                             <div className="form-group">
                               <label htmlFor="nom">Titre</label>
-                              <input
-                                type="text"
+                              <select
                                 className={
                                   "form-control " +
-                                  (errors.titre && `is-border-red`)
+                                  (errors.titre && ` is-border-red`)
                                 }
-                                defaultValue={users.oneUser.titre}
-                                placeholder="Titre"
                                 {...register("titre")}
-                              />
+                                defaultValue={users.oneUser.user.titre}
+                              >
+                                <option value={"Mr"}>M.</option>
+                                <option value={"Mme"}>Mme.</option>
+                              </select>
                               {errors.titre && (
                                 <small className="form-text is-red">
                                   {errors.titre.message}
@@ -333,15 +348,22 @@ const EditSalarie = ({ users, fetchOneUser, updateUser }) => {
                           <div className="col">
                             <div className="form-group">
                               <label htmlFor="adresse">Agent</label>
-                              <input
-                                type="text"
-                                className={
-                                  "form-control " +
-                                  (errors.agent && `is-border-red`)
-                                }
-                                {...register("agent")}
-                                defaultValue={""}
-                              />
+                              {!agentsLoading && agents.length > 0 && (
+                                <select
+                                  className={
+                                    "form-control " +
+                                    (errors.agent && ` is-border-red`)
+                                  }
+                                  {...register("agent")}
+                                  defaultValue={users.oneUser.agent_rattache.id}
+                                >
+                                  {agents.map((agent, idx) => (
+                                    <option value={agent.id} key={idx}>
+                                      {agent.user.prenom} {agent.user.nom}
+                                    </option>
+                                  ))}
+                                </select>
+                              )}
                               {errors.agent && (
                                 <small className="form-text is-red">
                                   {errors.agent.message}
@@ -349,7 +371,6 @@ const EditSalarie = ({ users, fetchOneUser, updateUser }) => {
                               )}
                             </div>
                           </div>
-
                         </div>
 
                         <div className="form-group">

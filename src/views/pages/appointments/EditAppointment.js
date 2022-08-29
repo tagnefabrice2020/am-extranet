@@ -45,7 +45,7 @@ const updateAppointementSchema = object({
   client: string()
     .required("Veuillez choisir le client concernées.")
     .typeError("Veuillez choisir le client concernées."),
-  aceint_tenant_info: string()
+    adresse_ancien_locataire: string()
     .typeError("Veuillez saisir des characteres alpha-numériques.")
     .required("Veuillez saisir l'identité de l'ancien locataire"),
 
@@ -62,14 +62,14 @@ const updateAppointementSchema = object({
   numero_sol_propriete: number()
     .required("Veuillez saisir l'étage du bien.")
     .typeError("Veuillez saisir des charactères numériques."),
-  numero_parking_propriete: string()
-    .typeError("Veuillez saisir des charactères alpha-numérique.")
+  numero_parking_propriete: number()
+    .typeError("Veuillez saisir des charactères numérique.")
     .required("Veuillez saisir le numéro de parking."),
-  numero_propriete: string()
-    .typeError("Veuillez saisir des charactères alpha-numérique.")
+  numero_propriete: number()
+    .typeError("Veuillez saisir des charactères numérique.")
     .required("Veuillez saisir la superficie du bien."),
-  numero_cave_propriete: string()
-    .typeError("Veuillez saisir des charactères alpha-numérique.")
+  numero_cave_propriete: number()
+    .typeError("Veuillez saisir des charactères numérique.")
     .required("Veuillez saisir le numéro de la cave."),
 
   adresse_propriete: string()
@@ -181,6 +181,7 @@ function EditAppointment({
   }, [uuid, fetchOneAppointment]);
 
   const editAppointment = (data) => {
+    console.log('innnnnn')
     const newData = {
         ...data,
         date: data.date.toISOString().slice(0, 19).replace("T", " "),
@@ -189,8 +190,10 @@ function EditAppointment({
         passeur: 1,
         intervention: parseInt(data.intervention),
         client: parseInt(data.client),
+        type_propriete: parseInt(data.type_propriete),
+        code_postal_propriete: data.code_postal_propriete.toString()
       };
-    // console.log(newData)
+    console.log(newData)
     updateAppointment(newData, uuid);
   };
 
@@ -258,6 +261,7 @@ function EditAppointment({
                   appointments.oneAppointmentLoadingError === false &&
                   appointments.oneAppointment.hasOwnProperty("id") && (
                     <form onSubmit={handleSubmit(editAppointment)}>
+                      {console.log(appointments.oneAppointment)}
                       <div className="card-body">
                         <div className="row mt-2 mb-3">
                           <div className="col">
@@ -541,12 +545,13 @@ function EditAppointment({
                             <div className="form-group">
                               <label htmlFor="email du locataire">Email</label>
                               <input
-                                type="email"
+                                type="text"
                                 className={
                                   "form-control " +
                                   (errors.email_locataire && ` is-border-red`)
                                 }
                                 {...register("email_locataire")}
+                                defaultValue={appointments.oneAppointment.propriete.locataire.email}
                               />
                               {errors.email_locataire && (
                                 <small className="form-text is-red">
@@ -564,14 +569,14 @@ function EditAppointment({
                                 type="text"
                                 className={
                                   "form-control " +
-                                  (errors.aceint_tenant_info &&
+                                  (errors.adresse_ancien_locataire &&
                                     ` is-border-red`)
                                 }
-                                {...register("aceint_tenant_info")}
+                                {...register("adresse_ancien_locataire")}
                               />
-                              {errors.aceint_tenant_info && (
+                              {errors.adresse_ancien_locataire && (
                                 <small className="form-text is-red">
-                                  {errors.aceint_tenant_info.message}
+                                  {errors.adresse_ancien_locataire.message}
                                 </small>
                               )}
                             </div>
@@ -875,12 +880,13 @@ function EditAppointment({
                             <div className="form-group">
                               <label htmlFor="email du bailleure">Email</label>
                               <input
-                                type="email"
+                                type="text"
                                 className={
                                   "form-control " +
                                   (errors.email_bailleur && ` is-border-red`)
                                 }
                                 {...register("email_bailleur")}
+                                defaultValue={appointments.oneAppointment.propriete.bailleur.email}
                               />
 
                               {errors.email_bailleur && (

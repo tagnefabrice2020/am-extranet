@@ -8,10 +8,12 @@ class AuthService {
         return axios.post(API_URL + `/manager_app/login/`, data)
             .then((response) => {
                 const user = response.data.user;
+                const stats = response.data.stats;
                 const token = response.data.tokens.access;
             
                 if(token && user) {
                     localStorage.setItem('user', JSON.stringify(user));
+                    localStorage.setItem('stats', JSON.stringify(stats));
                     localStorage.setItem('authToken', token);
                     this.setAxiosToken(token);
                 } 
@@ -21,6 +23,7 @@ class AuthService {
 
     logout() {
         localStorage.removeItem("user");
+        localStorage.removeItem("stats");
         localStorage.removeItem("authToken");
         this.removeAxiosToken();
     }

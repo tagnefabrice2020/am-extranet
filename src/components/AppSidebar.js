@@ -2,6 +2,7 @@ import React from "react";
 import { connect } from "react-redux";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import "../../src/assets/dist/js/menu.js";
+import { ADMIN, AGENT } from "../utils/constant.js";
 
 const parseData = (data) => {
   if (!data) return {};
@@ -12,6 +13,7 @@ const parseData = (data) => {
 
 const AppSidebar = ({ user }) => {
   const userInfo = parseData(user);
+
   const location = useLocation();
   return (
     <aside className="main-sidebar sidebar-dark-primary elevation-4">
@@ -70,178 +72,194 @@ const AppSidebar = ({ user }) => {
                 >
                   {/* Add icons to the links using the .nav-icon class
                                 with font-awesome or any other icon font library */}
-                  <li className="nav-item menu-open">
-                    <NavLink
-                      to="/"
-                      className={({ isActive }) =>
-                        isActive ? "nav-link active" : "nav-link"
-                      }
-                    >
-                      <i className="bi bi-speedometer2"></i>
-                      <p>Tableau de Bord</p>
-                    </NavLink>
-                  </li>
-                  <li
-                    className={
-                      location.pathname === "/ajouter/un/rendez-vous" ||
-                      location.pathname === "/rendez-vous"
-                        ? "nav-item sub-menu menu-is-opening menu-open"
-                        : "sub-menu nav-item"
-                    }
-                  >
-                    <Link
-                      to="#"
-                      className={
-                        location.pathname === "/ajouter/un/rendez-vous" ||
-                        location.pathname === "/rendez-vous"
-                          ? "nav-link active"
-                          : "nav-link"
-                      }
-                    >
-                      <i className="bi bi-calendar-event"></i>
-                      <p>RDV/Commande</p>
-                      <i className="fas fa-angle-left right"></i>
-                    </Link>
-                    <ul className="nav nav-treeview">
-                      <li className="nav-item">
-                        <Link
-                          to="/ajouter/un/rendez-vous"
+                  {userInfo.group && userInfo.group.toLowerCase() === ADMIN && (
+                    <li className="nav-item menu-open">
+                      <NavLink
+                        to="/"
+                        className={({ isActive }) =>
+                          isActive ? "nav-link active" : "nav-link"
+                        }
+                      >
+                        <i className="bi bi-speedometer2"></i>
+                        <p>Tableau de Bord</p>
+                      </NavLink>
+                    </li>
+                  )}
+                  {userInfo.group && (userInfo.group.toLowerCase() === ADMIN ||
+                    userInfo.group.toLowerCase() === AGENT) && (
+                      <>
+                        <li
                           className={
-                            location.pathname === "/ajouter/un/rendez-vous"
-                              ? "nav-link nav-active"
-                              : "nav-link"
-                          }
-                        >
-                          <i className="bi bi-calendar-plus-fill"></i>
-                          <p>Ajoutez un rendez-vous</p>
-                        </Link>
-                      </li>
-                      <li className="nav-item">
-                        <Link
-                          to="/rendez-vous"
-                          className={
+                            location.pathname === "/ajouter/un/rendez-vous" ||
                             location.pathname === "/rendez-vous"
-                              ? "nav-link nav-active"
-                              : "nav-link"
+                              ? "nav-item sub-menu menu-is-opening menu-open"
+                              : "sub-menu nav-item"
                           }
                         >
-                          <i className="bi bi-list-columns-reverse"></i>
-                          <p>Liste des rendez-vous</p>
-                        </Link>
-                      </li>
-                    </ul>
-                  </li>
-                  <li
-                    className={
-                      location.pathname === "/ajouter/utilisateur" ||
-                      location.pathname === "/utilisateurs"
-                        ? "sub-menu nav-item menu-is-opening menu-open"
-                        : "sub-menu nav-item"
-                    }
-                  >
-                    <Link
-                      to="#"
-                      className={
-                        location.pathname === "/ajouter/utilisateur" ||
-                        location.pathname === "/utilisateurs"
-                          ? "nav-link active"
-                          : "nav-link"
-                      }
-                    >
-                      <i className="bi bi-people"></i>
-                      <p>Utilisateurs</p>
-                      <i className="fas fa-angle-left right"></i>
-                    </Link>
-                    <ul className="nav nav-treeview">
-                      <li className="nav-item">
-                        <Link
-                          to="/ajouter/utilisateur"
+                          <Link
+                            to="#"
+                            className={
+                              location.pathname === "/ajouter/un/rendez-vous" ||
+                              location.pathname === "/rendez-vous"
+                                ? "nav-link active"
+                                : "nav-link"
+                            }
+                          >
+                            <i className="bi bi-calendar-event"></i>
+                            <p>RDV/Commande</p>
+                            <i className="fas fa-angle-left right"></i>
+                          </Link>
+                          <ul className="nav nav-treeview">
+                            <li className="nav-item">
+                              <Link
+                                to="/ajouter/un/rendez-vous"
+                                className={
+                                  location.pathname ===
+                                  "/ajouter/un/rendez-vous"
+                                    ? "nav-link nav-active"
+                                    : "nav-link"
+                                }
+                              >
+                                <i className="bi bi-calendar-plus-fill"></i>
+                                <p>Ajoutez un rendez-vous</p>
+                              </Link>
+                            </li>
+                            <li className="nav-item">
+                              <Link
+                                to="/rendez-vous"
+                                className={
+                                  location.pathname === "/rendez-vous"
+                                    ? "nav-link nav-active"
+                                    : "nav-link"
+                                }
+                              >
+                                <i className="bi bi-list-columns-reverse"></i>
+                                <p>Liste des rendez-vous</p>
+                              </Link>
+                            </li>
+                          </ul>
+                        </li>
+                        <li
                           className={
-                            location.pathname === "/ajouter/utilisateur"
-                              ? "nav-link nav-active"
-                              : "nav-link"
-                          }
-                        >
-                          <i className="bi bi-person-plus"></i>
-                          <p>Ajouter un utilisateur</p>
-                        </Link>
-                      </li>
-                      <li className="nav-item">
-                        <Link
-                          to="/utilisateurs"
-                          className={
+                            location.pathname === "/ajouter/utilisateur" ||
                             location.pathname === "/utilisateurs"
-                              ? "nav-link nav-active"
-                              : "nav-link"
+                              ? "sub-menu nav-item menu-is-opening menu-open"
+                              : "sub-menu nav-item"
                           }
                         >
-                          <i className="bi bi-list-columns-reverse"></i>
-                          <p>Liste des utilisateurs</p>
-                        </Link>
-                      </li>
-                    </ul>
-                  </li>
-                  <li
-                    className={
-                      location.pathname === "/interventions" ||
-                      location.pathname === "/nature-des-biens"
-                        ? "sub-menu nav-item menu-is-opening menu-open"
-                        : "sub-menu nav-item"
-                    }
-                  >
-                    <Link
-                      to="#"
+                          <Link
+                            to="#"
+                            className={
+                              location.pathname === "/ajouter/utilisateur" ||
+                              location.pathname === "/utilisateurs"
+                                ? "nav-link active"
+                                : "nav-link"
+                            }
+                          >
+                            <i className="bi bi-people"></i>
+                            <p>Utilisateurs</p>
+                            <i className="fas fa-angle-left right"></i>
+                          </Link>
+                          <ul className="nav nav-treeview">
+                            <li className="nav-item">
+                              <Link
+                                to="/ajouter/utilisateur"
+                                className={
+                                  location.pathname === "/ajouter/utilisateur"
+                                    ? "nav-link nav-active"
+                                    : "nav-link"
+                                }
+                              >
+                                <i className="bi bi-person-plus"></i>
+                                <p>Ajouter un utilisateur</p>
+                              </Link>
+                            </li>
+                            <li className="nav-item">
+                              <Link
+                                to="/utilisateurs"
+                                className={
+                                  location.pathname === "/utilisateurs"
+                                    ? "nav-link nav-active"
+                                    : "nav-link"
+                                }
+                              >
+                                <i className="bi bi-list-columns-reverse"></i>
+                                <p>Liste des utilisateurs</p>
+                              </Link>
+                            </li>
+                          </ul>
+                        </li>
+                      </>
+                    )}
+                  {userInfo.group && userInfo.group.toLowerCase() === ADMIN && (
+                    <li
                       className={
                         location.pathname === "/interventions" ||
                         location.pathname === "/nature-des-biens"
-                          ? "nav-link active"
-                          : "nav-link"
+                          ? "sub-menu nav-item menu-is-opening menu-open"
+                          : "sub-menu nav-item"
                       }
                     >
-                      <i className="bi bi-gear"></i>
-                      <p>Paramètres</p>
-                      <i className="fas fa-angle-left right"></i>
-                    </Link>
-                    <ul className="nav nav-treeview">
-                      <li className="nav-item">
-                        <Link
-                          to="interventions"
-                          className={
-                            location.pathname === "/interventions"
-                              ? "nav-link nav-active"
-                              : "nav-link"
-                          }
-                        >
-                          <i className="bi bi-gear-wide-connected"></i>
-                          <p>Type d'interventions</p>
-                        </Link>
-                      </li>
-                      <li className="nav-item">
-                        <Link
-                          to="/nature-des-biens"
-                          className={
-                            location.pathname === "/nature-des-biens"
-                              ? "nav-link nav-active"
-                              : "nav-link"
-                          }
-                        >
-                          <i className="bi bi-building"></i>
-                          <p>Nature du bien</p>
-                        </Link>
-                      </li>
-                    </ul>
-                  </li>
-                  <li className="nav-item menu-open">
-                    <NavLink
-                      to="/exporter"
-                      className={({ isActive }) =>
-                        isActive ? "nav-link active" : "nav-link"
-                      }
-                    >
-                      <i className="bi bi-cloud-arrow-down"></i>
-                      <p>Exporter</p>
-                    </NavLink>
-                  </li>
+                      <Link
+                        to="#"
+                        className={
+                          location.pathname === "/interventions" ||
+                          location.pathname === "/nature-des-biens"
+                            ? "nav-link active"
+                            : "nav-link"
+                        }
+                      >
+                        <i className="bi bi-gear"></i>
+                        <p>Paramètres</p>
+                        <i className="fas fa-angle-left right"></i>
+                      </Link>
+                      <ul className="nav nav-treeview">
+                        <li className="nav-item">
+                          <Link
+                            to="interventions"
+                            className={
+                              location.pathname === "/interventions"
+                                ? "nav-link nav-active"
+                                : "nav-link"
+                            }
+                          >
+                            <i className="bi bi-gear-wide-connected"></i>
+                            <p>Type d'interventions</p>
+                          </Link>
+                        </li>
+                        <li className="nav-item">
+                          <Link
+                            to="/nature-des-biens"
+                            className={
+                              location.pathname === "/nature-des-biens"
+                                ? "nav-link nav-active"
+                                : "nav-link"
+                            }
+                          >
+                            <i className="bi bi-building"></i>
+                            <p>Nature du bien</p>
+                          </Link>
+                        </li>
+                      </ul>
+                    </li>
+                  )}
+{/* 
+                  {userInfo.group && (
+                    userInfo.group.toLowerCase() === ADMIN ||
+                    userInfo.group.toLowerCase() === AGENT
+                  ) && (
+                    <li className="nav-item menu-open">
+                      <NavLink
+                        to="/exporter"
+                        className={({ isActive }) =>
+                          isActive ? "nav-link active" : "nav-link"
+                        }
+                      >
+                        <i className="bi bi-cloud-arrow-down"></i>
+                        <p>Exporter</p>
+                      </NavLink>
+                    </li>
+                  )} */}
                 </ul>
               </nav>
               {/* .sidebar-menu */}

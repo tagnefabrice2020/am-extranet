@@ -14,11 +14,9 @@ class UserService {
   async store(user) {
     switch (user.role) {
       case "1":
-        console.log(user.role);
         const response = await axios.post(API_URL + "/admin_app/admin/", user);
         return response;
       case "2":
-        console.log(user.role);
         const response_1 = await axios.post(
           API_URL + "/agent_app/agent/",
           user
@@ -44,8 +42,7 @@ class UserService {
     return axios
       .get(API_URL + `/admin_app/users/?value=${value}&page=${page}&perPage=${perPage}`)
       .then((response) => {
-        console.log(response)
-        const users = response.data.data;
+        const users = response.data;
         return users;
       });
   }
@@ -73,20 +70,18 @@ class UserService {
   }
 
   updateUser(user, id) {
+    console.log(id)
     let url;
     if (user.role === "1") {
       url = `/admin_app/admin/${id}`;
     } else if (user.role === "2") {
-      console.log(user.type);
       url = `/agent_app/agent/${id}`;
     } else if (user.role === "3") {
       url = `/client_app/client/${id}`;
     } else if (user.role === "4") {
       url = `/salarie_app/salarie/${id}`;
     }
-    console.log(API_URL + `${url}`)
     delete user['role']
-    console.log(user)
     return axios.put(API_URL + `${url}`, user).then((response) => {
       return response;
     });

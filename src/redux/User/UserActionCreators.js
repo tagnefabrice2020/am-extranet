@@ -136,9 +136,10 @@ export const fetchOneUserRequestSucces = (user) => {
   };
 };
 
-export const fetchSingleUserFailed = () => {
+export const fetchSingleUserFailed = (errorCode) => {
   return {
     type: FETCH_ONE_USER_ERROR,
+    payload: errorCode
   };
 };
 
@@ -172,12 +173,13 @@ export const searchUsers = (page, perPage) => {
     const users = state.users;
     if (users.searchValue.length > 0) {
       UserService.search(users.searchValue, page, perPage).then(
-        (users) => {
-          const totalPage = Math.ceil(users.total / users.per_page);
-          dispatch(setPage(users.current_page));
-          dispatch(setUsersPerPage(users.per_page));
+        (results) => {
+          console.log(results);
+          const totalPage = Math.ceil(results.count / 10);
+          dispatch(setPage(page));
+          dispatch(setUsersPerPage(perPage));
           dispatch(setTotalPage(totalPage));
-          dispatch(searchSuccess(users.data));
+          dispatch(searchSuccess(results.results));
           return Promise.resolve();
         },
         (error) => {
@@ -205,7 +207,12 @@ export const storeUser = (user) => {
         }
       },
       (error) => {
-        toast.error("La sauvegarde de l'utilisateur a échouée.");
+        console.log(error.response.status);
+        if (error.response.status === 401) {
+          toast.info('Vous avez pas le l\'access pour  effectuer cette operation', {transitionDuration: 3000})
+        } else {
+          toast.error("La sauvegarde de l'utilisateur a échouée.", {transitionDuration: 3000});
+        }
         return Promise.reject();
       }
     );
@@ -217,11 +224,13 @@ export const fetchOneUser = (user, type) => {
     dispatch(fetchOneUserRequest());
     UserService.fetchOneUser(user, type).then(
       (user) => {
+        console.log(user);
         dispatch(fetchOneUserRequestSucces(user));
         return Promise.resolve();
       },
       (error) => {
-        dispatch(fetchSingleUserFailed());
+        console.log(error.response.status);
+        dispatch(fetchSingleUserFailed(error.response.status));
         toast.error("Impossible de charger les information de l'utilisateur.");
       }
     );
@@ -251,7 +260,7 @@ export const updateUser = (user, uuid) => {
         if (response.status === 200) {
           toast.success("L'utilisateur enregistrer avec sucess.");
         }
-        console.log(response)
+        console.log(response);
       },
       (error) => {
         console.log(error);

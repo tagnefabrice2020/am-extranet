@@ -40,7 +40,7 @@ const newAppointementSchema = object({
   client: string()
     .required("Veuillez choisir le client concernées.")
     .typeError("Veuillez choisir le client concernées."),
-  aceint_tenant_info: string()
+    adresse_ancien_locataire: string()
     .typeError("Veuillez saisir des characteres alpha-numériques.")
     .required("Veuillez saisir l'identité de l'ancien locataire"),
 
@@ -179,6 +179,7 @@ const NewAppointment = ({ storeAppointment, appointments }) => {
       passeur: 1,
       intervention: parseInt(data.intervention),
       client: parseInt(data.client),
+      type_propriete: parseInt(data.type_propriete)
     };
     console.log(newData);
     storeAppointment(newData);
@@ -517,13 +518,13 @@ const NewAppointment = ({ storeAppointment, appointments }) => {
                             type="text"
                             className={
                               "form-control " +
-                              (errors.aceint_tenant_info && ` is-border-red`)
+                              (errors.adresse_ancien_locataire && ` is-border-red`)
                             }
-                            {...register("aceint_tenant_info")}
+                            {...register("adresse_ancien_locataire")}
                           />
-                          {errors.aceint_tenant_info && (
+                          {errors.adresse_ancien_locataire && (
                             <small className="form-text is-red">
-                              {errors.aceint_tenant_info.message}
+                              {errors.adresse_ancien_locataire.message}
                             </small>
                           )}
                         </div>
@@ -532,7 +533,7 @@ const NewAppointment = ({ storeAppointment, appointments }) => {
 
                     <div className="row mt-2 mb-3">
                       <div className="col">
-                        <h5>SPECIFICITES DU BIEN</h5>
+                        <h5>SPECIFICITES DU BIEN</h5> 
                       </div>
                     </div>
 

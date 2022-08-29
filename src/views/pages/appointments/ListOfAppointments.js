@@ -35,6 +35,7 @@ const ListOfAppointments = ({
         parseInt(appointments.perPage)
       );
     }
+    return () => {}
   }, [
     appointments.currentPage,
     appointments.perPage,
@@ -44,7 +45,8 @@ const ListOfAppointments = ({
   ]);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
+    let timer;
+    timer = setTimeout(() => {
       searchAppointments(
         appointments.currentPage,
         parseInt(appointments.perPage)
@@ -131,8 +133,8 @@ const ListOfAppointments = ({
                         className="form-control float-right"
                         placeholder="Recherche"
                         onChange={async (event) => {
-                          searchingAppointments(event.target.value);
-                          setAppointmentPage(1);
+                          // searchingAppointments(event.target.value);
+                          // setAppointmentPage(1);
                         }}
                       />
 
@@ -157,7 +159,6 @@ const ListOfAppointments = ({
                   {!appointments.loading &&
                     appointments.appointments.length > 0 && (
                       <table className="table table-head-fixed text-nowrap">
-                          {console.log(appointments)}
                         <thead>
                           <tr>
                             <th></th>
@@ -210,6 +211,14 @@ const ListOfAppointments = ({
                                   <i
                                     className="bi bi-pencil-square"
                                     style={{ color: `#000` }}
+                                  />
+                                </Link> &nbsp;
+                                <Link
+                                  to={`/voir/${a.id}/rendez-vous`}
+                                >
+                                  <i
+                                    className="bi bi-eye"
+                                    style={{ color: `#867` }}
                                   />
                                 </Link>
                               </td>
