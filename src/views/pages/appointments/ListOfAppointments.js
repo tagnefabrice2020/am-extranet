@@ -65,26 +65,26 @@ const ListOfAppointments = ({
       backgroundColor: "",
       color: "",
     };
-
-    if (title === "constat sortant") {
+    const lowerCaseTitle = title.toLowerCase();
+    if (lowerCaseTitle === "constat sortant") {
       style.backgroundColor = "#9b30ff";
       style.color = "#fff";
-    } else if (title === "constat entrant") {
+    } else if (lowerCaseTitle === "constat entrant") {
       style.backgroundColor = "#0b86aa";
       style.color = "#fff";
-    } else if (title === "constat avant travaux") {
+    } else if (lowerCaseTitle === "constat avant travaux") {
       style.backgroundColor = "#6e6767";
       style.color = "#fff";
-    } else if (title === "constat après travaux") {
+    } else if (lowerCaseTitle === "constat après travaux") {
       style.backgroundColor = "#0d9f3f";
       style.color = "#fff";
-    } else if (title === "constat entrant meublé") {
+    } else if (lowerCaseTitle === "constat entrant meublé") {
       style.backgroundColor = "#fcafac";
       style.color = "#fff";
-    } else if (title === "constat sortant meublé") {
+    } else if (lowerCaseTitle === "constat sortant meublé") {
       style.backgroundColor = "#8c1567";
       style.color = "#fff";
-    } else if (title === "visite conseil") {
+    } else if (lowerCaseTitle === "visite conseil") {
       style.backgroundColor = "#bf9053";
       style.color = "#fff";
     }
@@ -172,26 +172,26 @@ const ListOfAppointments = ({
                           </tr>
                         </thead>
                         <tbody>
-                          {appointments.appointments.map((a, i) => (
+                          {appointments?.appointments.map((a, i) => (
                             <tr key={i}>
                               <td>
-                                {appointments.currentPage * 10 - 10 + i + 1}
+                                {appointments?.currentPage * 10 - 10 + i + 1}
                               </td>
                               <td>
-                                {a.propriete.adresse}, {a.propriete.codePostal} {" "}
-                                {a.propriete.ville}
+                                {a?.propriete?.adresse}, {a?.propriete?.codePostal} {" "}
+                                {a?.propriete?.ville}
                               </td>
                               <td className="text-center">{new Date(a.date).toLocaleString()}</td>
                               <td className="text-center">
                                 <span
                                   className="badge"
-                                  style={getColor(a.intervention.type)}
+                                  style={getColor(a?.intervention?.type)}
                                 >
-                                  {a.intervention.type}
+                                  {a?.intervention?.type}
                                 </span>
                               </td>
                               <td>
-                                {a.agent.user.prenom} {a.agent.user.nom}
+                                {a?.agent?.user?.prenom} {a?.agent?.user?.nom}
                               </td>
                               {/* <td style={{ position: `relative` }}>
                                   <Tooltip>

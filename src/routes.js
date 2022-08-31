@@ -54,7 +54,7 @@ const routes = [
     auth: true,
     name: "List des Rendez-vous",
     element: ListOfAppointment,
-    roles: ["administrateur", "agent"],
+    roles: ["administrateur", "agent", "client"],
   },
   {
     path: "/interventions",
@@ -131,7 +131,7 @@ const routes = [
     auth: true,
     name: "modifier le rendez-vous",
     element: EditAppointment,
-    roles: ["administrateur", "agent"],
+    roles: ["administrateur", "agent", "client"],
   },
   {
     path: "/exporter",

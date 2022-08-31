@@ -2,18 +2,11 @@ import React from "react";
 import { connect } from "react-redux";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import "../../src/assets/dist/js/menu.js";
-import { ADMIN, AGENT } from "../utils/constant.js";
-
-const parseData = (data) => {
-  if (!data) return {};
-  if (typeof data === "object") return data;
-  if (typeof data === "string") return JSON.parse(data);
-  return {};
-};
+import { ADMIN, AGENT, CLIENT } from "../utils/constant.js";
+import { parseData } from "../utils/transformer";
 
 const AppSidebar = ({ user }) => {
   const userInfo = parseData(user);
-
   const location = useLocation();
   return (
     <aside className="main-sidebar sidebar-dark-primary elevation-4">
@@ -72,21 +65,77 @@ const AppSidebar = ({ user }) => {
                 >
                   {/* Add icons to the links using the .nav-icon class
                                 with font-awesome or any other icon font library */}
-                  {userInfo.group && userInfo.group.toLowerCase() === ADMIN && (
-                    <li className="nav-item menu-open">
-                      <NavLink
-                        to="/"
-                        className={({ isActive }) =>
-                          isActive ? "nav-link active" : "nav-link"
+                  {userInfo?.group &&
+                    (userInfo?.group?.toLowerCase() === ADMIN ||
+                      userInfo?.group?.toLowerCase() === CLIENT ||
+                      userInfo?.group?.toLowerCase() === AGENT) && (
+                      <li className="nav-item menu-open">
+                        <NavLink
+                          to="/"
+                          className={({ isActive }) =>
+                            isActive ? "nav-link active" : "nav-link"
+                          }
+                        >
+                          <i className="bi bi-speedometer2"></i>
+                          <p>Tableau de Bord</p>
+                        </NavLink>
+                      </li>
+                    )}
+                  {userInfo?.group?.toLowerCase() === CLIENT && (
+                    <li
+                      className={
+                        location.pathname === "/ajouter/un/rendez-vous" ||
+                        location.pathname === "/rendez-vous"
+                          ? "nav-item sub-menu menu-is-opening menu-open"
+                          : "sub-menu nav-item"
+                      }
+                    >
+                      <Link
+                        to="#"
+                        className={
+                          location.pathname === "/ajouter/un/rendez-vous" ||
+                          location.pathname === "/rendez-vous"
+                            ? "nav-link active"
+                            : "nav-link"
                         }
                       >
-                        <i className="bi bi-speedometer2"></i>
-                        <p>Tableau de Bord</p>
-                      </NavLink>
+                        <i className="bi bi-calendar-event"></i>
+                        <p>RDV/Commande</p>
+                        <i className="fas fa-angle-left right"></i>
+                      </Link>
+                      <ul className="nav nav-treeview">
+                        <li className="nav-item">
+                          <Link
+                            to="/ajouter/un/rendez-vous"
+                            className={
+                              location.pathname === "/ajouter/un/rendez-vous"
+                                ? "nav-link nav-active"
+                                : "nav-link"
+                            }
+                          >
+                            <i className="bi bi-calendar-plus-fill"></i>
+                            <p>Ajoutez un rendez-vous</p>
+                          </Link>
+                        </li>
+                        <li className="nav-item">
+                          <Link
+                            to="/rendez-vous"
+                            className={
+                              location.pathname === "/rendez-vous"
+                                ? "nav-link nav-active"
+                                : "nav-link"
+                            }
+                          >
+                            <i className="bi bi-list-columns-reverse"></i>
+                            <p>Liste des rendez-vous</p>
+                          </Link>
+                        </li>
+                      </ul>
                     </li>
                   )}
-                  {userInfo.group && (userInfo.group.toLowerCase() === ADMIN ||
-                    userInfo.group.toLowerCase() === AGENT) && (
+                  {userInfo?.group &&
+                    (userInfo?.group.toLowerCase() === ADMIN ||
+                      userInfo?.group.toLowerCase() === AGENT) && (
                       <>
                         <li
                           className={
@@ -191,7 +240,7 @@ const AppSidebar = ({ user }) => {
                         </li>
                       </>
                     )}
-                  {userInfo.group && userInfo.group.toLowerCase() === ADMIN && (
+                  {userInfo?.group && userInfo?.group.toLowerCase() === ADMIN && (
                     <li
                       className={
                         location.pathname === "/interventions" ||
@@ -243,7 +292,7 @@ const AppSidebar = ({ user }) => {
                       </ul>
                     </li>
                   )}
-{/* 
+                  {/* 
                   {userInfo.group && (
                     userInfo.group.toLowerCase() === ADMIN ||
                     userInfo.group.toLowerCase() === AGENT

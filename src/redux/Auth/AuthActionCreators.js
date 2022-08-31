@@ -40,9 +40,12 @@ export const authenticate = (data) => {
     dispatch(authenticating());
     AuthService.login(data).then(
       (response) => {
-        // window.location.reload();
-        console.log(response);
-        dispatch(authenticated(response));
+        
+          window.location.reload();
+      
+        new Promise((resolve) => setTimeout(resolve, 500)).then(() => {
+            dispatch(authenticated(response));
+        });
         return Promise.resolve();
       },
       (error) => {

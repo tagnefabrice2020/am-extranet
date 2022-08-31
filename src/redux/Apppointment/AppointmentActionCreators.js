@@ -158,7 +158,7 @@ export const fetchOneAppointment = (uuid) => {
     return dispatch => {
         dispatch(fetchOneAppointmentRequest());
         AppointementService.fetchOneAppointment(uuid)
-            .then((appointment) => { console.log(appointment)
+            .then((appointment) => {
                 dispatch(fetchOneAppointmentRequestSuccess(appointment))
                 return Promise.resolve();
             }, error => {
@@ -173,13 +173,11 @@ export const updateAppointment = (appointment, uuid) => {
     return dispatch => {
         AppointementService.update(appointment, uuid)
             .then((response) => {
-                console.log(response);
                 if(response.status === 200 || response.status === 201) {
                     toast.success('Rendez-vous enregistrer avec success.');
                 }
             }, 
             error => {
-                console.log(error)
                 toast.error('Impossible de modifier le rendez-vous, veuillez contacter le service de maintenance.');
             })
     }

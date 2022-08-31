@@ -6,6 +6,8 @@ import { connect } from "react-redux";
 import { storeAppointment } from "../../../redux/Apppointment/AppointmentActionCreators";
 import axios from "axios";
 import { API_URL } from "../../../config";
+import { parseData } from "../../../utils/transformer";
+import { CLIENT } from "../../../utils/constant";
 
 const newAppointementSchema = object({
   ref_lot: string().typeError("Veuillez des character alpha-numérique"),
@@ -18,7 +20,7 @@ const newAppointementSchema = object({
     .required("Veuillez choisir parmis les options."),
   date: date().typeError("Veuillez choisir une date."),
   agent: number().typeError("Veuillez choisir parmis les options."),
-  passeur: string(),
+  // passeur: string(),
 
   telephone_locataire: number()
     .test(
@@ -40,7 +42,7 @@ const newAppointementSchema = object({
   client: string()
     .required("Veuillez choisir le client concernées.")
     .typeError("Veuillez choisir le client concernées."),
-    adresse_ancien_locataire: string()
+  adresse_ancien_locataire: string()
     .typeError("Veuillez saisir des characteres alpha-numériques.")
     .required("Veuillez saisir l'identité de l'ancien locataire"),
 
@@ -107,11 +109,12 @@ const newAppointementSchema = object({
   ),
 });
 
-const NewAppointment = ({ storeAppointment, appointments }) => {
+const NewAppointment = ({ storeAppointment, appointments, user }) => {
   const { register, handleSubmit, reset, formState } = useForm({
     mode: "unTouched",
     resolver: yupResolver(newAppointementSchema),
   });
+  const userInfo = parseData(user);
   const [agentLoading, setAgentsLoading] = useState(true);
   const [agents, setAgents] = useState([]);
   const [clientsLoading, setClientsLoading] = useState(false);
@@ -171,6 +174,7 @@ const NewAppointment = ({ storeAppointment, appointments }) => {
   }, [appointments.reset.form, reset]);
 
   const newAppointment = (data) => {
+    if (userInfo.group.toLowerCase() === CLIENT) delete data.agent;
     const newData = {
       ...data,
       date: data.date.toISOString().slice(0, 19).replace("T", " "),
@@ -179,9 +183,8 @@ const NewAppointment = ({ storeAppointment, appointments }) => {
       passeur: 1,
       intervention: parseInt(data.intervention),
       client: parseInt(data.client),
-      type_propriete: parseInt(data.type_propriete)
+      type_propriete: parseInt(data.type_propriete),
     };
-    console.log(newData);
     storeAppointment(newData);
     if (appointments.reset.form) {
       reset();
@@ -335,20 +338,24 @@ const NewAppointment = ({ storeAppointment, appointments }) => {
                       <div className="col">
                         <div className="form-group">
                           <label htmlFor="exampleInputEmail1">Client</label>
+
                           <select
                             className={
                               "form-control " +
                               (errors.client && ` is-border-red`)
                             }
                             {...register("client")}
+                           defaultValue = {userInfo.group.toLowerCase() === CLIENT && userInfo?.client_id}
                           >
-                            {!clientsLoading &&
+                            {userInfo.group.toLowerCase() === CLIENT && <option value={userInfo?.client_id}>{userInfo.prenom.toUpperCase()} {userInfo.nom.toUpperCase()}</option>}
+                            {!clientsLoading && userInfo.group.toLowerCase() !== CLIENT &&
                               clients.map((client, idx) => (
                                 <option key={idx} value={client.id}>
                                   {client.user.prenom} {client.user.nom}
                                 </option>
                               ))}
                           </select>
+
                           {errors.client && (
                             <small className="form-text is-red">
                               {errors.client.message}
@@ -379,7 +386,7 @@ const NewAppointment = ({ storeAppointment, appointments }) => {
                       </div>
                     </div>
                     <div className="row">
-                      <div className="col">
+                      {/* <div className="col">
                         <div className="form-group">
                           <label htmlFor="exampleInputEmail1">Passeur</label>
                           <select
@@ -396,33 +403,35 @@ const NewAppointment = ({ storeAppointment, appointments }) => {
                             </small>
                           )}
                         </div>
-                      </div>
-                      <div className="col">
-                        <div className="form-group">
-                          <label htmlFor="exampleInputEmail1">
-                            Nom de l'agent Amexpert rattaché
-                          </label>
-                          <select
-                            className={
-                              "form-control " +
-                              (errors.agent && ` is-border-red`)
-                            }
-                            {...register("agent")}
-                          >
-                            {!agentLoading &&
-                              agents.map((agent, idx) => (
-                                <option key={idx} value={agent.id}>
-                                  {agent.user.prenom} {agent.user.nom}
-                                </option>
-                              ))}
-                          </select>
-                          {errors.agent && (
-                            <small className="form-text is-red">
-                              {errors.agent.message}
-                            </small>
-                          )}
-                        </div>
-                      </div>
+                      </div> */}
+                      {userInfo.group.toLowerCase() !== CLIENT && [
+                        <div className="col">
+                          <div className="form-group">
+                            <label htmlFor="exampleInputEmail1">
+                              Nom de l'agent Amexpert rattaché
+                            </label>
+                            <select
+                              className={
+                                "form-control " +
+                                (errors.agent && ` is-border-red`)
+                              }
+                              {...register("agent")}
+                            >
+                              {!agentLoading &&
+                                agents.map((agent, idx) => (
+                                  <option key={idx} value={agent.id}>
+                                    {agent.user.prenom} {agent.user.nom}
+                                  </option>
+                                ))}
+                            </select>
+                            {errors.agent && (
+                              <small className="form-text is-red">
+                                {errors.agent.message}
+                              </small>
+                            )}
+                          </div>
+                        </div>,
+                      ]}
                     </div>
 
                     <div className="row mt-2 mb-3">
@@ -518,7 +527,8 @@ const NewAppointment = ({ storeAppointment, appointments }) => {
                             type="text"
                             className={
                               "form-control " +
-                              (errors.adresse_ancien_locataire && ` is-border-red`)
+                              (errors.adresse_ancien_locataire &&
+                                ` is-border-red`)
                             }
                             {...register("adresse_ancien_locataire")}
                           />
@@ -533,7 +543,7 @@ const NewAppointment = ({ storeAppointment, appointments }) => {
 
                     <div className="row mt-2 mb-3">
                       <div className="col">
-                        <h5>SPECIFICITES DU BIEN</h5> 
+                        <h5>SPECIFICITES DU BIEN</h5>
                       </div>
                     </div>
 
@@ -931,6 +941,7 @@ const NewAppointment = ({ storeAppointment, appointments }) => {
 const mapStateToProps = (state) => {
   return {
     appointments: state.appointments,
+    user: state.auth.authUser,
   };
 };
 

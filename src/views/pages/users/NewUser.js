@@ -20,13 +20,21 @@ const NewUser = ({ storeUser, users, auth }) => {
   }, [users.reset.form, reset]);
 
   const newUser = (data) => {
-    if (data.role === "2")
+    if (data.role === "2") {
       data = {
         ...data,
         trigramme:
           data.prenom.substr(0, 1).toUpperCase() +
           data.nom.substr(0, 1).toUpperCase(),
-      };
+      };}
+      if (data.role === "3") {
+        data = {
+          ...data,
+          email_reponsable: data.email, // needs to correct this in db
+          code_client: 'AZ-564'
+        };
+        delete data.email
+      }
     storeUser(data);
   };
 

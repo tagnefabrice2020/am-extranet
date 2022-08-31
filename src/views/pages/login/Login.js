@@ -10,18 +10,15 @@ import { useTitle } from "../../../config/useTitle";
 
 const loginSchema = object({
     username: string().required('L\'email est obligatoire.').typeError('Veuillez saisir un adresse mail correct.'),
-    password: string().required('Le mot de passe est obligation.')/*.min(6, 'Le mot de passe doit être de six charactères minimum.')*/
+    password: string().required('Le mot de passe est obligation.')
 });
 
 const Login = ({ loginData, authenticate }) => {
-
     useTitle('Authentifier vous!');
-
     const { register, handleSubmit, formState } = useForm({
         mode: 'onChange',
         resolver: yupResolver(loginSchema)
-    })
-
+    });
     const { errors, isSubmitting, isValid } = formState;
 
     const loginAction = (data) => {

@@ -100,7 +100,6 @@ const EditSalarie = ({ users, fetchOneUser, updateUser }) => {
   const { isSubmitting, errors } = formState;
 
   const editUser = (data) => {
-    console.log(data);
     const newData = { ...data, is_active: true, mdp: "password" };
     updateUser(newData, uuid);
   };

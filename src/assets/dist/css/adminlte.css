@@ -5484,13 +5484,20 @@ input[type="button"].btn-block {
 
 .bg-3 {
   border-radius: 30px;
-  background: #970505;
+  background: linear-gradient(60deg, #f55a4e, #f32c1e); /*#970505;*/
   color: #fff;
 }
 
 .bg-4 {
   border-radius: 30px;
   background: linear-gradient(#8b2d96 0%, #4f1555 100%);
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.16);
+  color: #fff;
+}
+
+.bg-5 {
+  border-radius: 30px;
+  background: linear-gradient(60deg, #8ed6e4, #64c8da);
   box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.16);
   color: #fff;
 }

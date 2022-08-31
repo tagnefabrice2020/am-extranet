@@ -3,21 +3,19 @@ import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 // import styled from "styled-components";
 import AppCalendar from "../../../components/AppCalendar";
-import { loadStats } from "../../../redux/DashBoardCard/DashboardCardActionCreators";
+import { parseData } from "../../../utils/transformer";
+import { ADMIN, AGENT, CLIENT } from "../../../utils/constant.js";
 
-const Dashboard = ({ stats, loadStats, auth }) => {
+const Dashboard = ({ stats, auth }) => {
   const [statistics, setStatistics] = useState({});
   const [loadStatistics, setLoadStats] = useState(true);
+  const userInfo = parseData(auth.authUser);
 
   useEffect(() => {
     const stats = JSON.parse(localStorage.getItem("stats"));
     setStatistics(stats);
     setLoadStats(false);
   }, []);
-
-  useEffect(() => {
-    loadStats();
-  }, [loadStats]);
 
   return (
     <div className="content-wrapper" style={{ minHeight: 375 + "px" }}>
@@ -47,10 +45,11 @@ const Dashboard = ({ stats, loadStats, auth }) => {
       <section className="content">
         <div className="container-fluid">
           <div className="row">
+             {userInfo.group.toLowerCase() !== CLIENT &&
             <div className="col">
               <div className="small-box bg-1" style={{ position: "relative" }}>
                 <div className="inner">
-                  <h3>{!loadStatistics && statistics.utilisateurs}</h3>
+                  <h3>{!loadStatistics && statistics?.utilisateurs}</h3>
                   <p>NOMBRE D’UTILISATEURS</p>
                 </div>
                 <div className="icon">
@@ -65,12 +64,72 @@ const Dashboard = ({ stats, loadStats, auth }) => {
                   {/* Plus d'info <i className="fas fa-arrow-circle-right"></i> */}
                 </span>
               </div>
-            </div>
+            </div>}
+            {userInfo.group.toLowerCase() === ADMIN && 
+            <div className="col">
+              <div className="small-box bg-3" style={{ position: "relative" }}>
+                <div className="inner">
+                  <h3>{!loadStatistics && statistics?.admin}</h3>
+                  <p>NOMBRE D'ADMINISTRATEURS</p>
+                </div>
+                <div className="icon">
+                  <i className="fas fa-users"></i>
+                </div>
+                <span
+                  className="small-box-footer cursor"
+                  type="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  {/* Plus d'info <i className="fas fa-arrow-circle-right"></i> */}
+                </span>
+              </div>
+            </div>}
+
             {/* ./col */}
+            {userInfo.group.toLowerCase() !== CLIENT &&
+            [<div className="col">
+              <div className="small-box bg-4" style={{ position: "relative" }}>
+                <div className="inner">
+                  <h3>{!loadStatistics && statistics?.agent}</h3>
+                  <p>NOMBRE D'AGENT</p>
+                </div>
+                <div className="icon">
+                  <i className="fas fa-users"></i>
+                </div>
+                <span
+                  className="small-box-footer cursor"
+                  type="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  {/* Plus d'info <i className="fas fa-arrow-circle-right"></i> */}
+                </span>
+              </div>
+            </div>,
+            <div className="col">
+              <div className="small-box bg-5" style={{ position: "relative" }}>
+                <div className="inner">
+                  <h3>{!loadStatistics && statistics?.client}</h3>
+                  <p>NOMBRE DE CLIENT</p>
+                </div>
+                <div className="icon">
+                  <i className="fas fa-users"></i>
+                </div>
+                <span
+                  className="small-box-footer cursor"
+                  type="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  {/* Plus d'info <i className="fas fa-arrow-circle-right"></i> */}
+                </span>
+              </div>
+            </div>]}
             <div className="col">
               <div className="small-box bg-2">
                 <div className="inner">
-                  <h3>{!loadStatistics && statistics.rdv}</h3>
+                  <h3>{!loadStatistics && statistics?.rdv}</h3>
 
                   <p>NOMBRE DE RENDEZ-VOUS</p>
                 </div>
@@ -224,7 +283,7 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    loadStats: () => dispatch(loadStats()),
+    // loadStats: () => dispatch(loadStats()),
   };
 };
 

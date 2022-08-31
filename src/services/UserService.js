@@ -5,7 +5,7 @@ class UserService {
   async fetchUsers(page, perPage) {
     return axios
       .get(API_URL + `/admin_app/users?page=${page}`)
-      .then((response) => { console.log(response)
+      .then((response) => {
         const users = response.data;
         return users;
       });
@@ -23,6 +23,7 @@ class UserService {
         );
         return response_1;
       case "3":
+        delete user.role
         const response_2 = await axios.post(
           API_URL + "/client_app/client/",
           user
@@ -70,7 +71,6 @@ class UserService {
   }
 
   updateUser(user, id) {
-    console.log(id)
     let url;
     if (user.role === "1") {
       url = `/admin_app/admin/${id}`;

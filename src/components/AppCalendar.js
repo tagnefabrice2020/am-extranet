@@ -36,7 +36,6 @@ const AppCalendar = () => {
           `/rdv_app/rdv/date?debut=${formatDate(from)}&fin=${formatDate(to)}`
       );
       const events = response.data.results;
-      // console.log(events);
       callback(
         events.map((e) => {
           return {
@@ -60,28 +59,28 @@ const AppCalendar = () => {
   };
 
   function renderEventContent(eventInfo) {
-    //console.log(eventInfo)
     let backgroundColor, textColor;
     const title = JSON.parse(eventInfo.event.title);
-    if (title.title === "constat sortant") {
+    const lowerCaseTitle = title.title.toLowerCase();
+    if (lowerCaseTitle === "constat sortant") {
       backgroundColor = "#9b30ff";
       textColor = "#fff";
-    } else if (title.title === "constat entrant") {
+    } else if (lowerCaseTitle === "constat entrant") {
       backgroundColor = "#0b86aa";
       textColor = "#fff";
-    } else if (title.title === "constat avant travaux") {
+    } else if (lowerCaseTitle === "constat avant travaux") {
       backgroundColor = "#6e6767";
       textColor = "#fff";
-    } else if (title.title === "constat après travaux") {
+    } else if (lowerCaseTitle=== "constat après travaux") {
       backgroundColor = "#0d9f3f";
       textColor = "#fff";
-    } else if (title.title === "constat entrant meublé") {
+    } else if (lowerCaseTitle === "constat entrant meublé") {
       backgroundColor = "#fcafac";
       textColor = "#fff";
-    } else if (title.title === "constat sortant meublé") {
+    } else if (lowerCaseTitle === "constat sortant meublé") {
       backgroundColor = "#8c1567";
       textColor = "#fff";
-    } else if (title.title === "visite conseil") {
+    } else if (lowerCaseTitle === "visite conseil") {
       backgroundColor = "#bf9053";
       textColor = "#fff";
     } else {

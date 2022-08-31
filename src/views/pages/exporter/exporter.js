@@ -37,7 +37,6 @@ const Export = () => {
         setExportDate([]);
         await axios.post(API_URL + '/export/appointments', data)
             .then((response) => {
-                console.log(response);
                 setExportDate(response.data);
                 setLoading(false);
             })

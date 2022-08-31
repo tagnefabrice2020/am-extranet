@@ -66,8 +66,8 @@ const ShowAppointment = ({ fetchOneAppointment, appointments }) => {
                      <b> {`${appointments.oneAppointment.client.user.prenom.toUpperCase()}  ${appointments.oneAppointment.client.user.nom.toUpperCase()}`}{" "}</b>
                       à un{" "}
                       <span style={{padding: '0px 5px', background: "#847", color: "#fff", borderRadius: "6px"}}>{appointments.oneAppointment.intervention.type}</span>{" "}
-                      avec {"  L'agent "} <b>{appointments.oneAppointment.agent.user.prenom} {" "}
-                      {appointments.oneAppointment.agent.user.nom}</b>
+                      avec {"  L'agent "} <b>{appointments.oneAppointment?.agent?.user?.prenom} {" "}
+                      {appointments.oneAppointment?.agent?.user.nom}</b>
                     </h6>
                     <p className="proile-rating">
                       Email :{" "}
@@ -172,7 +172,7 @@ const ShowAppointment = ({ fetchOneAppointment, appointments }) => {
                               <label>Société</label>
                             </div>
                             <div className="col-md-6">
-                              <p>{`${appointments.oneAppointment.client.societe}`}</p>
+                              <p>{`${appointments.oneAppointment?.client?.societe || ''}`}</p>
                             </div>
                           </div>
                           <div className="row">
@@ -180,7 +180,7 @@ const ShowAppointment = ({ fetchOneAppointment, appointments }) => {
                               <label>Ref Société</label>
                             </div>
                             <div className="col-md-6">
-                              <p>{`${appointments.oneAppointment.client.ref_societe}`}</p>
+                              <p>{`${appointments.oneAppointment?.client?.ref_societe || ''}`}</p>
                             </div>
                           </div>
                           <div className="row">
@@ -188,7 +188,7 @@ const ShowAppointment = ({ fetchOneAppointment, appointments }) => {
                               <label>SIRET</label>
                             </div>
                             <div className="col-md-6">
-                              <p>{`${appointments.oneAppointment.client.siret}`}</p>
+                              <p>{`${appointments.oneAppointment?.client?.siret || ''}`}</p>
                             </div>
                           </div>
                           <div className="row">
@@ -196,7 +196,7 @@ const ShowAppointment = ({ fetchOneAppointment, appointments }) => {
                               <label>TVA Intercommunautaire</label>
                             </div>
                             <div className="col-md-6">
-                              <p>{`${appointments.oneAppointment.client.tva_intercommunautaire}`}</p>
+                              <p>{`${appointments.oneAppointment?.client?.tva_intercommunautaire || ''}`}</p>
                             </div>
                           </div>
                           <div className="row">
@@ -204,7 +204,7 @@ const ShowAppointment = ({ fetchOneAppointment, appointments }) => {
                               <label>Email de l'agence</label>
                             </div>
                             <div className="col-md-6">
-                              <p>{`${appointments.oneAppointment.client.email_agence}`}</p>
+                              <p>{`${appointments.oneAppointment?.client?.email_agence || ''}`}</p>
                             </div>
                           </div>
                           <div className="row">
@@ -212,7 +212,7 @@ const ShowAppointment = ({ fetchOneAppointment, appointments }) => {
                               <label>Téléphone</label>
                             </div>
                             <div className="col-md-6">
-                              <p>{`${appointments.oneAppointment.client.telephone}`}</p>
+                              <p>{`${appointments.oneAppointment?.client?.telephone || ''}`}</p>
                             </div>
                           </div>
 
@@ -221,7 +221,7 @@ const ShowAppointment = ({ fetchOneAppointment, appointments }) => {
                               <label>Code postal</label>
                             </div>
                             <div className="col-md-6">
-                              <p>{`${appointments.oneAppointment.client.code_postal}`}</p>
+                              <p>{`${appointments.oneAppointment?.client?.code_postal || ''}`}</p>
                             </div>
                           </div>
 
@@ -230,7 +230,7 @@ const ShowAppointment = ({ fetchOneAppointment, appointments }) => {
                               <label>Adresse </label>
                             </div>
                             <div className="col-md-6">
-                              <p>{`${appointments.oneAppointment.client.adresse}`}</p>
+                              <p>{`${appointments.oneAppointment?.client?.adresse || ''}`}</p>
                             </div>
                           </div>
 
@@ -239,7 +239,7 @@ const ShowAppointment = ({ fetchOneAppointment, appointments }) => {
                               <label>Ville</label>
                             </div>
                             <div className="col-md-6">
-                              <p>{`${appointments.oneAppointment.client.ville}`}</p>
+                              <p>{`${appointments.oneAppointment?.client?.ville || ''}`}</p>
                             </div>
                           </div>
                         </>
@@ -251,7 +251,7 @@ const ShowAppointment = ({ fetchOneAppointment, appointments }) => {
                               <label>Code client</label>
                             </div>
                             <div className="col-md-6">
-                              <p>{`${appointments.oneAppointment.client.code_client}`}</p>
+                              <p>{`${appointments.oneAppointment.client.code_client || ''}`}</p>
                             </div>
                           </div>
                           <div className="row">
@@ -259,7 +259,7 @@ const ShowAppointment = ({ fetchOneAppointment, appointments }) => {
                               <label>Nom</label>
                             </div>
                             <div className="col-md-6">
-                              <p>{`${appointments.oneAppointment.client.ref_comptable.nom}`}</p>
+                              <p>{`${appointments.oneAppointment?.client?.ref_comptable?.nom || ''}`}</p>
                             </div>
                           </div>
                           <div className="row">
@@ -267,7 +267,7 @@ const ShowAppointment = ({ fetchOneAppointment, appointments }) => {
                               <label>Email pour envoi des factures</label>
                             </div>
                             <div className="col-md-6">
-                              <p>{`${appointments.oneAppointment.client.ref_comptable.email_envoi_facture}`}</p>
+                              <p>{`${appointments.oneAppointment?.client?.ref_comptable?.email_envoi_facture || ''}`}</p>
                             </div>
                           </div>
                           <div className="row">
@@ -275,7 +275,7 @@ const ShowAppointment = ({ fetchOneAppointment, appointments }) => {
                               <label>Téléphone</label>
                             </div>
                             <div className="col-md-6">
-                              <p>{`${appointments.oneAppointment.client.ref_comptable.telephone}`}</p>
+                              <p>{`${appointments.oneAppointment?.client?.ref_comptable?.telephone || ''}`}</p>
                             </div>
                           </div>
                           <div className="row">
@@ -283,7 +283,7 @@ const ShowAppointment = ({ fetchOneAppointment, appointments }) => {
                               <label>Mobile</label>
                             </div>
                             <div className="col-md-6">
-                              <p>{`${appointments.oneAppointment.client.ref_comptable.mobile}`}</p>
+                              <p>{`${appointments.oneAppointment?.client?.ref_comptable?.mobile || ''}`}</p>
                             </div>
                           </div>
                         </>
@@ -296,7 +296,7 @@ const ShowAppointment = ({ fetchOneAppointment, appointments }) => {
                               <label>Nom</label>
                             </div>
                             <div className="col-md-6">
-                              <p>{`${appointments.oneAppointment.client.ref_service_gestion.nom_complet}`}</p>
+                              <p>{`${appointments.oneAppointment?.client?.ref_service_gestion?.nom_complet || ''}`}</p>
                             </div>
                           </div>
                           <div className="row">
@@ -304,7 +304,7 @@ const ShowAppointment = ({ fetchOneAppointment, appointments }) => {
                               <label>Email</label>
                             </div>
                             <div className="col-md-6">
-                              <p>{`${appointments.oneAppointment.client.ref_service_gestion.email}`}</p>
+                              <p>{`${appointments.oneAppointment?.client?.ref_service_gestion?.email || '' }`}</p>
                             </div>
                           </div>
                           <div className="row">
@@ -312,7 +312,7 @@ const ShowAppointment = ({ fetchOneAppointment, appointments }) => {
                               <label>Téléphone</label>
                             </div>
                             <div className="col-md-6">
-                              <p>{`${appointments.oneAppointment.client.ref_service_gestion.telephone}`}</p>
+                              <p>{`${appointments.oneAppointment?.client?.ref_service_gestion?.telephone || '' }`}</p>
                             </div>
                           </div>
                           <div className="row">
@@ -320,7 +320,7 @@ const ShowAppointment = ({ fetchOneAppointment, appointments }) => {
                               <label>Mobile</label>
                             </div>
                             <div className="col-md-6">
-                              <p>{`${appointments.oneAppointment.client.ref_service_gestion.mobile}`}</p>
+                              <p>{`${appointments.oneAppointment?.client?.ref_service_gestion?.mobile || '' }`}</p>
                             </div>
                           </div>
                         </>
@@ -333,7 +333,7 @@ const ShowAppointment = ({ fetchOneAppointment, appointments }) => {
                               <label>Nom</label>
                             </div>
                             <div className="col-md-6">
-                              <p>{`${appointments.oneAppointment.agent.user.prenom} ${appointments.oneAppointment.agent.user.nom}`}</p>
+                              <p>{`${appointments.oneAppointment?.agent?.user?.prenom || '' } ${appointments.oneAppointment?.agent?.user?.nom || '' }`}</p>
                             </div>
                           </div>
                           <div className="row">
@@ -341,7 +341,7 @@ const ShowAppointment = ({ fetchOneAppointment, appointments }) => {
                               <label>Email</label>
                             </div>
                             <div className="col-md-6">
-                              <p>{`${appointments.oneAppointment.agent.user.email}`}</p>
+                              <p>{`${appointments.oneAppointment?.agent?.user?.email || '' }`}</p>
                             </div>
                           </div>
                         </>
@@ -354,7 +354,7 @@ const ShowAppointment = ({ fetchOneAppointment, appointments }) => {
                               <label>Type</label>
                             </div>
                             <div className="col-md-6">
-                              <p>{`${appointments.oneAppointment.propriete.type_propriete.type}`}</p>
+                              <p>{`${appointments.oneAppointment.propriete.type_propriete.type || ''}`}</p>
                             </div>
                           </div>
                           <div className="row">
@@ -362,7 +362,7 @@ const ShowAppointment = ({ fetchOneAppointment, appointments }) => {
                               <label>Code postal</label>
                             </div>
                             <div className="col-md-6">
-                              <p>{`${appointments.oneAppointment.propriete.codePostal}`}</p>
+                              <p>{`${appointments.oneAppointment.propriete.codePostal || '' }`}</p>
                             </div>
                           </div>
                           <div className="row">
@@ -370,7 +370,7 @@ const ShowAppointment = ({ fetchOneAppointment, appointments }) => {
                               <label>Adresse</label>
                             </div>
                             <div className="col-md-6">
-                              <p>{`${appointments.oneAppointment.propriete.adresse}`}</p>
+                              <p>{`${appointments.oneAppointment.propriete.adresse || '' }`}</p>
                             </div>
                           </div>
                           <div className="row">
@@ -378,7 +378,7 @@ const ShowAppointment = ({ fetchOneAppointment, appointments }) => {
                               <label>Adresse complementaire</label>
                             </div>
                             <div className="col-md-6">
-                              <p>{`${appointments.oneAppointment.propriete.adresseComplementaire}`}</p>
+                              <p>{`${appointments.oneAppointment.propriete.adresseComplementaire || '' }`}</p>
                             </div>
                           </div>
                           <div className="row">
@@ -386,7 +386,7 @@ const ShowAppointment = ({ fetchOneAppointment, appointments }) => {
                               <label>Code postal</label>
                             </div>
                             <div className="col-md-6">
-                              <p>{`${appointments.oneAppointment.propriete.ville}`}</p>
+                              <p>{`${appointments.oneAppointment.propriete.ville || '' }`}</p>
                             </div>
                           </div>
                           <div className="row">
@@ -394,7 +394,7 @@ const ShowAppointment = ({ fetchOneAppointment, appointments }) => {
                               <label>Etage</label>
                             </div>
                             <div className="col-md-6">
-                              <p>{`${appointments.oneAppointment.propriete.numeroSol}`}</p>
+                              <p>{`${appointments.oneAppointment.propriete.numeroSol || '' }`}</p>
                             </div>
                           </div>
                           <div className="row">
@@ -402,7 +402,7 @@ const ShowAppointment = ({ fetchOneAppointment, appointments }) => {
                               <label>N° Parking</label>
                             </div>
                             <div className="col-md-6">
-                              <p>{`${appointments.oneAppointment.propriete.numeroParking}`}</p>
+                              <p>{`${appointments.oneAppointment.propriete.numeroParking || '' }`}</p>
                             </div>
                           </div>
                           <div className="row">
@@ -410,7 +410,7 @@ const ShowAppointment = ({ fetchOneAppointment, appointments }) => {
                               <label>N° Cave</label>
                             </div>
                             <div className="col-md-6">
-                              <p>{`${appointments.oneAppointment.propriete.numeroCave}`}</p>
+                              <p>{`${appointments.oneAppointment.propriete.numeroCave || '' }`}</p>
                             </div>
                           </div>
                           <div className="row">
@@ -418,7 +418,7 @@ const ShowAppointment = ({ fetchOneAppointment, appointments }) => {
                               <label>Bailleur</label>
                             </div>
                             <div className="col-md-6">
-                              <p>{`${appointments.oneAppointment.propriete.bailleur.prenom} ${appointments.oneAppointment.propriete.bailleur.nom}`}</p>
+                              <p>{`${appointments.oneAppointment.propriete.bailleur.prenom || ''} ${appointments.oneAppointment.propriete.bailleur.nom || ''}`}</p>
                             </div>
                           </div>
                           <div className="row">
@@ -426,7 +426,7 @@ const ShowAppointment = ({ fetchOneAppointment, appointments }) => {
                               <label>Locataire</label>
                             </div>
                             <div className="col-md-6">
-                              <p>{`${appointments.oneAppointment.propriete.locataire.prenom} ${appointments.oneAppointment.propriete.locataire.nom}`}</p>
+                              <p>{`${appointments.oneAppointment.propriete.locataire.prenom || ''} ${appointments.oneAppointment.propriete.locataire.nom || ''}`}</p>
                             </div>
                           </div>
                         </>

@@ -73,7 +73,6 @@ const EditUser = ({ users, fetchOneUser, updateUser }) => {
   const { isSubmitting, errors } = formState;
 
   const editUser = (data) => {
-    console.log(data);
     const { nom, prenom, is_active } = data;
     updateUser({...data, trigramme: nom[0].toUpperCase() + prenom[0].toUpperCase(), is_active: is_active === "1" ? true : false}, uuid);
   };

@@ -76,7 +76,6 @@ const EditAgent = ({ users, fetchOneUser, updateUser }) => {
   const { isSubmitting, errors } = formState;
 
   const editUser = (data) => {
-    console.log(data);
     updateUser({...data, is_active: true}, uuid);
   };
 

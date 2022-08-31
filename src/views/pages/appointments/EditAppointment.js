@@ -11,6 +11,8 @@ import axios from "axios";
 import { API_URL, getISOStringWithoutSecsAndMillisecs } from "../../../config";
 import { date, mixed, number, object, string } from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { parseData } from "../../../utils/transformer";
+import { CLIENT } from "../../../utils/constant";
 
 const updateAppointementSchema = object({
   ref_lot: string().typeError("Veuillez des character alpha-numérique"),
@@ -23,7 +25,7 @@ const updateAppointementSchema = object({
     .required("Veuillez choisir parmis les options."),
   date: date().typeError("Veuillez choisir une date."),
   agent: number().typeError("Veuillez choisir parmis les options."),
-  passeur: string(),
+  // passeur: string(),
 
   telephone_locataire: number()
     .test(
@@ -116,6 +118,7 @@ function EditAppointment({
   fetchOneAppointment,
   appointments,
   updateAppointment,
+  user
 }) {
   const { uuid } = useParams();
   const [agentLoading, setAgentsLoading] = useState(true);
@@ -126,7 +129,7 @@ function EditAppointment({
   const [interventions, setInterventions] = useState([]);
   const [propertyTypes, setPropertyTypes] = useState([]);
   const [propertyTypesLoading, setPropertyTypesLoading] = useState(true);
-
+  const userInfo = parseData(user);
   const { register, handleSubmit, formState } = useForm({
     mode: "unChange",
     resolver: yupResolver(updateAppointementSchema),
@@ -181,7 +184,7 @@ function EditAppointment({
   }, [uuid, fetchOneAppointment]);
 
   const editAppointment = (data) => {
-    console.log('innnnnn')
+    if (userInfo.group.toLowerCase() === CLIENT) delete data.agent;
     const newData = {
         ...data,
         date: data.date.toISOString().slice(0, 19).replace("T", " "),
@@ -193,7 +196,6 @@ function EditAppointment({
         type_propriete: parseInt(data.type_propriete),
         code_postal_propriete: data.code_postal_propriete.toString()
       };
-    console.log(newData)
     updateAppointment(newData, uuid);
   };
 
@@ -261,7 +263,6 @@ function EditAppointment({
                   appointments.oneAppointmentLoadingError === false &&
                   appointments.oneAppointment.hasOwnProperty("id") && (
                     <form onSubmit={handleSubmit(editAppointment)}>
-                      {console.log(appointments.oneAppointment)}
                       <div className="card-body">
                         <div className="row mt-2 mb-3">
                           <div className="col">
@@ -382,10 +383,11 @@ function EditAppointment({
                                   (errors.client && ` is-border-red`)
                                 }
                                 {...register("client")}
-                                defaultValue={appointments.oneAppointment.client.id}
+                                defaultValue={userInfo.group.toLowerCase() === CLIENT ? userInfo?.client_id : appointments?.oneAppointment?.client?.id}
                               >
+                                {userInfo.group.toLowerCase() === CLIENT && <option value={userInfo?.client_id}>{userInfo.prenom.toUpperCase()} {userInfo.nom.toUpperCase()}</option>}
                                   {!clientsLoading && clients.map((client, idx) => (
-                                      <option value={client.id} key={idx}>{client.user.prenom} {client.user.nom}</option>
+                                      <option value={client?.id} key={idx}>{client?.user?.prenom} {client?.user?.nom}</option>
                                   ))}
                               </select>
                               {errors.client && (
@@ -419,7 +421,7 @@ function EditAppointment({
                           </div>
                         </div>
                         <div className="row">
-                          <div className="col">
+                          {/* <div className="col">
                             <div className="form-group">
                               <label htmlFor="exampleInputEmail1">
                                 Passeur
@@ -439,7 +441,8 @@ function EditAppointment({
                                 </small>
                               )}
                             </div>
-                          </div>
+                          </div> */}
+                          {userInfo.group.toLowerCase() !== CLIENT && [
                           <div className="col">
                             <div className="form-group">
                               <label htmlFor="exampleInputEmail1">
@@ -467,6 +470,7 @@ function EditAppointment({
                               )}
                             </div>
                           </div>
+                          ]}
                         </div>
 
                         <div className="row mt-2 mb-3">
@@ -1017,6 +1021,7 @@ function EditAppointment({
 const mapPropsToState = (state) => {
   return {
     appointments: state.appointments,
+    user: state.auth.authUser
   };
 };
 

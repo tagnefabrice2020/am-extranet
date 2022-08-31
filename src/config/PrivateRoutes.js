@@ -7,12 +7,13 @@ const PrivateRoutes = ({children, auth, roles}) => {
         
         if (!!roles && roles.length > 0) {
             if (roles.includes(authUser.group.toLowerCase())) {
+                new Promise((resolve) => setTimeout(resolve, 200));
                 return children;
             } else {
-                console.log({userRole: authUser.group.toLowerCase(), roles})
                 return <Navigate to='/not-allowed' />
             }
         }
+        new Promise((resolve) => setTimeout(resolve, 200));
         return children;
     } else {
         return  <Navigate replace to='/login' />;

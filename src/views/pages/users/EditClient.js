@@ -106,7 +106,9 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
     complement_adresse: string().typeError(
       "Veuillez saisir des charatères alpha-numériques."
     ),
-    code_postal: number(),
+    code_postal: number().typeError(
+      "Veuillez saisir des charatères numériques."
+    ),
     ville: string().typeError(
       "Veuillez saisir des charatères alpha-numériques."
     ),
@@ -121,14 +123,12 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
   useEffect(() => {
     fetchOneUser(uuid, "client");
   }, [uuid, fetchOneUser]);
-  const { register, handleSubmit, formState, setValue } = useForm({
+  const { register, handleSubmit, formState } = useForm({
     mode: "Onchange",
     resolver: yupResolver(userSchema),
   });
 
   const { errors, isSubmitting } = formState;
-
-  // console.log(errors)
 
   useEffect(() => {
     async function fetchAgents() {
@@ -150,7 +150,6 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
   }, [users.oneUserLoading, users?.oneUser?.user?.id]);
 
   const editUser = (formData) => {
-    console.log(uuid);
     const data = { ...formData, is_active: true, role: "3" };
     updateUser(data, uuid);
   };
@@ -685,9 +684,6 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                                     placeholder="Agent rattache"
                                     {...register("agent_rattache")}
                                   >
-                                    {console.log(
-                                      typeof users.oneUser.info_concession.agent_rattache.id.toString()
-                                    )}
                                     {!agentLoading &&
                                       agents.map((agent, idx) => (
                                         <option key={idx} value={agent.id}>

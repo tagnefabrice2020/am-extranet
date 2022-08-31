@@ -174,7 +174,6 @@ export const searchUsers = (page, perPage) => {
     if (users.searchValue.length > 0) {
       UserService.search(users.searchValue, page, perPage).then(
         (results) => {
-          console.log(results);
           const totalPage = Math.ceil(results.count / 10);
           dispatch(setPage(page));
           dispatch(setUsersPerPage(perPage));
@@ -199,7 +198,6 @@ export const storeUser = (user) => {
     dispatch(storingUser());
     UserService.store(user).then(
       (response) => {
-        console.log(response.status);
         if (response.status === 200) {
           dispatch(resetForm());
           toast.success("Utilisateur ajouter avec sucèss.");
@@ -207,7 +205,6 @@ export const storeUser = (user) => {
         }
       },
       (error) => {
-        console.log(error.response.status);
         if (error.response.status === 401) {
           toast.info('Vous avez pas le l\'access pour  effectuer cette operation', {transitionDuration: 3000})
         } else {
@@ -224,12 +221,11 @@ export const fetchOneUser = (user, type) => {
     dispatch(fetchOneUserRequest());
     UserService.fetchOneUser(user, type).then(
       (user) => {
-        console.log(user);
+        console.log(user)
         dispatch(fetchOneUserRequestSucces(user));
         return Promise.resolve();
       },
       (error) => {
-        console.log(error.response.status);
         dispatch(fetchSingleUserFailed(error.response.status));
         toast.error("Impossible de charger les information de l'utilisateur.");
       }
@@ -257,13 +253,12 @@ export const updateUser = (user, uuid) => {
   return (dispatch) => {
     UserService.updateUser(user, uuid).then(
       (response) => {
+        console.log(response)
         if (response.status === 200) {
           toast.success("L'utilisateur enregistrer avec sucess.");
         }
-        console.log(response);
       },
       (error) => {
-        console.log(error);
         toast.error("La modification de l'utilisateur a échouée.");
       }
     );
@@ -282,7 +277,6 @@ export const switchBulkUserStatus = () => {
         }
       },
       (error) => {
-        console.log(error);
       }
     );
   };
@@ -290,9 +284,7 @@ export const switchBulkUserStatus = () => {
 
 export const test = (user) => {
   return (dispatch, getState) => {
-    console.log(user);
     const state = getState();
     dispatch(searchSuccess({}));
-    console.log(state);
   };
 };
