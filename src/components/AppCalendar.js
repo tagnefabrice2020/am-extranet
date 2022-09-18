@@ -38,6 +38,7 @@ const AppCalendar = () => {
       const events = response.data.results;
       callback(
         events.map((e) => {
+          console.log(e)
           return {
             start: e.date,
             title: JSON.stringify({
@@ -49,6 +50,7 @@ const AppCalendar = () => {
               tenant_last_name: e.propriete.locataire.nom,
               lanlord_first_name: e.propriete.bailleur.prenom,
               lanlord_last_name: e.propriete.bailleur.nom,
+              type: e.propriete.type,
               title: e.intervention.type
             }),
             backgroundColor: "#ccc"
@@ -99,7 +101,7 @@ const AppCalendar = () => {
             <p>
               <span className="">
                 <strong>
-                  <small>Le Locataire est</small>
+                  <small>Locataire: </small>
                 </strong>
               </span>
               <span className="badge badge-primary">
@@ -107,24 +109,24 @@ const AppCalendar = () => {
               </span>
             </p>
             <p>
-              <span className="">
-                <strong>
-                  <small>Le Bailleure est</small>
-                </strong>
-              </span>
-              <span className="badge badge-secondary">
-                {title.lanlord_first_name} {title.lanlord_last_name}.
-              </span>
-            </p>
-            <p>
               <span>
                 <strong>
-                  <small>à </small>
+                  <small>Lieu: </small>
                 </strong>
               </span>
               <span className="badge badge-success">
                 {title.property_adresse}, {title.property_postal_code}{" "}
                 {title.property_city}
+              </span>
+            </p>
+            <p>
+              <span>
+                <strong>
+                  <small>Type de bien: </small>
+                </strong>
+              </span>
+              <span className="badge badge-dark">
+                {title.type.toString().toUpperCase()}
               </span>
             </p>
           </EventDetails>

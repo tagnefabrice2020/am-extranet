@@ -4,7 +4,7 @@ import { API_URL } from "../config";
 class AppontementService {
 
     fetchAppointments (page, perPage) {
-        return axios.get(API_URL + `/rdv_app/rdv/`)
+        return axios.get(API_URL + `/rdv_app/rdv/?page=${page}`)
             .then((response) => {
                 return response.data;
             })

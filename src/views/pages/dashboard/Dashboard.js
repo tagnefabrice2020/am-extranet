@@ -143,7 +143,6 @@ const Dashboard = ({ stats, auth }) => {
             </div>
             {/* ./col */}
             {/* <div className="col-lg-3 col-6">
-             
               <div className="small-box bg-3">
                 <div className="inner">
                   <h3>{!loadStatistics && statistics.rdv}</h3>

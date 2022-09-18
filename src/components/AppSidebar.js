@@ -292,10 +292,9 @@ const AppSidebar = ({ user }) => {
                       </ul>
                     </li>
                   )}
-                  {/* 
+                  
                   {userInfo.group && (
-                    userInfo.group.toLowerCase() === ADMIN ||
-                    userInfo.group.toLowerCase() === AGENT
+                    userInfo.group.toLowerCase() === ADMIN
                   ) && (
                     <li className="nav-item menu-open">
                       <NavLink
@@ -308,7 +307,7 @@ const AppSidebar = ({ user }) => {
                         <p>Exporter</p>
                       </NavLink>
                     </li>
-                  )} */}
+                  )} 
                 </ul>
               </nav>
               {/* .sidebar-menu */}

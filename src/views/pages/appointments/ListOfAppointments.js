@@ -1,9 +1,11 @@
+import axios from "axios";
 import React, { useEffect } from "react";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import Pagination from "../../../components/Pagination";
 import TableLoader from "../../../components/TableLoader";
+import { API_URL } from "../../../config";
 import {
   fetchAppointments,
   setAppointmentPage,
@@ -11,6 +13,9 @@ import {
   searchingAppointments,
   searchAppointments,
 } from "../../../redux/Apppointment/AppointmentActionCreators";
+import { toast } from "react-toastify";
+import { parseData } from "../../../utils/transformer";
+import { ADMIN } from "../../../utils/constant";
 
 const ListOfAppointments = ({
   fetchAppointments,
@@ -19,7 +24,10 @@ const ListOfAppointments = ({
   setAppointmentsPerPage,
   searchingAppointments,
   searchAppointments,
+  user
 }) => {
+  const userInfo = parseData(user);
+
   useEffect(() => {
     if (appointments.searchValue.length > 0) {
       const timer = setTimeout(() => {
@@ -91,6 +99,52 @@ const ListOfAppointments = ({
     return style;
   };
 
+  const bgColor = (status) => {
+    const lowerCaseTitle = status.toLowerCase();
+    let backgroundColor;
+    if (lowerCaseTitle === "constat sortant") {
+      backgroundColor = "9b30ff";
+     
+    } else if (lowerCaseTitle === "constat entrant") {
+      backgroundColor = "0b86aa";
+     
+    } else if (lowerCaseTitle === "constat avant travaux") {
+      backgroundColor = "6e6767";
+    
+    } else if (lowerCaseTitle === "constat après travaux") {
+      backgroundColor = "0d9f3f";
+     
+    } else if (lowerCaseTitle === "constat entrant meublé") {
+      backgroundColor = "fcafac";
+    
+    } else if (lowerCaseTitle === "constat sortant meublé") {
+      backgroundColor = "8c1567";
+     
+    } else if (lowerCaseTitle === "visite conseil") {
+      backgroundColor = "bf9053";
+    
+    } 
+    return `#12${backgroundColor}`;
+  }
+
+  const deleteAppointment = (id) => {
+    if (window.confirm(`Voulez vous supprimer ce rendez-vous?`)) {
+    try {
+      axios.delete(`${API_URL}/rdv_app/rdv/${id}`)
+        .then((r) => {
+          if (r.status === 200) {
+            toast.success('RDV supprimer avec succès')
+            fetchAppointments(
+              appointments.currentPage,
+              parseInt(appointments.perPage)
+            );
+          }
+        })
+    } catch (e) {
+      toast.error('Oops une erreur c\'est produit');
+    }}
+  } 
+
   return (
     <div className="content-wrapper">
       {/* Content Header (Page header) */}
@@ -158,14 +212,21 @@ const ListOfAppointments = ({
                   {appointments.loading && <TableLoader />}
                   {!appointments.loading &&
                     appointments.appointments.length > 0 && (
+                     
                       <table className="table table-head-fixed text-nowrap">
+                         {console.log(appointments.appointments)}
                         <thead>
                           <tr>
                             <th></th>
-                            <th>Lieu</th>
                             <th className="text-center">Date</th>
-                            <th className="text-center">Type d'intervention</th>
-                            <th>Agent</th>
+                            <th>Client</th>
+                            <th className="text-center">Type de service</th>
+                            <th className="text-center">Type de bien</th>
+                            <th className="text-center">Etage</th>
+                            <th>Lieu</th>
+                            <th>Code postal</th>
+                            <th>Ville</th>
+                            {/* <th>Agent</th> */}
                             {/* <th>Bailleur</th> */}
                             {/* <th>Locataire</th> */}
                             <th></th>
@@ -173,15 +234,12 @@ const ListOfAppointments = ({
                         </thead>
                         <tbody>
                           {appointments?.appointments.map((a, i) => (
-                            <tr key={i}>
+                            <tr key={i} style={{background: bgColor(a?.intervention?.type)}}>
                               <td>
                                 {appointments?.currentPage * 10 - 10 + i + 1}
                               </td>
-                              <td>
-                                {a?.propriete?.adresse}, {a?.propriete?.codePostal} {" "}
-                                {a?.propriete?.ville}
-                              </td>
                               <td className="text-center">{new Date(a.date).toLocaleString()}</td>
+                              <td>{a.client.user.nom} {a.client.user.prenom}</td>
                               <td className="text-center">
                                 <span
                                   className="badge"
@@ -190,9 +248,16 @@ const ListOfAppointments = ({
                                   {a?.intervention?.type}
                                 </span>
                               </td>
+                              <td className="text-center">{a.propriete.type}</td>
+                              <td className="text-center">{a.propriete.numeroSol}</td>
                               <td>
-                                {a?.agent?.user?.prenom} {a?.agent?.user?.nom}
+                                {a?.propriete?.adresse}
                               </td>
+                             <td> {a?.propriete?.codePostal} </td>
+                             <td>{a?.propriete?.ville}</td>
+                              {/* <td>
+                                {a?.agent?.user?.prenom} {a?.agent?.user?.nom}
+                              </td> */}
                               {/* <td style={{ position: `relative` }}>
                                   <Tooltip>
                                 {a.propriete.bailleur.prenom} {a.propriete.bailleur.nom}
@@ -220,7 +285,15 @@ const ListOfAppointments = ({
                                     className="bi bi-eye"
                                     style={{ color: `#867` }}
                                   />
-                                </Link>
+                                </Link> &nbsp;
+                                {userInfo?.group?.toLowerCase() === ADMIN && 
+                                  <Link to="#" onClick={() => deleteAppointment(a.id)}>
+                                    <i
+                                      className="bi bi-x-lg"
+                                      style={{ color: `red` }}
+                                    />
+                                  </Link>
+                                 }
                               </td>
                             </tr>
                           ))}
@@ -305,6 +378,7 @@ const Content = styled.p`
 const mapStateToProps = (state) => {
   return {
     appointments: state.appointments,
+    user: state.auth.authUser
   };
 };
 
