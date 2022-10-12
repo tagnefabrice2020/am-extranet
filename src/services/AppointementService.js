@@ -1,10 +1,13 @@
 import axios from "axios";
 import { API_URL } from "../config";
+import { CLIENT_PARTICULIER, CLIENT_PROFESSIONEL, AGENT_SECTEUR } from "../utils/constant";
+import { parseData } from "../utils/transformer";
 
 class AppontementService {
 
     fetchAppointments (page, perPage) {
-        return axios.get(API_URL + `/rdv_app/rdv/?page=${page}`)
+        let url = `/rdv_app/rdv/?page=${page}`;
+        return axios.get(API_URL + url)
             .then((response) => {
                 return response.data;
             })

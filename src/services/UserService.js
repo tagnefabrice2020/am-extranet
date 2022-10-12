@@ -23,25 +23,44 @@ class UserService {
         );
         return response_1;
       case "3":
-        delete user.role
+        delete user.role;
         const response_2 = await axios.post(
-          API_URL + "/client_app/client/",
+          API_URL + "/agent_app/agent/",
           user
         );
         return response_2;
-      case 4:
-        break;
+      case "4":
+        delete user.role;
+        const response_3 = await axios.post(
+          API_URL + "/client_app/client/",
+          user
+        );
+        return response_3;
+      case "5":
+        delete user.role;
+        const response_4 = await axios.post(
+          API_URL + "/client_app/client/",
+          user
+        );
+        return response_4;
+      case "6":
+        delete user.role;
+        const response_5 = await axios.post(
+          API_URL + "/client_app/client/",
+          user
+        );
+        return response_5;
       default:
         return null;
     }
-
-    const response_3 = await axios.post(API_URL + "/users", user);
-    return response_3;
   }
 
   async search(value, page, perPage) {
     return axios
-      .get(API_URL + `/admin_app/users/?value=${value}&page=${page}&perPage=${perPage}`)
+      .get(
+        API_URL +
+          `/admin_app/users/?value=${value}&page=${page}&perPage=${perPage}`
+      )
       .then((response) => {
         const users = response.data;
         return users;
@@ -74,14 +93,18 @@ class UserService {
     let url;
     if (user.role === "1") {
       url = `/admin_app/admin/${id}`;
-    } else if (user.role === "2") {
+      delete user.role;
+    } else if (user.role === "2" || user.role === "3" || user.role === "4") {
       url = `/agent_app/agent/${id}`;
-    } else if (user.role === "3") {
+      user = { ...user, role: parseInt(user.role) };
+    } else if (user.role === "5" || user.role === "6") {
       url = `/client_app/client/${id}`;
-    } else if (user.role === "4") {
+      delete user.role;
+    } else if (user.role === "7") {
       url = `/salarie_app/salarie/${id}`;
+      delete user.role;
     }
-    delete user['role']
+    console.log(user);
     return axios.put(API_URL + `${url}`, user).then((response) => {
       return response;
     });

@@ -1,7 +1,7 @@
 import axios from "axios";
 import jwtDecode from "jwt-decode";
 import { API_URL } from "../config";
-import { CLIENT, AGENT, ADMIN } from "../utils/constant";
+import { ADMIN, CLIENT_PARTICULIER, CLIENT_PROFESSIONEL, AGENT_SECTEUR } from "../utils/constant";
 
 class AuthService {
   login(data) {
@@ -9,9 +9,9 @@ class AuthService {
       .post(API_URL + `/manager_app/login/`, data)
       .then((response) => {
         let user = response.data.user;
-        if (user.group.toLowerCase() === CLIENT) {
+        if (user.group.toLowerCase() === CLIENT_PARTICULIER || user.group.toLowerCase() === CLIENT_PROFESSIONEL) {
           user = {...user, client_id: response.data.id}
-        } else if (user.group.toLowerCase() === AGENT) {
+        } else if (user.group.toLowerCase() === AGENT_SECTEUR) {
           user = {...user, agent_id: response.data.id}
         } else if (user.group.toLowerCase() === ADMIN) {
           user = {...user, admin_id: response.data.id}

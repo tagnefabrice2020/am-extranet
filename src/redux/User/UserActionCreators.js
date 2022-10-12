@@ -221,12 +221,11 @@ export const fetchOneUser = (user, type) => {
     dispatch(fetchOneUserRequest());
     UserService.fetchOneUser(user, type).then(
       (user) => {
-        console.log(user)
         dispatch(fetchOneUserRequestSucces(user));
         return Promise.resolve();
       },
       (error) => {
-        dispatch(fetchSingleUserFailed(error.response.status));
+        dispatch(fetchSingleUserFailed(error?.response?.status));
         toast.error("Impossible de charger les information de l'utilisateur.");
       }
     );
@@ -253,7 +252,6 @@ export const updateUser = (user, uuid) => {
   return (dispatch) => {
     UserService.updateUser(user, uuid).then(
       (response) => {
-        console.log(response)
         if (response.status === 200) {
           toast.success("L'utilisateur enregistrer avec sucess.");
         }

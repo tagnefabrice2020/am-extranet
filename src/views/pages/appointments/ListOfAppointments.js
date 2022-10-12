@@ -52,28 +52,16 @@ const ListOfAppointments = ({
     searchAppointments,
   ]);
 
-  useEffect(() => {
-    let timer;
-    timer = setTimeout(() => {
-      searchAppointments(
-        appointments.currentPage,
-        parseInt(appointments.perPage)
-      );
-    }, 1500);
-    return () => clearTimeout(timer);
-  }, [
-    appointments.searchValue,
-    appointments.currentPage,
-    appointments.perPage,
-    searchAppointments,
-  ]);
+  useEffect (() => {
+    axios.get(`${API_URL}/rdv_app/rdv?page=1`).then((r) => console.log(r))
+  }, [])
 
   const getColor = (title) => {
     let style = {
       backgroundColor: "",
       color: "",
     };
-    const lowerCaseTitle = title.toLowerCase();
+    const lowerCaseTitle = title?.toLowerCase();
     if (lowerCaseTitle === "constat sortant") {
       style.backgroundColor = "#9b30ff";
       style.color = "#fff";
@@ -100,7 +88,7 @@ const ListOfAppointments = ({
   };
 
   const bgColor = (status) => {
-    const lowerCaseTitle = status.toLowerCase();
+    const lowerCaseTitle = status?.toLowerCase();
     let backgroundColor;
     if (lowerCaseTitle === "constat sortant") {
       backgroundColor = "9b30ff";
@@ -124,7 +112,7 @@ const ListOfAppointments = ({
       backgroundColor = "bf9053";
     
     } 
-    return `#12${backgroundColor}`;
+    return `#f5b7b1`;
   }
 
   const deleteAppointment = (id) => {
@@ -185,7 +173,7 @@ const ListOfAppointments = ({
                         type="text"
                         name="table_search"
                         className="form-control float-right"
-                        placeholder="Recherche"
+                        placeholder="Client, Agent"
                         onChange={async (event) => {
                           // searchingAppointments(event.target.value);
                           // setAppointmentPage(1);
@@ -211,10 +199,8 @@ const ListOfAppointments = ({
                 <div className="card-body table-responsive p-0">
                   {appointments.loading && <TableLoader />}
                   {!appointments.loading &&
-                    appointments.appointments.length > 0 && (
-                     
+                    appointments?.appointments?.length > 0 && (
                       <table className="table table-head-fixed text-nowrap">
-                         {console.log(appointments.appointments)}
                         <thead>
                           <tr>
                             <th></th>
@@ -285,15 +271,7 @@ const ListOfAppointments = ({
                                     className="bi bi-eye"
                                     style={{ color: `#867` }}
                                   />
-                                </Link> &nbsp;
-                                {userInfo?.group?.toLowerCase() === ADMIN && 
-                                  <Link to="#" onClick={() => deleteAppointment(a.id)}>
-                                    <i
-                                      className="bi bi-x-lg"
-                                      style={{ color: `red` }}
-                                    />
-                                  </Link>
-                                 }
+                                </Link>
                               </td>
                             </tr>
                           ))}
@@ -301,8 +279,8 @@ const ListOfAppointments = ({
                       </table>
                     )}
                   {!appointments.loading &&
-                    appointments.appointments.length === 0 &&
-                    appointments.totalPages <= 0 && (
+                    appointments?.appointments?.length === 0 &&
+                    appointments?.totalPages <= 0 && (
                       <div
                         style={{
                           margin: `0 auto`,
@@ -327,7 +305,7 @@ const ListOfAppointments = ({
               </div>
               {/* /.card */}
               {!appointments.loading &&
-                appointments.appointments.length > 0 && (
+                appointments?.appointments?.length > 0 && (
                   <Pagination
                     currentPage={appointments.currentPage}
                     onPageChange={setAppointmentPage}

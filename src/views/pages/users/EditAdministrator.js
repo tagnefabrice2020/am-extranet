@@ -10,7 +10,7 @@ import {
   updateUser,
 } from "../../../redux/User/UserActionCreators";
 import { connect } from "react-redux";
-import AppFormLoader from '../../../components/AppFormLoader';
+import AppFormLoader from "../../../components/AppFormLoader";
 
 const EditUser = ({ users, fetchOneUser, updateUser }) => {
   const { uuid } = useParams();
@@ -24,7 +24,6 @@ const EditUser = ({ users, fetchOneUser, updateUser }) => {
       .required("Veuillez saisir le Nom")
       .typeError("Veuillez saisir des characters alphabetic."),
     login: string()
-      .required("Veuillez saisir ce champs")
       .typeError("Veuillez saisir des characters alphabetic."),
     email: string()
       .email("Veuillez entrer une adresse email valid.")
@@ -52,7 +51,9 @@ const EditUser = ({ users, fetchOneUser, updateUser }) => {
     telephone: string()
       .required("Veuillez saisir numéro de téléphone")
       .typeError("Veuillez saisir des characters alphabetic."),
-    is_active: mixed().oneOf(["1", "0"], "Veuillez choisir parmis les options").required('Veuillez choisir parmis les options')
+    is_active: mixed()
+      .oneOf(["1", "0"], "Veuillez choisir parmis les options")
+      .required("Veuillez choisir parmis les options"),
   });
 
   const { register, formState, handleSubmit, watch } = useForm({
@@ -74,7 +75,16 @@ const EditUser = ({ users, fetchOneUser, updateUser }) => {
 
   const editUser = (data) => {
     const { nom, prenom, is_active } = data;
-    updateUser({...data, trigramme: nom[0].toUpperCase() + prenom[0].toUpperCase(), is_active: is_active === "1" ? true : false}, uuid);
+    const newData = {
+      ...data,
+      login: users?.oneUser?.user?.login,
+      is_active: is_active === "1" ? true : false
+    };
+    console.log(newData);
+    updateUser(
+      newData,
+      uuid
+    );
   };
 
   return (
@@ -109,7 +119,19 @@ const EditUser = ({ users, fetchOneUser, updateUser }) => {
               {/* general form elements */}
               <div className="card">
                 <div className="card-header">
-                  <h3 className="card-title">{!users?.oneUser?.errorCode && !users.oneUserLoading && <>Modifier l'utilisateur</>} {!users.oneUserLoading && users.oneUserLoadingError && users?.oneUser?.errorCode === 401 && <span style={{color: 'red'}}>Vous n'êtes pas autorisé à visualiser ou modifier cette utilisateur</span>}</h3>
+                  <h3 className="card-title">
+                    {!users?.oneUser?.errorCode && !users.oneUserLoading && (
+                      <>Modifier l'utilisateur</>
+                    )}{" "}
+                    {!users.oneUserLoading &&
+                      users.oneUserLoadingError &&
+                      users?.oneUser?.errorCode === 401 && (
+                        <span style={{ color: "red" }}>
+                          Vous n'êtes pas autorisé à visualiser ou modifier
+                          cette utilisateur
+                        </span>
+                      )}
+                  </h3>
                 </div>
                 {/* /.card-header */}
                 {/* form start */}
@@ -136,7 +158,7 @@ const EditUser = ({ users, fetchOneUser, updateUser }) => {
                                 }
                                 defaultValue={users.oneUser.user.login}
                                 placeholder="Le login"
-                                {...register("login")}
+                                disabled
                               />
                               {errors.login && (
                                 <small className="form-text is-red">
@@ -253,7 +275,7 @@ const EditUser = ({ users, fetchOneUser, updateUser }) => {
                               )}
                             </div>
                           </div>
-                          
+
                           <div className="col">
                             <div className="form-group">
                               <label htmlFor="adresse">Statut</label>
@@ -276,7 +298,6 @@ const EditUser = ({ users, fetchOneUser, updateUser }) => {
                               )}
                             </div>
                           </div>
-                          
                         </div>
 
                         <div className="form-group">
@@ -329,9 +350,17 @@ const EditUser = ({ users, fetchOneUser, updateUser }) => {
                       </div>
                     </form>
                   )}
-                  {!users.oneUserLoading && users.oneUserLoadingError && users?.oneUser?.errorCode === 401 && <>
-                    <img src={require("../../../assets/dist/img/404.png")} alt="non-authorizer" style={{width: 'fit-content', margin: '10px auto'}} />
-                  </>}
+                {!users.oneUserLoading &&
+                  users.oneUserLoadingError &&
+                  users?.oneUser?.errorCode === 401 && (
+                    <>
+                      <img
+                        src={require("../../../assets/dist/img/404.png")}
+                        alt="non-authorizer"
+                        style={{ width: "fit-content", margin: "10px auto" }}
+                      />
+                    </>
+                  )}
               </div>
               {/* /.card */}
             </div>

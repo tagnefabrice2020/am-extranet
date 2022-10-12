@@ -48,7 +48,10 @@ const NatureDuBien = () => {
   const [properties, setProperties] = useState([]);
   const [openEditBox, setOpenEditBox] = useState(false);
   const [loadingSelectedProperty, setLoadingSelectedProperty] = useState(false);
-  const [selectedProperty, setSelectedProperty] = useState({});
+  const [selectedProperty, setSelectedProperty] = useState(null);
+
+  const [selectedPropertyType, setSelectedPropertyType] = useState(null);
+  const [selectedPropertyStatus, setSelectedPropertyStatus] = useState(null);
 
   useEffect(() => {
     async function fetchTypeOfProperties() {
@@ -89,12 +92,24 @@ const NatureDuBien = () => {
       });
   };
 
+  useEffect(() => {
+    if (selectedProperty?.hasOwnProperty("type")) {
+      setSelectedPropertyType(selectedProperty?.type);
+      setSelectedPropertyStatus(selectedProperty?.statut);
+    } else {
+      setSelectedPropertyType(null);
+      setSelectedPropertyStatus(null);
+    }
+  }, [loadingSelectedProperty, selectedProperty]);
+
   const getSingleProperty = async (id) => {
     setOpenEditBox(true);
     setLoadingSelectedProperty(true);
+    setSelectedProperty(null);
     await axios
       .get(API_URL + `/config_app/propriete/${id}`)
       .then((r) => {
+       
         setSelectedProperty(r.data[0]);
       })
       .catch((e) => {
@@ -108,10 +123,7 @@ const NatureDuBien = () => {
   const updatePropertyType = async (formData) => {
     const data = { ...formData, statut: parseInt(formData.statut) };
     await axios
-      .put(
-        API_URL + `/config_app/propriete/${selectedProperty.id}`,
-        data
-      )
+      .put(API_URL + `/config_app/propriete/${selectedProperty.id}`, data)
       .then((r) => {
         toast.success("Type de bien modifier avec succèss.");
       })
@@ -136,9 +148,7 @@ const NatureDuBien = () => {
             <div className="col-sm-6">
               <ol className="breadcrumb float-sm-right">
                 <li className="breadcrumb-item active">Biens</li>
-                <li className="breadcrumb-item active">
-                  Gerer vos type biens
-                </li>
+                <li className="breadcrumb-item active">Gerer vos type biens</li>
               </ol>
             </div>
           </div>
@@ -166,7 +176,7 @@ const NatureDuBien = () => {
                           visibleSection === "add" && "active"
                         }`}
                       >
-                        Ajouter
+                        Ajoutez
                       </span>
                     </li>
                     <li
@@ -191,8 +201,8 @@ const NatureDuBien = () => {
                     <div className="card-body">
                       <div className="row">
                         <div className="col">
-                          <label htmlFor="type de bien">
-                            Type de bien
+                          <label htmlFor=" nature du bien">
+                            Nature du bien
                           </label>
                           <input
                             className={
@@ -211,7 +221,7 @@ const NatureDuBien = () => {
                       </div>
                       <div className="row mt-2">
                         <div className="col">
-                          <label htmlFor="status">Status*</label>
+                          <label htmlFor="statut">Statut*</label>
                           <select
                             className={
                               "form-control " +
@@ -259,7 +269,7 @@ const NatureDuBien = () => {
                           <th>
                             <em>Type</em>
                           </th>
-                          <th className="text-center">Status</th>
+                          <th className="text-center">Statut</th>
                           <th></th>
                         </tr>
                       </thead>
@@ -313,7 +323,7 @@ const NatureDuBien = () => {
           {/* /.row */}
         </div>
         {/* /.container-fluid */}
-        {openEditBox && (
+        {openEditBox && !loadingSelectedProperty && (
           <>
             <div
               className="modal fade"
@@ -345,6 +355,8 @@ const NatureDuBien = () => {
                       onClick={() => {
                         setOpenEditBox(false);
                         setSelectedProperty({});
+                        setSelectedPropertyType(null);
+                        setSelectedPropertyStatus(null);
                       }}
                     >
                       <span aria-hidden="true">&times;</span>
@@ -354,6 +366,7 @@ const NatureDuBien = () => {
                     {loadingSelectedProperty && <AppFormLoader />}
                     {!loadingSelectedProperty && (
                       <>
+                        
                         <form onSubmit={handleSubmit1(updatePropertyType)}>
                           <div
                             className="card-body"
@@ -373,7 +386,10 @@ const NatureDuBien = () => {
                                     (errors1.type && ` is-border-red`)
                                   }
                                   {...register1("type")}
-                                  defaultValue={selectedProperty.type}
+                                  value={selectedPropertyType}
+                                  onChange={(e) => {
+                                    setSelectedPropertyType(e.target.value);
+                                  }}
                                 />
 
                                 {errors1.type && (
@@ -389,7 +405,7 @@ const NatureDuBien = () => {
                                   htmlFor="statut"
                                   style={{ marginBottom: "2px" }}
                                 >
-                                  Status*
+                                  Statut*
                                 </label>
                                 <select
                                   className={
@@ -397,7 +413,10 @@ const NatureDuBien = () => {
                                     (errors1.statut && ` is-border-red`)
                                   }
                                   {...register1("statut")}
-                                  defaultValue={selectedProperty.statut}
+                                  defaultValue={selectedPropertyStatus}
+                                  onChange={(e) =>
+                                    setSelectedPropertyStatus(e.target.value)
+                                  }
                                 >
                                   <option value="1">active</option>
                                   <option value="0">inactive</option>
@@ -441,6 +460,8 @@ const NatureDuBien = () => {
                       onClick={() => {
                         setOpenEditBox(false);
                         setSelectedProperty({});
+                        setSelectedPropertyType(null);
+                        setSelectedPropertyStatus(null);
                       }}
                     >
                       Fermer

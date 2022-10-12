@@ -84,9 +84,11 @@ export const UserReducers = (state = initialState, action) => {
         currentPage: action.payload,
       };
     case SEARCHING:
+      let searchx = action.payload.length > 0 ? true : false;
+      console.log(action.payload)
       return {
         ...state,
-        searching: true,
+        searching: searchx,
         loading: true,
         users: [],
         totalPages: 1,

@@ -50,6 +50,9 @@ const Intervention = () => {
     useState(false);
   const [selectedIntervention, setSelectedIntervention] = useState({});
 
+  const [selectedInterventionType, setSelectedInterventionType] = useState (null); 
+  const [selectedInterventionStatus, setSelectedInterventionStatus] = useState (null); 
+
   useEffect(() => {
     async function fetchTypeOfInterventions() {
       if (visibleSection === "list") {
@@ -92,6 +95,16 @@ const Intervention = () => {
         toast.error("Veuillez contacter le service de maintenance.");
       });
   };
+
+  useEffect(() => {
+    if (selectedIntervention?.hasOwnProperty('type')) {
+      setSelectedInterventionType(selectedIntervention?.type);
+      setSelectedInterventionStatus(selectedIntervention?.statut);
+    } else {
+      setSelectedInterventionType(null);
+      setSelectedInterventionStatus(null);
+    }
+  }, [loadingSelectedIntervention, selectedIntervention]);
 
   const updateInterventionType = async (formData) => {
     const data = { ...formData, statut: parseInt(formData.statut) };
@@ -215,7 +228,7 @@ const Intervention = () => {
                       </div>
                       <div className="row mt-2">
                         <div className="col">
-                          <label htmlFor="intervention">Status*</label>
+                          <label htmlFor="intervention">Statut*</label>
                           <select
                             className={
                               "form-control " +
@@ -263,7 +276,7 @@ const Intervention = () => {
                           <th>
                             <em>Type</em>
                           </th>
-                          <th className="text-center">Status</th>
+                          <th className="text-center">Statut</th>
                           <th></th>
                         </tr>
                       </thead>
@@ -351,6 +364,8 @@ const Intervention = () => {
                       onClick={() => {
                         setOpenEditBox(false);
                         setSelectedIntervention({});
+                        setSelectedInterventionType(null);
+                        setSelectedInterventionStatus(null);
                       }}
                     >
                       <span aria-hidden="true">&times;</span>
@@ -379,7 +394,8 @@ const Intervention = () => {
                                     (errors1.type && ` is-border-red`)
                                   }
                                   {...register1("type")}
-                                  defaultValue={selectedIntervention.type}
+                                  value={selectedInterventionType}
+                                  onChange={(e) => setSelectedInterventionType(e.target.value)}
                                 />
 
                                 {errors1.type && (
@@ -395,7 +411,7 @@ const Intervention = () => {
                                   htmlFor="intervention"
                                   style={{ marginBottom: "2px" }}
                                 >
-                                  Status*
+                                  Statut*
                                 </label>
                                 <select
                                   className={
@@ -403,7 +419,8 @@ const Intervention = () => {
                                     (errors1.statut && ` is-border-red`)
                                   }
                                   {...register1("statut")}
-                                  defaultValue={selectedIntervention.statut}
+                                  value={selectedInterventionStatus}
+                                  onChange={(e) => setSelectedInterventionType(e.target.value)}
                                 >
                                   <option value="1">active</option>
                                   <option value="0">inactive</option>
@@ -448,6 +465,8 @@ const Intervention = () => {
                       onClick={() => {
                         setOpenEditBox(false);
                         setSelectedIntervention({});
+                        setSelectedInterventionType(null);
+                        setSelectedInterventionStatus(null);
                       }}
                     >
                       Fermer

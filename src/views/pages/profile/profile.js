@@ -220,7 +220,6 @@ const phoneNumberValidation = number()
   });
 
   useTitle("Profil");
-  console.log({role, ADMIN})
   const userId =
     role === ADMIN
       ? auth.admin_id
@@ -358,6 +357,7 @@ const phoneNumberValidation = number()
                                         }
                                         defaultValue={users.oneUser.user.login}
                                         placeholder="Le login"
+                                        disabled
                                         {...register("login")}
                                       />
                                       {errors.login && (
@@ -546,6 +546,7 @@ const phoneNumberValidation = number()
                                         }
                                         defaultValue={users.oneUser.user.login}
                                         placeholder="Le login"
+                                        disabled
                                         {...register("login")}
                                       />
                                       {errors.login && (
@@ -740,6 +741,7 @@ const phoneNumberValidation = number()
                                       }
                                       defaultValue={users.oneUser.user.login}
                                       placeholder="Le login"
+                                      disabled
                                       {...register("login")}
                                     />
                                     {errors.login && (

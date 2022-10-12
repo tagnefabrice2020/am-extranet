@@ -3,6 +3,7 @@ import { fetchOneUser } from "../../../redux/User/UserActionCreators";
 import { useParams } from "react-router-dom";
 import { connect } from "react-redux";
 import AppLoader from "../../../components/AppLoader";
+import { ADMIN, AGENT_CONSTAT, AGENT_SECTEUR, AUDIT_PLANNEUR } from "../../../utils/constant";
 
 const ShowUser = ({ fetchOneUser, users }) => {
   const { uuid, role } = useParams();
@@ -50,6 +51,7 @@ const ShowUser = ({ fetchOneUser, users }) => {
                 boxShadow: "rgba(0, 0, 0, 0.16) 0px 1px 4px",
               }}
             >
+              {console.log(users.oneUser)}
               <div className="row p-2">
                 <div className="col-md-12">
                   <div className="profile-head">
@@ -89,7 +91,9 @@ const ShowUser = ({ fetchOneUser, users }) => {
                     <p className="proile-rating">
                       Téléphone : <span>{users.oneUser.telephone}</span>
                     </p>
-
+                    <p className="proile-rating">
+                      Trigramme : <span>{users.oneUser.trigramme}</span>
+                    </p>
                     <br />
                     <ul className="nav nav-tabs" id="myTab" role="tablist">
                       {role.toLowerCase() === "salarie" && (
@@ -107,8 +111,8 @@ const ShowUser = ({ fetchOneUser, users }) => {
                           </span>
                         </li>
                       )}
-                      {(role.toLowerCase() === "administrateur" ||
-                        role.toLowerCase() === "agent") && (
+                      {(role.toLowerCase() === ADMIN ||
+                        role.toLowerCase() === "agent" ) && (
                         <li className="nav-item" style={liStyle}>
                           <span
                             className="nav-link active"
@@ -219,14 +223,14 @@ const ShowUser = ({ fetchOneUser, users }) => {
                         role="tabpanel"
                         aria-labelledby="home-tab"
                       >
-                        {role.toLowerCase() === "administrateur" && (
+                        {(role.toLowerCase() === "administrateur" || role.toLowerCase() ===  "agent") && (
                           <>
                             <div className="row">
                               <div className="col-md-6">
                                 <label>Téléphone</label>
                               </div>
                               <div className="col-md-6">
-                                <p>{`${users.oneUser.telephone}`}</p>
+                                <p>{`${users?.oneUser?.telephone || ""}`}</p>
                               </div>
                             </div>
                             <div className="row">
@@ -234,7 +238,7 @@ const ShowUser = ({ fetchOneUser, users }) => {
                                 <label>Adresse</label>
                               </div>
                               <div className="col-md-6">
-                                <p>{`${users.oneUser.adresse}`}</p>
+                                <p>{`${users?.oneUser?.adresse || ""}`}</p>
                               </div>
                             </div>
 
@@ -243,7 +247,7 @@ const ShowUser = ({ fetchOneUser, users }) => {
                                 <label>Login</label>
                               </div>
                               <div className="col-md-6">
-                                <p>{`${users.oneUser.user.login}`}</p>
+                                <p>{`${users?.oneUser?.user?.login || ""}`}</p>
                               </div>
                             </div>
                           </>

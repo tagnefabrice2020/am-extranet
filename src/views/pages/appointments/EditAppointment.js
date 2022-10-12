@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { connect } from "react-redux";
 import styled from "styled-components";
 import { useParams } from "react-router-dom";
@@ -12,17 +12,25 @@ import { API_URL, getISOStringWithoutSecsAndMillisecs } from "../../../config";
 import { date, mixed, number, object, string } from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { parseData } from "../../../utils/transformer";
-import { CLIENT } from "../../../utils/constant";
+import {
+  ADMIN,
+  CLIENT,
+  CLIENT_PARTICULIER,
+  CLIENT_PROFESSIONEL,
+  CONSTAT_SORTANT,
+} from "../../../utils/constant";
+import { useLayoutEffect } from "react";
 
 const updateAppointementSchema = object({
   ref_lot: string().typeError("Veuillez des character alpha-numérique"),
   ref_edl: string().typeError("Veuillez des character alpha-numérique"),
   intervention: mixed()
-    .oneOf(["1", "2", "3", "4", "5", "6", "7", "8", "9"], "Veuillez choisir parmis les options.")
+    .oneOf(
+      ["1", "2", "3", "4", "5", "6", "7", "8", "9"],
+      "Veuillez choisir parmis les options."
+    )
     .required("Veuillez choisir parmis les options."),
-  type_propriete: mixed()
-    .oneOf(["1", "2", "3", "4", "5", "6", "7", "8", "9"], "Veuillez choisir parmis les options.")
-    .required("Veuillez choisir parmis les options."),
+  type_propriete: string().required("Veuillez choisir parmis les options."),
   date: date().typeError("Veuillez choisir une date."),
   agent: number().typeError("Veuillez choisir parmis les options."),
   // passeur: string(),
@@ -47,7 +55,7 @@ const updateAppointementSchema = object({
   client: string()
     .required("Veuillez choisir le client concernées.")
     .typeError("Veuillez choisir le client concernées."),
-    adresse_ancien_locataire: string()
+  adresse_ancien_locataire: string()
     .typeError("Veuillez saisir des characteres alpha-numériques.")
     .required("Veuillez saisir l'identité de l'ancien locataire"),
 
@@ -55,12 +63,7 @@ const updateAppointementSchema = object({
     .positive("Veuillez saisir un nombre positive.")
     .required("Veuiller saisir le superficie du bien.")
     .typeError("Veuillez saisir des charactères numériques."),
-  type: mixed()
-    .oneOf(
-      ["T1", "T2", "T3", "T4", "T5"],
-      "Veuillez choisir parmis les options proposer."
-    )
-    .required("Veuillez choisir parmis les options proposer."),
+  type: string().required("Veuillez choisir parmis les options proposer."),
   numero_sol_propriete: number()
     .required("Veuillez saisir l'étage du bien.")
     .typeError("Veuillez saisir des charactères numériques."),
@@ -97,9 +100,7 @@ const updateAppointementSchema = object({
   nom_bailleur: string()
     .typeError("Veuillez saisir des charactères alphabetic.")
     .required("Le Nom du propriétaire est obligatoire."),
-  email_bailleur: string()
-    .email("Veuillez saisir un email valid.")
-    .required("l'email du propriétaire est obligatoire."),
+  email_bailleur: string().email("Veuillez saisir un email valid."),
   reference_bailleur: string().typeError(
     "Veuillez inserer des characteres alpha-numerique"
   ),
@@ -118,7 +119,7 @@ function EditAppointment({
   fetchOneAppointment,
   appointments,
   updateAppointment,
-  user
+  user,
 }) {
   const { uuid } = useParams();
   const [agentLoading, setAgentsLoading] = useState(true);
@@ -130,10 +131,15 @@ function EditAppointment({
   const [propertyTypes, setPropertyTypes] = useState([]);
   const [propertyTypesLoading, setPropertyTypesLoading] = useState(true);
   const userInfo = parseData(user);
-  const { register, handleSubmit, formState } = useForm({
+  const [passeurs, setPasseurs] = useState([]);
+  const [loadingPasseur, setLoadingPasseur] = useState(true);
+  const ServiceRef = useRef(null);
+
+  const { register, handleSubmit, formState, watch } = useForm({
     mode: "unChange",
     resolver: yupResolver(updateAppointementSchema),
   });
+  const client = watch("client");
 
   useEffect(() => {
     async function fetchInterventions() {
@@ -162,12 +168,19 @@ function EditAppointment({
     }
 
     async function fetchClients() {
+      if (
+        userInfo.group.toLowerCase() !== CLIENT_PARTICULIER &&
+        userInfo.group.toLowerCase() !== CLIENT_PROFESSIONEL
+      ) {
+        let url = userInfo.group.toLowerCase() === ADMIN ? `/client_app/client?paginated=none` : `/client_app/client`
+      
       await axios
-        .get(API_URL + `/client_app/client?paginated=none`)
+        .get(API_URL + url)
         .then((response) => {
           setClients(response.data);
           setClientsLoading(false);
         });
+      }
     }
 
     fetchInterventions();
@@ -176,6 +189,32 @@ function EditAppointment({
     fetchAgents();
   }, []);
 
+  useEffect(() => {
+    async function fetchPasseur() {
+      if (
+        userInfo.group.toLowerCase() === CLIENT_PARTICULIER ||
+        userInfo.group.toLowerCase() === CLIENT_PROFESSIONEL
+      ) {
+        await axios
+          .get(API_URL + `/salarie_app/salarie?paginated=none&client=${userInfo.client_id}`)
+          .then((response) => {
+            setPasseurs(response.data);
+            setLoadingPasseur(false);
+          });
+      } else {
+        setLoadingPasseur(true);
+        await axios
+          .get(API_URL + `/salarie_app/salarie?paginated=none`)
+          .then((response) => {
+            setPasseurs(response.data);
+            setLoadingPasseur(false);
+          });
+      }
+    }
+    fetchPasseur();
+    return () => {};
+  }, [client, userInfo.group, userInfo.client_id]);
+
   const { errors, isSubmitting } = formState;
 
   useEffect(() => {
@@ -183,20 +222,30 @@ function EditAppointment({
     fetchOneAppointment(uuid);
   }, [uuid, fetchOneAppointment]);
 
+  const service = watch("intervention");
+  const [intervention, setIntervention] = useState(null);
+
+  useLayoutEffect(() => { 
+    !interventionsLoading && setIntervention(ServiceRef?.current?.nextElementSibling.selectedOptions[0].firstChild.textContent);
+  }, [service, interventionsLoading]);
+
   const editAppointment = (data) => {
-    if (userInfo.group.toLowerCase() === CLIENT) delete data.agent;
+    if (userInfo.group.toLowerCase() === CLIENT_PARTICULIER || data.passeur === "") delete data.passeur
+    delete data.adresse_ancien_locataire;
+    const date = new Date(data.date);
     const newData = {
-        ...data,
-        date: data.date.toISOString().slice(0, 19).replace("T", " "),
-        longitude: "238.43",
-        latitude: "238.43",
-        passeur: 1,
-        intervention: parseInt(data.intervention),
-        client: parseInt(data.client),
-        type_propriete: parseInt(data.type_propriete),
-        code_postal_propriete: data.code_postal_propriete.toString()
-      };
-    updateAppointment(newData, uuid);
+      ...data,
+      date: date.toISOString().slice(0, 19).replace("T", " "),
+      longitude: "238.43",
+      latitude: "238.43",
+      intervention: parseInt(data.intervention),
+      client: parseInt(data.client),
+      type_propriete: parseInt(data.type_propriete),
+      code_postal_propriete: data.code_postal_propriete.toString(),
+      statut: 0
+    };
+    console.log(newData)
+    updateAppointment(newData, uuid);  
   };
 
   return (
@@ -281,7 +330,9 @@ function EditAppointment({
                                 }
                                 placeholder="Entrer votre Ref Lot"
                                 {...register("ref_lot")}
-                                defaultValue={appointments.oneAppointment.ref_lot}
+                                defaultValue={
+                                  appointments.oneAppointment.ref_lot
+                                }
                               />
                               {errors.ref_lot && (
                                 <small className="form-text is-red">
@@ -302,7 +353,9 @@ function EditAppointment({
                                 }
                                 placeholder="Entrer votre Ref RDV EDL"
                                 {...register("ref_edl")}
-                                defaultValue={appointments.oneAppointment.ref_rdv_edl}
+                                defaultValue={
+                                  appointments.oneAppointment.ref_rdv_edl
+                                }
                               />
                               {errors.ref_edl && (
                                 <small className="form-text is-red">
@@ -313,7 +366,7 @@ function EditAppointment({
                           </div>
                           <div className="col">
                             <div className="form-group">
-                              <label htmlFor="intervention">
+                              <label htmlFor="intervention" ref={ServiceRef}>
                                 Type d'intervention *
                               </label>
                               <select
@@ -322,7 +375,9 @@ function EditAppointment({
                                   (errors.intervention && ` is-border-red`)
                                 }
                                 {...register("intervention")}
-                                defaultValue={appointments.oneAppointment.intervention.id}
+                                defaultValue={
+                                  appointments.oneAppointment.intervention.id
+                                }
                               >
                                 {!interventionsLoading &&
                                   interventions.map((intervention, idx) => (
@@ -351,7 +406,10 @@ function EditAppointment({
                                   (errors.type_propriete && ` is-border-red`)
                                 }
                                 {...register("type_propriete")}
-                                defaultValue={appointments.oneAppointment.propriete.type_propriete.id}
+                                defaultValue={
+                                  appointments?.oneAppointment?.propriete
+                                    ?.type_propriete?.id
+                                }
                               >
                                 {!propertyTypesLoading &&
                                   propertyTypes.map((propertyType, idx) => (
@@ -383,11 +441,23 @@ function EditAppointment({
                                   (errors.client && ` is-border-red`)
                                 }
                                 {...register("client")}
-                                defaultValue={userInfo.group.toLowerCase() === CLIENT ? userInfo?.client_id : appointments?.oneAppointment?.client?.id}
+                                defaultValue={
+                                  (userInfo.group.toLowerCase() === CLIENT_PROFESSIONEL || userInfo.group.toLowerCase() === CLIENT_PARTICULIER)
+                                    ? userInfo?.client_id
+                                    : appointments?.oneAppointment?.client?.id
+                                }
                               >
-                                {userInfo.group.toLowerCase() === CLIENT && <option value={userInfo?.client_id}>{userInfo.prenom.toUpperCase()} {userInfo.nom.toUpperCase()}</option>}
-                                  {!clientsLoading && clients.map((client, idx) => (
-                                      <option value={client?.id} key={idx}>{client?.user?.prenom} {client?.user?.nom}</option>
+                                {(userInfo.group.toLowerCase() === CLIENT_PROFESSIONEL || userInfo.group.toLowerCase() === CLIENT_PARTICULIER) && (
+                                  <option value={userInfo?.client_id}>
+                                    {userInfo.prenom.toUpperCase()}{" "}
+                                    {userInfo.nom.toUpperCase()}
+                                  </option>
+                                )}
+                                {!clientsLoading && (userInfo.group.toLowerCase() !== CLIENT_PROFESSIONEL && userInfo.group.toLowerCase() !== CLIENT_PARTICULIER) &&
+                                  clients?.map((client, idx) => (
+                                    <option value={client?.id} key={idx}>
+                                      {client?.user?.prenom} {client?.user?.nom}
+                                    </option>
                                   ))}
                               </select>
                               {errors.client && (
@@ -400,17 +470,19 @@ function EditAppointment({
                           <div className="col">
                             <div className="form-group">
                               <label htmlFor="exampleInputEmail1">
-                                Date et Heure
+                                Date
                               </label>
                               <input
-                                type="datetime-local"
+                                type="date"
                                 min={new Date().toISOString()}
                                 className={
                                   "form-control " +
                                   (errors.date && ` is-border-red`)
                                 }
                                 {...register("date")}
-                                defaultValue={getISOStringWithoutSecsAndMillisecs(appointments.oneAppointment.date)}
+                                defaultValue={getISOStringWithoutSecsAndMillisecs(
+                                  appointments.oneAppointment.date
+                                )}
                               />
                               {errors.date && (
                                 <small className="form-text is-red">
@@ -421,55 +493,67 @@ function EditAppointment({
                           </div>
                         </div>
                         <div className="row">
-                          {/* <div className="col">
-                            <div className="form-group">
-                              <label htmlFor="exampleInputEmail1">
-                                Passeur
-                              </label>
-                              <select
-                                className={
-                                  "form-control " +
-                                  (errors.passeur && ` is-border-red`)
-                                }
-                                defaultValue={appointments.oneAppointment.passeur}
-                              >
-                                <option>Intervenant</option>
-                              </select>
-                              {errors.passeur && (
-                                <small className="form-text is-red">
-                                  {errors.passeur.message}
-                                </small>
-                              )}
+                          {(userInfo.group.toLowerCase() !== CLIENT_PARTICULIER) && 
+                            <div className="col">
+                              <div className="form-group">
+                                <label htmlFor="exampleInputEmail1">
+                                  Passeur
+                                </label>
+                                <select
+                                  className={
+                                    "form-control " +
+                                    (errors.passeur && ` is-border-red`)
+                                  }
+                                  {...register("passeur")}
+                                  defaultValue={
+                                  !appointments.oneAppointmentLoading && appointments?.oneAppointment?.passeur?.user?.id
+                                  }
+                                >
+                                  {!loadingPasseur &&
+                                    passeurs.map((p, idx) => (
+                                      <option value={p?.id} key={idx}>
+                                        {p?.user?.prenom} {p?.user?.nom}
+                                      </option>
+                                    ))}
+                                </select>
+                                {errors.passeur && (
+                                  <small className="form-text is-red">
+                                    {errors.passeur.message}
+                                  </small>
+                                )}
+                              </div>
                             </div>
-                          </div> */}
-                          {userInfo.group.toLowerCase() !== CLIENT && [
-                          <div className="col">
-                            <div className="form-group">
-                              <label htmlFor="exampleInputEmail1">
-                                Nom de l'agent Amexpert rattaché
-                              </label>
-                              <select
-                                className={
-                                  "form-control " +
-                                  (errors.agent && ` is-border-red`)
-                                }
-                                {...register("agent")}
-                                defaultValue={appointments.oneAppointment.agent.id}
-                              >
-                                {!agentLoading &&
-                                  agents.map((agent, idx) => (
-                                    <option key={idx} value={agent.id}>
-                                      {agent.user.prenom} {agent.user.nom}
-                                    </option>
-                                  ))}
-                              </select>
-                              {errors.agent && (
-                                <small className="form-text is-red">
-                                  {errors.agent.message}
-                                </small>
-                              )}
-                            </div>
-                          </div>
+                          }
+                          {(userInfo.group.toLowerCase() !== CLIENT_PARTICULIER && userInfo.group.toLowerCase() !== CLIENT_PROFESSIONEL) && [
+                            <div className="col">
+                              <div className="form-group">
+                                <label htmlFor="exampleInputEmail1">
+                                  Nom de l'agent Amexpert rattaché
+                                </label>
+                                <select
+                                  className={
+                                    "form-control " +
+                                    (errors.agent && ` is-border-red`)
+                                  }
+                                  {...register("agent")}
+                                  defaultValue={
+                                    appointments.oneAppointment.agent.id
+                                  }
+                                >
+                                  {!agentLoading &&
+                                    agents.map((agent, idx) => (
+                                      <option key={idx} value={agent.id}>
+                                        {agent.user.prenom} {agent.user.nom}
+                                      </option>
+                                    ))}
+                                </select>
+                                {errors.agent && (
+                                  <small className="form-text is-red">
+                                    {errors.agent.message}
+                                  </small>
+                                )}
+                              </div>
+                            </div>,
                           ]}
                         </div>
 
@@ -490,7 +574,10 @@ function EditAppointment({
                                   (errors.nom_locataire && ` is-border-red`)
                                 }
                                 {...register("nom_locataire")}
-                                defaultValue={appointments.oneAppointment.propriete.locataire.nom}
+                                defaultValue={
+                                  appointments?.oneAppointment?.propriete
+                                    ?.locataire?.nom
+                                }
                               />
                               {errors.nom_locataire && (
                                 <small className="form-text is-red">
@@ -511,7 +598,10 @@ function EditAppointment({
                                   (errors.prenom_locataire && ` is-border-red`)
                                 }
                                 {...register("prenom_locataire")}
-                                defaultValue={appointments.oneAppointment.propriete.locataire.prenom}
+                                defaultValue={
+                                  appointments?.oneAppointment?.propriete
+                                    ?.locataire?.prenom
+                                }
                               />
                               {errors.prenom_locataire && (
                                 <small className="form-text is-red">
@@ -534,7 +624,10 @@ function EditAppointment({
                                     ` is-border-red`)
                                 }
                                 {...register("telephone_locataire")}
-                                defaultValue={appointments.oneAppointment.propriete.locataire.telephone}
+                                defaultValue={
+                                  appointments?.oneAppointment?.propriete
+                                    ?.locataire?.telephone
+                                }
                               />
                               {errors.telephone_locataire && (
                                 <small className="form-text is-red">
@@ -555,7 +648,10 @@ function EditAppointment({
                                   (errors.email_locataire && ` is-border-red`)
                                 }
                                 {...register("email_locataire")}
-                                defaultValue={appointments.oneAppointment.propriete.locataire.email}
+                                defaultValue={
+                                  appointments?.oneAppointment?.propriete
+                                    ?.locataire?.email
+                                }
                               />
                               {errors.email_locataire && (
                                 <small className="form-text is-red">
@@ -585,6 +681,29 @@ function EditAppointment({
                               )}
                             </div>
                           </div>
+                          { !interventionsLoading && (intervention?.toLowerCase() === CONSTAT_SORTANT.toLocaleLowerCase() && 
+                        <div className="col">
+                          <div className="form-group">
+                            <label htmlFor="Date d’entrée du locataire">
+                              Date d’entrée du locataire
+                            </label>
+                            <input
+                              type="date"
+                              className={
+                                "form-control " +
+                                (errors.debut_du_bail_locataire &&
+                                  ` is-border-red`)
+                              }
+                              {...register("debut_du_bail_locataire")}
+                            />
+                            {errors.debut_du_bail_locataire && (
+                              <small className="form-text is-red">
+                                {errors.debut_du_bail_locataire.message}
+                              </small>
+                            )}
+                          </div>
+                        </div>)
+                      }
                         </div>
 
                         <div className="row mt-2 mb-3">
@@ -607,7 +726,9 @@ function EditAppointment({
                                   (errors.surface_propriete && ` is-border-red`)
                                 }
                                 {...register("surface_propriete")}
-                                defaultValue={appointments.oneAppointment.propriete.surface}
+                                defaultValue={
+                                  appointments.oneAppointment.propriete.surface
+                                }
                               />
                               {errors.surface_propriete && (
                                 <small className="form-text is-red">
@@ -625,13 +746,49 @@ function EditAppointment({
                                   (errors.type && ` is-border-red`)
                                 }
                                 {...register("type")}
-                                defaultValue={appointments.oneAppointment.propriete.type}
+                                defaultValue={
+                                  appointments.oneAppointment.propriete.type
+                                }
                               >
-                                <option value="T1">F1</option>
-                                <option value="T2">F2</option>
-                                <option value="T3">F3</option>
-                                <option value="T4">F5</option>
-                                <option value="T5">F5</option>
+                                <option value="studio">STUDIO</option>
+                            <option value="studio meublé">STUDIO MEUBLE</option>
+                            <option value="F1">F1</option>
+                            <option value="F1 Bis">F1 Bis</option>
+                            <option value="F1 Bis Meublé">F1 Bis Meublé</option>
+                            <option value="F2">F2</option>
+                            <option value="F2 meuble">F2 Meublé</option>
+                            <option value="F3">F3</option>
+                            <option value="F3 meuble">F3 Meublé</option>
+                            <option value="F4">F4</option>
+                            <option value="F4 meuble">F4 Meublé</option>
+                            <option value="F5">F5</option>
+                            <option value="F5 meuble">F5 Meublé</option>
+                            <option value="F6">F6</option>
+                            <option value="F6 meuble">F6 Meublé</option>
+                            <option value="F7">F7</option>
+                            <option value="F7 meuble">F7 Meublé</option>
+                            <option value="F8">F8</option>
+                            <option value="F8 meuble">F8 Meublé</option>
+                            <option value="T1">T1</option>
+                            <option value="T1 meuble">T1 Meublé</option>
+                            <option value="T2">T2</option>
+                            <option value="T2 meuble">T2 Meublé</option>
+                             <option value="T3">T3</option>
+                            <option value="T3 meuble">T3 Meublé</option>
+                            <option value="T4">T4</option>
+                            <option value="T4 meuble">T4 Meublé</option>
+                            <option value="T5">T5</option>
+                            <option value="T5 meuble">T5 Meublé</option>
+                            <option value="T6">T6</option>
+                            <option value="T6 meuble">T6 Meublé</option>
+                             <option value="T7">T7</option>
+                            <option value="T7 meuble">T7 Meublé</option>
+                            <option value="T8">T8</option>
+                            <option value="T8 meuble">T8 Meublé</option>
+                             <option value="T9">T9</option>
+                            <option value="T9 meuble">T9 Meublé</option>
+                            <option value="T10">T10</option>
+                            <option value="T10 meuble">T10 Meublé</option>
                               </select>
                               {errors.type && (
                                 <small className="form-text is-red">
@@ -652,7 +809,10 @@ function EditAppointment({
                                     ` is-border-red`)
                                 }
                                 {...register("numero_sol_propriete")}
-                                defaultValue={appointments.oneAppointment.propriete.numeroSol}
+                                defaultValue={
+                                  appointments.oneAppointment.propriete
+                                    .numeroSol
+                                }
                               />
                               {errors.numero_sol_propriete && (
                                 <small className="form-text is-red">
@@ -677,7 +837,9 @@ function EditAppointment({
                                   (errors.numero_propriete && ` is-border-red`)
                                 }
                                 {...register("numero_propriete")}
-                                defaultValue={appointments.oneAppointment.propriete.numero}
+                                defaultValue={
+                                  appointments.oneAppointment.propriete.numero
+                                }
                               />
                               {errors.numero_propriete && (
                                 <small className="form-text is-red">
@@ -700,7 +862,10 @@ function EditAppointment({
                                     ` is-border-red`)
                                 }
                                 {...register("numero_parking_propriete")}
-                                defaultValue={appointments.oneAppointment.propriete.numeroParking}
+                                defaultValue={
+                                  appointments.oneAppointment.propriete
+                                    .numeroParking
+                                }
                               />
                               {errors.numero_parking_propriete && (
                                 <small className="form-text is-red">
@@ -721,7 +886,10 @@ function EditAppointment({
                                     ` is-border-red`)
                                 }
                                 {...register("numero_cave_propriete")}
-                                defaultValue={appointments.oneAppointment.propriete.numeroCave}
+                                defaultValue={
+                                  appointments.oneAppointment.propriete
+                                    .numeroCave
+                                }
                               />
                               {errors.numero_cave_propriete && (
                                 <small className="form-text is-red">
@@ -751,7 +919,9 @@ function EditAppointment({
                                   (errors.adresse_propriete && ` is-border-red`)
                                 }
                                 {...register("adresse_propriete")}
-                                defaultValue={appointments.oneAppointment.propriete.adresse}
+                                defaultValue={
+                                  appointments.oneAppointment.propriete.adresse
+                                }
                               />
                               {errors.adresse_propriete && (
                                 <small className="form-text is-red">
@@ -775,7 +945,10 @@ function EditAppointment({
                                 {...register(
                                   "adresse_complementaire_propriete"
                                 )}
-                                defaultValue={appointments.oneAppointment.propriete.adresseComplementaire}
+                                defaultValue={
+                                  appointments.oneAppointment.propriete
+                                    .adresseComplementaire
+                                }
                               />
                               {errors.adresse_complementaire_propriete && (
                                 <small className="form-text is-red">
@@ -801,7 +974,10 @@ function EditAppointment({
                                     ` is-border-red`)
                                 }
                                 {...register("code_postal_propriete")}
-                                defaultValue={appointments.oneAppointment.propriete.codePostal}
+                                defaultValue={
+                                  appointments.oneAppointment.propriete
+                                    .codePostal
+                                }
                               />
                               {errors.code_postal_propriete && (
                                 <small className="form-text is-red">
@@ -820,7 +996,9 @@ function EditAppointment({
                                   (errors.ville_propriete && ` is-border-red`)
                                 }
                                 {...register("ville_propriete")}
-                                defaultValue={appointments.oneAppointment.propriete.ville}
+                                defaultValue={
+                                  appointments.oneAppointment.propriete.ville
+                                }
                               />
                               {errors.ville_propriete && (
                                 <small className="form-text is-red">
@@ -848,7 +1026,10 @@ function EditAppointment({
                                   (errors.nom_bailleur && ` is-border-red`)
                                 }
                                 {...register("nom_bailleur")}
-                                defaultValue={appointments.oneAppointment.propriete.bailleur.nom}
+                                defaultValue={
+                                  appointments?.oneAppointment?.propriete
+                                    ?.bailleur?.nom
+                                }
                               />
                               {errors.nom_bailleur && (
                                 <small className="form-text is-red">
@@ -869,7 +1050,10 @@ function EditAppointment({
                                   (errors.prenom_bailleur && ` is-border-red`)
                                 }
                                 {...register("prenom_bailleur")}
-                                defaultValue={appointments.oneAppointment.propriete.bailleur.prenom}
+                                defaultValue={
+                                  appointments?.oneAppointment?.propriete
+                                    ?.bailleur?.prenom
+                                }
                               />
                               {errors.prenom_bailleur && (
                                 <small className="form-text is-red">
@@ -890,7 +1074,10 @@ function EditAppointment({
                                   (errors.email_bailleur && ` is-border-red`)
                                 }
                                 {...register("email_bailleur")}
-                                defaultValue={appointments.oneAppointment.propriete.bailleur.email}
+                                defaultValue={
+                                  appointments?.oneAppointment?.propriete
+                                    ?.bailleur?.email
+                                }
                               />
 
                               {errors.email_bailleur && (
@@ -939,7 +1126,10 @@ function EditAppointment({
                                   (errors.list_documents && ` is-border-red`)
                                 }
                                 {...register("list_documents")}
-                                defaultValue={appointments.oneAppointment.liste_document_recuperer}
+                                defaultValue={
+                                  appointments.oneAppointment
+                                    .liste_document_recuperer
+                                }
                               ></textarea>
                             </div>
                             {errors.list_documents && (
@@ -959,7 +1149,10 @@ function EditAppointment({
                                   (errors.consignes_part && ` is-border-red`)
                                 }
                                 {...register("consignes_part")}
-                                defaultValue={appointments.oneAppointment.consignes_particuliere}
+                                defaultValue={
+                                  appointments.oneAppointment
+                                    .consignes_particuliere
+                                }
                               ></textarea>
                             </div>
                             {errors.consignes_part && (
@@ -980,7 +1173,9 @@ function EditAppointment({
                                 (errors.info_diverses && ` is-border-red`)
                               }
                               {...register("info_diverses")}
-                              defaultValue={appointments.oneAppointment.info_diverses}
+                              defaultValue={
+                                appointments.oneAppointment.info_diverses
+                              }
                             ></textarea>
                           </div>
                           {errors.info_diverses && (
@@ -1021,7 +1216,7 @@ function EditAppointment({
 const mapPropsToState = (state) => {
   return {
     appointments: state.appointments,
-    user: state.auth.authUser
+    user: state.auth.authUser,
   };
 };
 

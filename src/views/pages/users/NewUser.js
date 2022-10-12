@@ -4,13 +4,21 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { storeUser } from "../../../redux/User/UserActionCreators";
 import { connect } from "react-redux";
 import { userAdminSchema } from "../../../validationRules/userSchema";
+import { API_URL } from "../../../config";
+import axios from "axios";
+import { toast } from "react-toastify";
+import { ADMIN } from "../../../utils/constant";
+import { extractMiddleCharacter } from "../../../utils/transformer";
 
 const NewUser = ({ storeUser, users, auth }) => {
   const { register, formState, reset, handleSubmit } = useForm({
     mode: "unTouched",
     resolver: yupResolver(userAdminSchema),
   });
-  const authUser = typeof auth.authUser === 'string' ? JSON.parse(auth.authUser) : auth.authUser;
+  const authUser =
+    typeof auth.authUser === "string"
+      ? JSON.parse(auth.authUser)
+      : auth.authUser;
   const { errors, isSubmitting } = formState;
 
   useEffect(() => {
@@ -20,21 +28,42 @@ const NewUser = ({ storeUser, users, auth }) => {
   }, [users.reset.form, reset]);
 
   const newUser = (data) => {
-    if (data.role === "2") {
+    if (data.role === "2" || data.role === "3" || data.role === "4") {
       data = {
         ...data,
         trigramme:
           data.prenom.substr(0, 1).toUpperCase() +
-          data.nom.substr(0, 1).toUpperCase(),
-      };}
-      if (data.role === "3") {
-        data = {
-          ...data,
-          email_reponsable: data.email, // needs to correct this in db
-          code_client: 'AZ-564'
-        };
-        delete data.email
-      }
+          data.nom.substr(0, 1).toUpperCase() + extractMiddleCharacter(data.nom),
+        role: data.role === "2" ? 1 : data.role === "3" ? 2 : 3,
+      };
+      delete data.telephone;
+      axios.post(API_URL + "/agent_app/agent/", data).then((r) => {
+        if (r.status === 200) {
+          toast.success("Utilisateur ajouter avec sucèss.");
+          reset();
+        }
+      });
+      return;
+    }
+    if (data.role === "5") {
+      data = {
+        ...data,
+        email_reponsable: data.email, // needs to correct this in db
+        code_client: "AZ-564",
+        type: 1,
+      };
+      delete data.email;
+    }
+
+    if (data.role === "6") {
+      data = {
+        ...data,
+        email_reponsable: data.email, // needs to correct this in db
+        code_client: "AZ-564",
+        type: 2,
+      };
+      delete data.email;
+    }
     storeUser(data);
   };
 
@@ -216,9 +245,15 @@ const NewUser = ({ storeUser, users, auth }) => {
                         }
                         {...register("role")}
                       >
-                        <option value="1" disabled={authUser.group.toLowerCase() !== 'administrateur'}>Administrateur</option>
-                        <option value="2">Agent</option>
-                        <option value="3">Client</option>
+                        {authUser.group.toLowerCase() === ADMIN && (
+                          <option value="1">Administrateur</option>
+                        )}
+
+                        <option value="2">Agent Secteur</option>
+                        <option value="3">Agent Constat</option>
+                        <option value="4">Audit Planner</option>
+                        <option value="5">Client Pro</option>
+                        <option value="6">Client Par</option>
                         {/* <option value="4">Salarié</option> */}
                       </select>
                       {errors.role && (
@@ -250,7 +285,7 @@ const NewUser = ({ storeUser, users, auth }) => {
 const mapStateToProps = (state) => {
   return {
     users: state.users,
-    auth: state.auth
+    auth: state.auth,
   };
 };
 

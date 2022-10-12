@@ -2,7 +2,7 @@ import React from "react";
 import { connect } from "react-redux";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import "../../src/assets/dist/js/menu.js";
-import { ADMIN, AGENT, CLIENT } from "../utils/constant.js";
+import { ADMIN, AGENT, AGENT_CONSTAT, AGENT_SECTEUR, AUDIT_PLANNEUR, CLIENT, CLIENT_PARTICULIER, CLIENT_PROFESSIONEL } from "../utils/constant.js";
 import { parseData } from "../utils/transformer";
 
 const AppSidebar = ({ user }) => {
@@ -67,8 +67,10 @@ const AppSidebar = ({ user }) => {
                                 with font-awesome or any other icon font library */}
                   {userInfo?.group &&
                     (userInfo?.group?.toLowerCase() === ADMIN ||
-                      userInfo?.group?.toLowerCase() === CLIENT ||
-                      userInfo?.group?.toLowerCase() === AGENT) && (
+                      userInfo?.group?.toLowerCase() === AUDIT_PLANNEUR ||
+                      userInfo?.group?.toLowerCase() === AGENT_SECTEUR ||
+                      userInfo?.group?.toLowerCase() === CLIENT_PARTICULIER ||
+                      userInfo?.group?.toLowerCase() === CLIENT_PROFESSIONEL || userInfo?.group?.toLowerCase() === AGENT_CONSTAT) && (
                       <li className="nav-item menu-open">
                         <NavLink
                           to="/"
@@ -81,7 +83,9 @@ const AppSidebar = ({ user }) => {
                         </NavLink>
                       </li>
                     )}
-                  {userInfo?.group?.toLowerCase() === CLIENT && (
+
+                   {(userInfo?.group?.toLowerCase() === CLIENT_PROFESSIONEL || userInfo?.group?.toLowerCase() === CLIENT_PARTICULIER) && (
+                    <>
                     <li
                       className={
                         location.pathname === "/ajouter/un/rendez-vous" ||
@@ -132,11 +136,68 @@ const AppSidebar = ({ user }) => {
                         </li>
                       </ul>
                     </li>
+                  </> 
+                  )}
+                  {(userInfo?.group?.toLowerCase() === CLIENT_PROFESSIONEL) && (
+                    <>
+                    <li
+                      className={
+                        location.pathname === "/ajouter/un/salarie" ||
+                        location.pathname === "/salarie"
+                          ? "nav-item sub-menu menu-is-opening menu-open"
+                          : "sub-menu nav-item"
+                      }
+                    >
+                      <Link
+                        to="#"
+                        className={
+                          location.pathname === "/ajoutez/un/salarie" ||
+                          location.pathname === "/salarie"
+                            ? "nav-link active"
+                            : "nav-link"
+                        }
+                      >
+                        <i className="bi bi-person"></i>
+                        <p>Salarie</p>
+                        <i className="fas fa-angle-left right"></i>
+                      </Link>
+                      <ul className="nav nav-treeview">
+                        <li className="nav-item">
+                          <Link
+                            to="/ajoutez/un/salarie"
+                            className={
+                              location.pathname === "/ajoutez/un/salarie"
+                                ? "nav-link nav-active"
+                                : "nav-link"
+                            }
+                          >
+                            <i className="bi bi-calendar-plus-fill"></i>
+                            <p>Ajoutez un salarié</p>
+                          </Link>
+                        </li>
+                        <li className="nav-item">
+                          <Link
+                            to="/salarie"
+                            className={
+                              location.pathname === "/salarie"
+                                ? "nav-link nav-active"
+                                : "nav-link"
+                            }
+                          >
+                            <i className="bi bi-list-columns-reverse"></i>
+                            <p>Liste des salarié</p>
+                          </Link>
+                        </li>
+                      </ul>
+                    </li>
+                  </> 
                   )}
                   {userInfo?.group &&
-                    (userInfo?.group.toLowerCase() === ADMIN ||
-                      userInfo?.group.toLowerCase() === AGENT) && (
-                      <>
+                    (userInfo?.group?.toLowerCase() === ADMIN ||
+                      userInfo?.group?.toLowerCase() === AGENT_SECTEUR || 
+                      userInfo?.group?.toLowerCase() === AGENT_CONSTAT || 
+                      userInfo?.group?.toLowerCase() === AUDIT_PLANNEUR) && (
+                     
                         <li
                           className={
                             location.pathname === "/ajouter/un/rendez-vous" ||
@@ -187,8 +248,12 @@ const AppSidebar = ({ user }) => {
                               </Link>
                             </li>
                           </ul>
-                        </li>
-                        <li
+                        </li>  )}
+                        {(
+                          userInfo?.group?.toLowerCase() === ADMIN || 
+                          userInfo?.group?.toLowerCase() === AGENT_SECTEUR || 
+                          userInfo?.group?.toLowerCase() === AGENT_CONSTAT) && 
+                          <li
                           className={
                             location.pathname === "/ajouter/utilisateur" ||
                             location.pathname === "/utilisateurs"
@@ -238,9 +303,8 @@ const AppSidebar = ({ user }) => {
                             </li>
                           </ul>
                         </li>
-                      </>
-                    )}
-                  {userInfo?.group && userInfo?.group.toLowerCase() === ADMIN && (
+                        }
+                  {userInfo?.group && userInfo?.group?.toLowerCase() === ADMIN && (
                     <li
                       className={
                         location.pathname === "/interventions" ||
@@ -293,7 +357,7 @@ const AppSidebar = ({ user }) => {
                     </li>
                   )}
                   
-                  {userInfo.group && (
+                  {/* {userInfo.group && (
                     userInfo.group.toLowerCase() === ADMIN
                   ) && (
                     <li className="nav-item menu-open">
@@ -307,7 +371,7 @@ const AppSidebar = ({ user }) => {
                         <p>Exporter</p>
                       </NavLink>
                     </li>
-                  )} 
+                  )}  */}
                 </ul>
               </nav>
               {/* .sidebar-menu */}

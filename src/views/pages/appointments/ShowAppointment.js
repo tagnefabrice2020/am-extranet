@@ -62,9 +62,10 @@ const ShowAppointment = ({ fetchOneAppointment, appointments }) => {
                         {`${appointments.oneAppointment.client.user.prenom.toUpperCase()} ${appointments.oneAppointment.client.user.nom.toUpperCase()}`}
                       </span>
                     </h5>
+                    <p>Date et heure du RDV:  {new Date(appointments?.oneAppointment?.date).toLocaleString()}</p>
                     <h6>
-                     <b> {`${appointments.oneAppointment.client.user.prenom.toUpperCase()}  ${appointments.oneAppointment.client.user.nom.toUpperCase()}`}{" "}</b>
-                      à un{" "}
+                     <b> {`${appointments.oneAppointment.client.user.prenom.toUpperCase()} ${appointments.oneAppointment.client.user.nom.toUpperCase()}`}{" "}</b>
+                      à un  
                       <span style={{padding: '0px 5px', background: "#847", color: "#fff", borderRadius: "6px"}}>{appointments.oneAppointment.intervention.type}</span>{" "}
                       avec {"  L'agent "} <b>{appointments.oneAppointment?.agent?.user?.prenom} {" "}
                       {appointments.oneAppointment?.agent?.user.nom}</b>
@@ -354,7 +355,7 @@ const ShowAppointment = ({ fetchOneAppointment, appointments }) => {
                               <label>Type</label>
                             </div>
                             <div className="col-md-6">
-                              <p>{`${appointments.oneAppointment.propriete.type_propriete.type || ''}`}</p>
+                              <p>{`${appointments?.oneAppointment?.propriete?.type_propriete?.type || ''}`}</p>
                             </div>
                           </div>
                           <div className="row">
@@ -362,7 +363,7 @@ const ShowAppointment = ({ fetchOneAppointment, appointments }) => {
                               <label>Code postal</label>
                             </div>
                             <div className="col-md-6">
-                              <p>{`${appointments.oneAppointment.propriete.codePostal || '' }`}</p>
+                              <p>{`${appointments?.oneAppointment?.propriete?.codePostal || '' }`}</p>
                             </div>
                           </div>
                           <div className="row">

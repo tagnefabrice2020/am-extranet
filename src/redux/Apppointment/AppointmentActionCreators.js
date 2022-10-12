@@ -115,6 +115,7 @@ export const fetchAppointments = (page, perPage) => {
             dispatch(fetchAppointmentsRequest()); // fetchingAppointments
             AppointementService.fetchAppointments(page, perPage)
                 .then((appointments) => {
+                    console.log(appointments)
                     const totalPage = Math.ceil(appointments.count / 10);
                     dispatch(setAppointmentPage(page));
                     dispatch(setAppointmentTotalPages(totalPage));
@@ -158,7 +159,7 @@ export const fetchOneAppointment = (uuid) => {
     return dispatch => {
         dispatch(fetchOneAppointmentRequest());
         AppointementService.fetchOneAppointment(uuid)
-            .then((appointment) => {
+            .then((appointment) => { 
                 dispatch(fetchOneAppointmentRequestSuccess(appointment))
                 return Promise.resolve();
             }, error => {
@@ -173,6 +174,7 @@ export const updateAppointment = (appointment, uuid) => {
     return dispatch => {
         AppointementService.update(appointment, uuid)
             .then((response) => {
+                alert("rr")
                 if(response.status === 200 || response.status === 201) {
                     toast.success('Rendez-vous enregistrer avec success.');
                 }

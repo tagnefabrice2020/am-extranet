@@ -11,20 +11,18 @@ import {
   updateUser,
 } from "../../../redux/User/UserActionCreators";
 import AppFormLoader from "../../../components/AppFormLoader";
+import { parseData } from "../../../utils/transformer";
+import { CLIENT_PROFESSIONEL } from "../../../utils/constant";
 
-const EditClient = ({ users, fetchOneUser, updateUser }) => {
+const EditClient = ({ users, user, fetchOneUser, updateUser }) => {
   const { uuid } = useParams();
   const [userId, setUserId] = useState(null);
   const simpleValidation = string()
-    .required("Veuillez remplir ce champs")
     .typeError("Veuillez saisir des characters alphabetic.");
   const simpleEmailValidation = string()
     .email("Veuillez saisir une email correct")
-    .required("Veuillez remplir ce champs")
     .typeError("Veuillez saisir des characters alphabetic.");
-  const phoneNumberValidation = number()
-    .min(10, "Veuillez saisir 10 chiffres")
-    .required("Veuillez remplir ce champs")
+  const phoneNumberValidation = string()
     .typeError("Veuillez saisir des characters numérique.");
 
   const userSchema = object({
@@ -32,24 +30,7 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
     prenom: simpleValidation,
     email_reponsable: string()
       .email("Veuillez entrer une adresse email valid.")
-      .required("Veuillez entre votre email.")
-      .typeError("Veuillez entrer une adresse email valid.")
-      .test(
-        "check-if-user-exist",
-        "Il exist déjà un client avec cette email.",
-        async (value) => {
-          value = value?.length === 0 ? "empty" : value;
-          let result;
-          if (userId) {
-            result = await axios.get(
-              API_URL + `/manager_app/checker?email=${value}&id=${userId}`
-            );
-            if (result.data.status === "good") return true;
-          } else {
-            return true;
-          }
-        }
-      ),
+      .typeError("Veuillez entrer une adresse email valid."),
     adresse: simpleValidation,
     code_client: simpleValidation,
     nom_complet_comptable: simpleValidation,
@@ -65,9 +46,9 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
     ),
     agence_secteur_rattachement: string().typeError(
       "Veuillez saisir des charatères alpha-numériques."
-    ),
+    ).nullable(),
     nom_concessionnaire: simpleValidation,
-    numero_proposition_prestation: number().typeError(
+    numero_proposition_prestation: string().typeError(
       "Veuillez saisir des charatères numériques."
     ),
     as_client: string().typeError(
@@ -79,7 +60,7 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
     suivie_technique_client: string().typeError(
       "Veuillez saisir des charatères alpha-numériques."
     ),
-    statut_client: mixed().oneOf(
+    is_active: mixed().oneOf(
       ["1", "0"],
       "Veuillez choisir parmis les options proposer."
     ),
@@ -106,7 +87,7 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
     complement_adresse: string().typeError(
       "Veuillez saisir des charatères alpha-numériques."
     ),
-    code_postal: number().typeError(
+    code_postal: string().typeError(
       "Veuillez saisir des charatères numériques."
     ),
     ville: string().typeError(
@@ -119,6 +100,7 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
 
   const [agents, setAgents] = useState([]);
   const [agentLoading, setAgentsLoading] = useState(true);
+  const userInfo = parseData(user);
 
   useEffect(() => {
     fetchOneUser(uuid, "client");
@@ -129,6 +111,7 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
   });
 
   const { errors, isSubmitting } = formState;
+  const PROFESSIONEL = "professionnel";
 
   useEffect(() => {
     async function fetchAgents() {
@@ -150,7 +133,22 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
   }, [users.oneUserLoading, users?.oneUser?.user?.id]);
 
   const editUser = (formData) => {
-    const data = { ...formData, is_active: true, role: "3" };
+    console.log(users.oneUser)
+    let data = { 
+      ...formData, 
+      agence_secteur_rattachement: users?.oneUser?.info_concession?.agence_secteur_rattachement,
+      agent_rattache: users.oneUser?.info_concession?.agent_rattache?.id,
+      nom_concessionnaire: users?.oneUser?.info_concession?.nom_concessionnaire,
+      suivie_technique_client: users.oneUser.info_concession?.suivie_technique_client,
+      origine_client: users?.oneUser?.info_concession?.origine_client,
+      numero_proposition_prestation: users?.oneUser?.info_concession?.numero_proposition_prestation,
+      as_client: users?.oneUser?.info_concession?.as_client,
+      login: users?.oneUser?.user?.login,
+      role: users?.oneUser?.type === PROFESSIONEL ? "5" : "6", 
+      type: users?.oneUser?.type === PROFESSIONEL ? 1 : 2,
+      statut_client: 1,
+      is_active: formData.is_active === "1" ? true : false 
+    };
     updateUser(data, uuid);
   };
 
@@ -202,14 +200,15 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                     users.oneUserLoadingError === false &&
                     users.oneUser.hasOwnProperty("id") && (
                       <form onSubmit={handleSubmit(editUser)}>
+                        {console.log(users.oneUser)}
                         <div className="card-body">
                           <div className="row mt-2 mb-3">
-                            <div className="col">
+                            <div className="col-12 col">
                               <h5>INFORMATION PRINCIPALES DU CLIENT</h5>
                             </div>
                           </div>
                           <div className="row">
-                            <div className="col">
+                            <div className="col-12 col-md-4">
                               <div className="form-group">
                                 <label htmlFor="login">Login</label>
                                 <input
@@ -218,8 +217,9 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                                     "form-control " +
                                     (errors.login && ` is-border-red`)
                                   }
-                                  defaultValue={users.oneUser.user.login}
+                                  defaultValue={users?.oneUser?.user?.login}
                                   placeholder="Le login"
+                                  disabled
                                   {...register("login")}
                                 />
                                 {errors.login && (
@@ -229,7 +229,7 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                                 )}
                               </div>
                             </div>
-                            <div className="col">
+                            <div className="col-12 col-md-4">
                               <div className="form-group">
                                 <label htmlFor="prenom">Prénom</label>
                                 <input
@@ -238,7 +238,7 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                                     "form-control " +
                                     (errors.prenom && ` is-border-red`)
                                   }
-                                  defaultValue={users.oneUser.user.prenom}
+                                  defaultValue={users?.oneUser?.user?.prenom}
                                   placeholder="Prénom de l'utilisateur"
                                   {...register("prenom")}
                                 />
@@ -249,7 +249,7 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                                 )}
                               </div>
                             </div>
-                            <div className="col">
+                            <div className="col-12 col-md-4">
                               <div className="form-group">
                                 <label htmlFor="nom">Nom</label>
                                 <input
@@ -258,7 +258,7 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                                     "form-control " +
                                     (errors.nom && `is-border-red`)
                                   }
-                                  defaultValue={users.oneUser.user.nom}
+                                  defaultValue={users?.oneUser?.user?.nom}
                                   placeholder="Nom de l'utilisateur"
                                   {...register("nom")}
                                 />
@@ -272,7 +272,7 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                           </div>
 
                           <div className="row">
-                            <div className="col">
+                            <div className="col-12 col-sm-6 col-md-4">
                               <div className="form-group">
                                 <label htmlFor="email">Email</label>
                                 <input
@@ -281,7 +281,7 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                                     "form-control " +
                                     (errors.email_reponsable && `is-border-red`)
                                   }
-                                  defaultValue={users.oneUser.user.email}
+                                  defaultValue={users?.oneUser?.user?.email}
                                   placeholder="Email"
                                   {...register("email_reponsable")}
                                 />
@@ -293,7 +293,7 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                               </div>
                             </div>
 
-                            <div className="col">
+                            <div className="col-12 col-sm-6 col-md-4">
                               <div className="form-group">
                                 <label htmlFor="email">Code client</label>
 
@@ -303,7 +303,7 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                                     "form-control " +
                                     (errors.code_client && `is-border-red`)
                                   }
-                                  defaultValue={users.oneUser.code_client}
+                                  defaultValue={users?.oneUser?.code_client}
                                   placeholder="Code client"
                                   {...register("code_client")}
                                 />
@@ -315,7 +315,7 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                               </div>
                             </div>
 
-                            <div className="col">
+                            <div className="col-12 col-sm-6 col-md-4">
                               <div className="form-group">
                                 <label htmlFor="exampleInputEmail1">
                                   Fonction
@@ -326,7 +326,7 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                                     "form-control " +
                                     (errors.fonction && `is-border-red`)
                                   }
-                                  defaultValue={users.oneUser.fonction}
+                                  defaultValue={users?.oneUser?.fonction}
                                   placeholder="Fonction"
                                   {...register("fonction")}
                                 />
@@ -340,7 +340,7 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                           </div>
 
                           <div className="row">
-                            <div className="col">
+                            <div className="col-12 col-md-4 col-sm-6">
                               <div className="form-group">
                                 <label htmlFor="exampleInputEmail1">
                                   Titre
@@ -351,8 +351,8 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                                     "form-control " +
                                     (errors.titre && `is-border-red`)
                                   }
-                                  key={users.oneUser.titre}
-                                  defaultValue={users.oneUser.titre}
+                                  key={users?.oneUser?.titre}
+                                  defaultValue={users?.oneUser?.titre}
                                   placeholder="Titre"
                                   {...register("titre")}
                                 >
@@ -367,35 +367,33 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                               </div>
                             </div>
 
-                            <div className="col">
+                            <div className="col-12 col-md-4 col-sm-6">
                               <div className="form-group">
                                 <label htmlFor="exampleInputEmail1">
-                                  Status
+                                  Statut
                                 </label>
                                 <select
                                   type="text"
                                   className={
                                     "form-control " +
-                                    (errors.statut_client && `is-border-red`)
+                                    (errors.is_active && `is-border-red`)
                                   }
-                                  key={users.oneUser.statut_client}
-                                  defaultValue={users.oneUser.statut}
-                                  {...register("statut_client")}
+                                  key={users.oneUser.statut}
+                                  defaultValue={users?.oneUser?.statut || 0}
+                                  {...register("is_active")}
                                 >
                                   <option value="1">active</option>
                                   <option value="0">inactive</option>
                                 </select>
-                                {errors.statut_client && (
+                                {errors.is_active && (
                                   <small className="form-text is-red">
-                                    {errors.statut_client.message}
+                                    {errors.is_active.message}
                                   </small>
                                 )}
                               </div>
                             </div>
-                          </div>
-
-                          <div className="row">
-                            <div className="col">
+                            {users?.oneUser?.user?.group?.toLowerCase() === CLIENT_PROFESSIONEL && <>
+                              <div className="col col-12 col-md-4 col-sm-6">
                               <div className="form-group">
                                 <label htmlFor="exampleInputEmail1">
                                   Société
@@ -406,7 +404,7 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                                     "form-control " +
                                     (errors.societe && `is-border-red`)
                                   }
-                                  defaultValue={users.oneUser.societe}
+                                  defaultValue={users?.oneUser?.societe}
                                   placeholder="Société"
                                   {...register("societe")}
                                 />
@@ -417,7 +415,12 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                                 )}
                               </div>
                             </div>
-                            <div className="col">
+                            </>}
+                            
+                          </div>
+                                  {users?.oneUser?.user?.group?.toLowerCase() === CLIENT_PROFESSIONEL && <>
+                                  <div className="row">
+                            <div className="col-12 col-md-4 col-sm-6">
                               <div className="form-group">
                                 <label htmlFor="exampleInputEmail1">
                                   Société Ref
@@ -428,7 +431,7 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                                     "form-control " +
                                     (errors.ref_societe && `is-border-red`)
                                   }
-                                  defaultValue={users.oneUser.ref_societe}
+                                  defaultValue={users?.oneUser?.ref_societe}
                                   placeholder="Ref Société"
                                   {...register("ref_societe")}
                                 />
@@ -439,7 +442,7 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                                 )}
                               </div>
                             </div>
-                            <div className="col">
+                            <div className="col-12 col-md-4 col-sm-6">
                               <div className="form-group">
                                 <label htmlFor="exampleInputEmail1">
                                   TVA Intercommunautaire
@@ -452,7 +455,7 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                                       `is-border-red`)
                                   }
                                   defaultValue={
-                                    users.oneUser.tva_intercommunautaire
+                                    users?.oneUser?.tva_intercommunautaire
                                   }
                                   placeholder="TVA intercommunautaire"
                                   {...register("tva_intercommunautaire")}
@@ -464,8 +467,7 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                                 )}
                               </div>
                             </div>
-
-                            <div className="col">
+                            <div className="col-12 col-md-4 col-sm-6">
                               <div className="form-group">
                                 <label htmlFor="exampleInputEmail1">
                                   Siret
@@ -476,7 +478,7 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                                     "form-control " +
                                     (errors.siret && `is-border-red`)
                                   }
-                                  defaultValue={users.oneUser.siret}
+                                  defaultValue={users?.oneUser?.siret}
                                   placeholder="Siret"
                                   {...register("siret")}
                                 />
@@ -488,9 +490,11 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                               </div>
                             </div>
                           </div>
+                                  </>}
+                          
 
                           <div className="row">
-                            <div className="col">
+                            <div className="col-12 col-md-4">
                               <div className="form-group">
                                 <label htmlFor="email">Téléphone </label>
                                 <input
@@ -499,7 +503,7 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                                     "form-control " +
                                     (errors.telephone && `is-border-red`)
                                   }
-                                  defaultValue={users.oneUser.telephone}
+                                  defaultValue={users?.oneUser?.telephone}
                                   placeholder="telephone"
                                   {...register("telephone")}
                                 />
@@ -510,7 +514,7 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                                 )}
                               </div>
                             </div>
-                            <div className="col">
+                            <div className="col-12 col-md-4">
                               <div className="form-group">
                                 <label htmlFor="email">Mobile </label>
                                 <input
@@ -519,7 +523,7 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                                     "form-control " +
                                     (errors.mobile && `is-border-red`)
                                   }
-                                  defaultValue={users.oneUser.mobile}
+                                  defaultValue={users?.oneUser?.mobile}
                                   placeholder="mobile"
                                   {...register("mobile")}
                                 />
@@ -530,30 +534,32 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                                 )}
                               </div>
                             </div>
-                            <div className="col">
-                              <div className="form-group">
-                                <label htmlFor="email">Téléphone agence </label>
-                                <input
-                                  type="text"
-                                  className={
-                                    "form-control " +
-                                    (errors.telephone_agence && `is-border-red`)
-                                  }
-                                  defaultValue={users.oneUser.telephone_agence}
-                                  placeholder="telephone agence"
-                                  {...register("telephone_agence")}
-                                />
-                                {errors.telephone_agence && (
-                                  <small className="form-text is-red">
-                                    {errors.telephone_agence.message}
-                                  </small>
-                                )}
+                            {users?.oneUser?.user?.group?.toLowerCase() === CLIENT_PROFESSIONEL && <>
+                              <div className="col-12 col-md-4">
+                                <div className="form-group">
+                                  <label htmlFor="email">Téléphone agence </label>
+                                  <input
+                                    type="text"
+                                    className={
+                                      "form-control " +
+                                      (errors.telephone_agence && `is-border-red`)
+                                    }
+                                    defaultValue={users?.oneUser?.telephone_agence}
+                                    placeholder="telephone agence"
+                                    {...register("telephone_agence")}
+                                  />
+                                  {errors.telephone_agence && (
+                                    <small className="form-text is-red">
+                                      {errors.telephone_agence.message}
+                                    </small>
+                                  )}
+                                </div>
                               </div>
-                            </div>
+                            </>}
                           </div>
 
                           <div className="row">
-                            <div className="col">
+                            <div className="col-12 col-md-6">
                               <div className="form-group">
                                 <label htmlFor="email">Ville </label>
                                 <input
@@ -562,7 +568,7 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                                     "form-control " +
                                     (errors.ville && `is-border-red`)
                                   }
-                                  defaultValue={users.oneUser.ville}
+                                  defaultValue={users?.oneUser?.ville}
                                   placeholder="Ville"
                                   {...register("ville")}
                                 />
@@ -574,7 +580,7 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                               </div>
                             </div>
 
-                            <div className="col">
+                            <div className="col-12 col-md-6">
                               <div className="form-group">
                                 <label htmlFor="email">Email Agence</label>
                                 <input
@@ -583,7 +589,7 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                                     "form-control " +
                                     (errors.email_agence && `is-border-red`)
                                   }
-                                  defaultValue={users.oneUser.email_agence}
+                                  defaultValue={users?.oneUser?.email_agence}
                                   placeholder="Entre votre email"
                                   {...register("email_agence")}
                                 />
@@ -597,7 +603,7 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                           </div>
 
                           <div className="row">
-                            <div className="col">
+                            <div className="col-12 col-md-4">
                               <div className="form-group">
                                 <label htmlFor="adresse">Adresse</label>
                                 <input
@@ -607,7 +613,7 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                                     (errors.adresse && `is-border-red`)
                                   }
                                   {...register("adresse")}
-                                  defaultValue={users.oneUser.adresse}
+                                  defaultValue={users?.oneUser?.adresse}
                                   placeholder="Entre votre adresse"
                                 />
                                 {errors.adresse && (
@@ -617,7 +623,8 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                                 )}
                               </div>
                             </div>
-                            <div className="col">
+
+                            <div className="col-12 col-md-4">
                               <div className="form-group">
                                 <label htmlFor="adresse">
                                   Adresse complémentaire
@@ -631,7 +638,7 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                                   }
                                   {...register("complement_adresse")}
                                   defaultValue={
-                                    users.oneUser.complement_adresse
+                                    users?.oneUser?.complement_adresse
                                   }
                                   placeholder="Complement adresse"
                                 />
@@ -642,7 +649,8 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                                 )}
                               </div>
                             </div>
-                            <div className="col">
+
+                            <div className="col-12 col-md-4">
                               <div className="form-group">
                                 <label htmlFor="adresse">Code Postal</label>
                                 <input
@@ -652,7 +660,7 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                                     (errors.code_postal && `is-border-red`)
                                   }
                                   {...register("code_postal")}
-                                  defaultValue={users.oneUser.code_postal}
+                                  defaultValue={users?.oneUser?.code_postal}
                                   placeholder="Complement adresse"
                                 />
                                 {errors.code_postal && (
@@ -663,14 +671,15 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                               </div>
                             </div>
                           </div>
+
                           <div className="row mt-2 mb-3">
-                            <div className="col">
+                            <div className="col-12 col">
                               <h5>INFORMATION PRINCIPALES DE L'AGENT</h5>
                             </div>
                           </div>
                           <div className="row">
-                            {!agentLoading && agents.length > 0 && (
-                              <div className="col">
+                            {!agentLoading && agents?.length > 0 && (
+                              <div className="col-12 col-md-6">
                                 <div className="form-group">
                                   <label htmlFor="exampleInputEmail1">
                                     Agent rattaché
@@ -680,12 +689,13 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                                       "form-control " +
                                       (errors.agent_rattache && `is-border-red`)
                                     }
-                                    defaultValue={users.oneUser.info_concession.agent_rattache.id.toString()}
+                                    defaultValue={users?.oneUser?.info_concession?.agent_rattache?.id?.toString()}
                                     placeholder="Agent rattache"
                                     {...register("agent_rattache")}
+                                    disabled
                                   >
                                     {!agentLoading &&
-                                      agents.map((agent, idx) => (
+                                      agents?.map((agent, idx) => (
                                         <option key={idx} value={agent.id}>
                                           {agent.user.prenom} {agent.user.nom}
                                         </option>
@@ -699,7 +709,7 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                                 </div>
                               </div>
                             )}
-                            <div className="col">
+                            <div className="col-12 col-md-6">
                               <div className="form-group">
                                 <label htmlFor="exampleInputEmail1">
                                   Agence secteur de rattachement
@@ -712,9 +722,9 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                                       `is-border-red`)
                                   }
                                   defaultValue={
-                                    users.oneUser.info_concession
-                                      .agence_secteur_rattachement
+                                    users?.oneUser?.info_concession?.agence_secteur_rattachement
                                   }
+                                  disabled
                                   placeholder="Agence secteur def rattachement"
                                   {...register("agence_secteur_rattachement")}
                                 />
@@ -728,7 +738,7 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                           </div>
 
                           <div className="row">
-                            <div className="col">
+                            <div className="col-12 col-md-4">
                               <div className="form-group">
                                 <label htmlFor="exampleInputEmail1">
                                   Nom concessionnaire
@@ -740,9 +750,9 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                                     (errors.nom_concessionnaire &&
                                       `is-border-red`)
                                   }
+                                  disabled
                                   defaultValue={
-                                    users.oneUser.info_concession
-                                      .nom_concessionnaire
+                                    users?.oneUser?.info_concession?.nom_concessionnaire
                                   }
                                   placeholder="Nom du concessionnaire"
                                   {...register("nom_concessionnaire")}
@@ -754,7 +764,8 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                                 )}
                               </div>
                             </div>
-                            <div className="col">
+
+                            <div className="col-12 col-md-4">
                               <div className="form-group">
                                 <label htmlFor="exampleInputEmail1">
                                   Suivie Technique Client
@@ -767,9 +778,9 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                                       `is-border-red`)
                                   }
                                   defaultValue={
-                                    users.oneUser.info_concession
-                                      .suivie_technique_client
+                                    users?.oneUser?.info_concession?.suivie_technique_client
                                   }
+                                  disabled
                                   placeholder="Suivie technique"
                                   {...register("suivie_technique_client")}
                                 />
@@ -780,7 +791,8 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                                 )}
                               </div>
                             </div>
-                            <div className="col">
+
+                            <div className="col-12 col-md-4">
                               <div className="form-group">
                                 <label htmlFor="exampleInputEmail1">
                                   Origine client
@@ -792,8 +804,9 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                                     (errors.origine_client && `is-border-red`)
                                   }
                                   defaultValue={
-                                    users.oneUser.info_concession.origine_client
+                                    users?.oneUser?.info_concession?.origine_client
                                   }
+                                  disabled
                                   placeholder="Origine du client"
                                   {...register("origine_client")}
                                 />
@@ -807,7 +820,7 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                           </div>
 
                           <div className="row">
-                            <div className="col">
+                            <div className="col-12 col-md-6">
                               <div className="form-group">
                                 <label htmlFor="exampleInputEmail1">
                                   Numero de proposition de prestation
@@ -820,9 +833,9 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                                       `is-border-red`)
                                   }
                                   defaultValue={
-                                    users.oneUser.info_concession
-                                      .numero_proposition_prestation
+                                    users?.oneUser?.info_concession?.numero_proposition_prestation
                                   }
+                                  disabled
                                   placeholder="Numero de proposition de prestation"
                                   {...register("numero_proposition_prestation")}
                                 />
@@ -836,7 +849,8 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                                 )}
                               </div>
                             </div>
-                            <div className="col">
+
+                            <div className="col-12 col-md-6">
                               <div className="form-group">
                                 <label htmlFor="exampleInputEmail1">
                                   AS Client
@@ -848,8 +862,9 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                                     (errors.as_client && `is-border-red`)
                                   }
                                   defaultValue={
-                                    users.oneUser.info_concession.as_client
+                                    users?.oneUser?.info_concession?.as_client
                                   }
+                                  disabled
                                   placeholder="AS client"
                                   {...register("as_client")}
                                 />
@@ -861,17 +876,17 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                               </div>
                             </div>
                           </div>
-
+                          {users?.oneUser?.user?.group?.toLowerCase() === CLIENT_PROFESSIONEL && <>
                           <div className="row mt-2 mb-3">
-                            <div className="col">
+                            <div className="col-12 col">
                               <h5>INFORMATION PRINCIPALES DU COMPTABLE</h5>
                             </div>
                           </div>
                           <div className="row">
-                            <div className="col">
+                            <div className="col-12 col-md-6">
                               <div className="form-group">
                                 <label htmlFor="nom_complet_comptable">
-                                  Nom complèt
+                                  Nom complet
                                 </label>
                                 <input
                                   type="text"
@@ -881,7 +896,7 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                                       `is-border-red`)
                                   }
                                   {...register("nom_complet_comptable")}
-                                  defaultValue={users.oneUser.ref_comptable.nom}
+                                  defaultValue={users?.oneUser?.ref_comptable?.nom}
                                   placeholder="nom du comptable"
                                 />
                                 {errors.adresse && (
@@ -891,10 +906,10 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                                 )}
                               </div>
                             </div>
-                            <div className="col">
+                            <div className="col-12 col-md-6">
                               <div className="form-group">
                                 <label htmlFor="email_envoi_facture">
-                                  Email envoi acture
+                                  Email envoi facture
                                 </label>
                                 <input
                                   type="text"
@@ -905,8 +920,7 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                                   }
                                   {...register("email_envoi_facture")}
                                   defaultValue={
-                                    users.oneUser.ref_comptable
-                                      .email_envoi_facture
+                                    users?.oneUser?.ref_comptable?.email_envoi_facture
                                   }
                                   placeholder="Email envoi facture"
                                 />
@@ -919,7 +933,7 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                             </div>
                           </div>
                           <div className="row">
-                            <div className="col">
+                            <div className="col-12 col-md-6">
                               <div className="form-group">
                                 <label htmlFor="telephone_comptable">
                                   Téléphone comptable
@@ -933,7 +947,7 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                                   }
                                   {...register("telephone_comptable")}
                                   defaultValue={
-                                    users.oneUser.ref_comptable.telephone
+                                    users?.oneUser?.ref_comptable?.telephone
                                   }
                                   placeholder="téléphone comptable"
                                 />
@@ -944,7 +958,8 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                                 )}
                               </div>
                             </div>
-                            <div className="col">
+
+                            <div className="col-12 col-md-6">
                               <div className="form-group">
                                 <label htmlFor="mobile_comptable">
                                   Mobile comptable
@@ -957,7 +972,7 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                                   }
                                   {...register("mobile_comptable")}
                                   defaultValue={
-                                    users.oneUser.ref_comptable.mobile
+                                    users?.oneUser?.ref_comptable?.mobile
                                   }
                                 />
                                 {errors.mobile_comptable && (
@@ -970,7 +985,7 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                           </div>
 
                           <div className="row mt-2 mb-3">
-                            <div className="col">
+                            <div className="col-12 col">
                               <h5>
                                 INFORMATION PRINCIPALES DU GESTIONNAIRE DE
                                 SERVICE
@@ -978,10 +993,10 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                             </div>
                           </div>
                           <div className="row">
-                            <div className="col">
+                            <div className="col-12 col-md-6">
                               <div className="form-group">
                                 <label htmlFor="nom_complet_contact">
-                                  Nom complèt
+                                  Nom complet
                                 </label>
                                 <input
                                   type="text"
@@ -992,8 +1007,7 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                                   }
                                   {...register("nom_complet_contact")}
                                   defaultValue={
-                                    users.oneUser.ref_service_gestion
-                                      .nom_complet
+                                    users?.oneUser?.ref_service_gestion?.nom_complet
                                   }
                                   placeholder="Email"
                                 />
@@ -1004,7 +1018,8 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                                 )}
                               </div>
                             </div>
-                            <div className="col">
+
+                            <div className="col-12 col-md-6">
                               <div className="form-group">
                                 <label htmlFor="email_service_gestion">
                                   Email
@@ -1018,7 +1033,7 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                                   }
                                   {...register("email_service_gestion")}
                                   defaultValue={
-                                    users.oneUser.ref_service_gestion.email
+                                    users?.oneUser?.ref_service_gestion?.email
                                   }
                                   placeholder="Email"
                                 />
@@ -1031,7 +1046,7 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                             </div>
                           </div>
                           <div className="row">
-                            <div className="col">
+                            <div className="col-12 col-md-6">
                               <div className="form-group">
                                 <label htmlFor="telephone_service_gestion">
                                   Téléphone comptable
@@ -1045,7 +1060,7 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                                   }
                                   {...register("telephone_service_gestion")}
                                   defaultValue={
-                                    users.oneUser.ref_service_gestion.telephone
+                                    users?.oneUser?.ref_service_gestion?.telephone
                                   }
                                   placeholder="téléphone comptable"
                                 />
@@ -1057,7 +1072,7 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                               </div>
                             </div>
 
-                            <div className="col">
+                            <div className="col-12 col-md-6">
                               <div className="form-group">
                                 <label htmlFor="mobile_service_gestion">
                                   Mobile comptable
@@ -1071,7 +1086,7 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                                   }
                                   {...register("mobile_service_gestion")}
                                   defaultValue={
-                                    users.oneUser.ref_service_gestion.mobile
+                                    users?.oneUser?.ref_service_gestion?.mobile
                                   }
                                 />
                                 {errors.mobile_service_gestion && (
@@ -1081,44 +1096,11 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
                                 )}
                               </div>
                             </div>
-                          </div>
+                          </div></>
+                            
+                           }
+                          
 
-                          <div className="form-group">
-                            {/* <label htmlFor="role">Role</label> */}
-                            {/* <select
-                              hidden
-                              className={
-                                "form-control " +
-                                (errors.role && `is-border-red`)
-                              }
-                              defaultValue={
-                                users.oneUser.user.group.toLowerCase() ===
-                                "administrateur"
-                                  ? 1
-                                  : users.oneUser.user.group.toLowerCase() ===
-                                    "agent"
-                                  ? 2
-                                  : users.oneUser.user.group.toLowerCase() ===
-                                    "client"
-                                  ? 3
-                                  : users.oneUser.user.group.toLowerCase() ===
-                                    "salarie"
-                                  ? 4
-                                  : null
-                              }
-                              {...register("role")}
-                            >
-                              <option value="1">Administrateur</option>
-                              <option value="2">Agent</option>
-                              <option value="3">Client</option>
-                              <option value="4">Salarié</option>
-                            </select>
-                            {errors.role && (
-                              <small className="form-text text-muted is-danger">
-                                {errors.role.message}
-                              </small>
-                            )} */}
-                          </div>
                         </div>
                         {/* /.card-body */}
                         <div className="card-footer">
@@ -1151,6 +1133,7 @@ const EditClient = ({ users, fetchOneUser, updateUser }) => {
 const mapStateToProps = (state) => {
   return {
     users: state.users,
+    user: state.auth.authUser,
   };
 };
 

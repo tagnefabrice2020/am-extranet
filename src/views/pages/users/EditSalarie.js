@@ -26,7 +26,6 @@ const EditSalarie = ({ users, fetchOneUser, updateUser }) => {
       .required("Veuillez saisir votre Nom")
       .typeError("Veuillez saisir des characters alphabetic."),
     login: string()
-      .required("Veuillez saisir ce champs")
       .typeError("Veuillez saisir des characters alphabetic."),
     email: string()
       .email("Veuillez entrer une adresse email valid.")

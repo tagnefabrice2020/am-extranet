@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import React, { useEffect, useState, useRef, useLayoutEffect } from "react";
+import { useForm, useWatch } from "react-hook-form";
 import { object, string, mixed, number, date } from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { connect } from "react-redux";
@@ -7,20 +7,22 @@ import { storeAppointment } from "../../../redux/Apppointment/AppointmentActionC
 import axios from "axios";
 import { API_URL } from "../../../config";
 import { parseData } from "../../../utils/transformer";
-import { CLIENT } from "../../../utils/constant";
+import {
+  ADMIN,
+  CLIENT,
+  CLIENT_PARTICULIER,
+  CLIENT_PROFESSIONEL,
+  CONSTAT_SORTANT,
+} from "../../../utils/constant";
 
 const newAppointementSchema = object({
   ref_lot: string().typeError("Veuillez des character alpha-numérique"),
   ref_edl: string().typeError("Veuillez des character alpha-numérique"),
-  intervention: mixed()
-    .oneOf(["1", "2", "3", "4", "5"], "Veuillez choisir parmis les options.")
-    .required("Veuillez choisir parmis les options."),
-  type_propriete: mixed()
-    .oneOf(["1", "2", "3", "4", "5"], "Veuillez choisir parmis les options.")
-    .required("Veuillez choisir parmis les options."),
+  intervention: string().required("Veuillez choisir parmis les options."),
+  type_propriete: string().required("Veuillez choisir parmis les options."),
   date: date().typeError("Veuillez choisir une date."),
-  agent: number().typeError("Veuillez choisir parmis les options."),
-  // passeur: string(),
+  agent: string().nullable().typeError("Veuillez choisir parmis les options."),
+  passeur: string(),
 
   telephone_locataire: number()
     .test(
@@ -50,12 +52,7 @@ const newAppointementSchema = object({
     .positive("Veuillez saisir un nombre positive.")
     .required("Veuiller saisir le superficie du bien.")
     .typeError("Veuillez saisir des charactères numériques."),
-  type: mixed()
-    .oneOf(
-      ["T1", "T2", "T3", "T4", "T5"],
-      "Veuillez choisir parmis les options proposer."
-    )
-    .required("Veuillez choisir parmis les options proposer."),
+  type: string().required("Veuillez choisir parmis les options proposer."),
   numero_sol_propriete: number()
     .required("Veuillez saisir l'étage du bien.")
     .typeError("Veuillez saisir des charactères numériques."),
@@ -92,9 +89,7 @@ const newAppointementSchema = object({
   nom_bailleur: string()
     .typeError("Veuillez saisir des charactères alphabetic.")
     .required("Le Nom du propriétaire est obligatoire."),
-  email_bailleur: string()
-    .email("Veuillez saisir un email valid.")
-    .required("l'email du propriétaire est obligatoire."),
+  email_bailleur: string().email("Veuillez saisir un email valid."),
   reference_bailleur: string().typeError(
     "Veuillez inserer des characteres alpha-numerique"
   ),
@@ -107,13 +102,17 @@ const newAppointementSchema = object({
   info_diverses: string().typeError(
     "Veuillez saisir des charactères alpha-numérique."
   ),
+  debut_du_bail_locataire: string()
+    .typeError("Veuillez inserer une date.")
+    .nullable(),
 });
 
 const NewAppointment = ({ storeAppointment, appointments, user }) => {
-  const { register, handleSubmit, reset, formState } = useForm({
+  const { register, handleSubmit, reset, formState, watch } = useForm({
     mode: "unTouched",
     resolver: yupResolver(newAppointementSchema),
   });
+  const ServiceRef = useRef(null);
   const userInfo = parseData(user);
   const [agentLoading, setAgentsLoading] = useState(true);
   const [agents, setAgents] = useState([]);
@@ -123,8 +122,12 @@ const NewAppointment = ({ storeAppointment, appointments, user }) => {
   const [interventions, setInterventions] = useState([]);
   const [propertyTypes, setPropertyTypes] = useState([]);
   const [propertyTypesLoading, setPropertyTypesLoading] = useState(true);
+  const [passeurs, setPasseurs] = useState([]);
+  const [loadingPasseur, setLoadingPasseur] = useState(true);
 
   const { errors, isSubmitting } = formState;
+
+  const client = watch("client");
 
   useEffect(() => {
     async function fetchInterventions() {
@@ -153,12 +156,18 @@ const NewAppointment = ({ storeAppointment, appointments, user }) => {
     }
 
     async function fetchClients() {
-      await axios
-        .get(API_URL + `/client_app/client?paginated=none`)
-        .then((response) => {
-          setClients(response.data);
-          setClientsLoading(false);
-        });
+      if (
+        userInfo.group.toLowerCase() !== CLIENT_PARTICULIER &&
+        userInfo.group.toLowerCase() !== CLIENT_PROFESSIONEL
+      ) {
+        let url = userInfo.group.toLowerCase() === ADMIN ? `/client_app/client?paginated=none` : `/client_app/client`
+        await axios
+          .get(API_URL + url)
+          .then((response) => {
+            setClients(response?.data);
+            setClientsLoading(false);
+          });
+      }
     }
 
     fetchInterventions();
@@ -168,28 +177,79 @@ const NewAppointment = ({ storeAppointment, appointments, user }) => {
   }, []);
 
   useEffect(() => {
+    async function fetchPasseur() {
+      if (
+        userInfo.group.toLowerCase() === CLIENT_PARTICULIER ||
+        userInfo.group.toLowerCase() === CLIENT_PROFESSIONEL
+      ) {
+        await axios
+          .get(
+            API_URL +
+              `/salarie_app/salarie?paginated=none&client=${userInfo.client_id}`
+          )
+          .then((response) => {
+            console.log(response.data);
+            setPasseurs(response.data);
+            console.log(response.data);
+            setLoadingPasseur(false);
+          });
+      } else {
+        setLoadingPasseur(true);
+        await axios
+          .get(
+            API_URL +
+              `/salarie_app/salarie?paginated=none&client=${client || 0}`
+          )
+          .then((response) => {
+            setPasseurs(response.data);
+            setLoadingPasseur(false);
+          });
+      }
+    }
+    fetchPasseur();
+    return () => {};
+  }, [client, userInfo.group, userInfo.client_id]);
+
+  useEffect(() => {
     if (appointments.reset.form) {
       reset();
     }
   }, [appointments.reset.form, reset]);
 
   const newAppointment = (data) => {
-    if (userInfo.group.toLowerCase() === CLIENT) delete data.agent;
+    delete data.adresse_ancien_locataire;
+    // if (userInfo.group.toLowerCase() === CLIENT_PARTICULIER || data.passeur === "") data = {...data, passeur: data.passeur};
+
+    const date = new Date(data.date);
     const newData = {
       ...data,
-      date: data.date.toISOString().slice(0, 19).replace("T", " "),
+      date: date.toISOString().slice(0, 19).replace("T", " "),
       longitude: "238.43",
       latitude: "238.43",
-      passeur: 1,
+      passeur: parseInt(data.passeur),
       intervention: parseInt(data.intervention),
       client: parseInt(data.client),
       type_propriete: parseInt(data.type_propriete),
+      // default agent
+      statut: 0, // status
     };
     storeAppointment(newData);
+    console.log(newData);
     if (appointments.reset.form) {
       reset();
     }
   };
+
+  const service = watch("intervention");
+  const [intervention, setIntervention] = useState(null);
+
+  useLayoutEffect(() => {
+    !interventionsLoading &&
+      setIntervention(
+        ServiceRef.current.nextElementSibling.selectedOptions[0].firstChild
+          .textContent
+      );
+  }, [service, interventionsLoading]);
 
   return (
     <div className="content-wrapper">
@@ -276,7 +336,7 @@ const NewAppointment = ({ storeAppointment, appointments, user }) => {
                       </div>
                       <div className="col">
                         <div className="form-group">
-                          <label htmlFor="intervention">
+                          <label htmlFor="intervention" ref={ServiceRef}>
                             Type d'intervention *
                           </label>
                           <select
@@ -345,11 +405,29 @@ const NewAppointment = ({ storeAppointment, appointments, user }) => {
                               (errors.client && ` is-border-red`)
                             }
                             {...register("client")}
-                           defaultValue = {userInfo.group.toLowerCase() === CLIENT && userInfo?.client_id}
+                            defaultValue={
+                              (userInfo.group.toLowerCase() ===
+                                CLIENT_PROFESSIONEL ||
+                                userInfo.group.toLowerCase() ===
+                                  CLIENT_PARTICULIER) &&
+                              userInfo?.client_id
+                            }
                           >
-                            {userInfo.group.toLowerCase() === CLIENT && <option value={userInfo?.client_id}>{userInfo.prenom.toUpperCase()} {userInfo.nom.toUpperCase()}</option>}
-                            {!clientsLoading && userInfo.group.toLowerCase() !== CLIENT &&
-                              clients.map((client, idx) => (
+                            {(userInfo.group.toLowerCase() ===
+                              CLIENT_PROFESSIONEL ||
+                              userInfo.group.toLowerCase() ===
+                                CLIENT_PARTICULIER) && (
+                              <option value={userInfo?.client_id}>
+                                {userInfo.prenom.toUpperCase()}{" "}
+                                {userInfo.nom.toUpperCase()}
+                              </option>
+                            )}
+                            {!clientsLoading &&
+                              userInfo.group.toLowerCase() !==
+                                CLIENT_PROFESSIONEL &&
+                              userInfo.group.toLowerCase() !==
+                                CLIENT_PARTICULIER &&
+                              clients?.map((client, idx) => (
                                 <option key={idx} value={client.id}>
                                   {client.user.prenom} {client.user.nom}
                                 </option>
@@ -363,75 +441,85 @@ const NewAppointment = ({ storeAppointment, appointments, user }) => {
                           )}
                         </div>
                       </div>
-                      <div className="col">
-                        <div className="form-group">
-                          <label htmlFor="exampleInputEmail1">
-                            Date et Heure
-                          </label>
-                          <input
-                            type="datetime-local"
-                            min={new Date().toISOString()}
-                            className={
-                              "form-control " +
-                              (errors.date && ` is-border-red`)
-                            }
-                            {...register("date")}
-                          />
-                          {errors.date && (
-                            <small className="form-text is-red">
-                              {errors.date.message}
-                            </small>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="row">
-                      {/* <div className="col">
-                        <div className="form-group">
-                          <label htmlFor="exampleInputEmail1">Passeur</label>
-                          <select
-                            className={
-                              "form-control " +
-                              (errors.passeur && ` is-border-red`)
-                            }
-                          >
-                            <option>Intervenant</option>
-                          </select>
-                          {errors.passeur && (
-                            <small className="form-text is-red">
-                              {errors.passeur.message}
-                            </small>
-                          )}
-                        </div>
-                      </div> */}
-                      {userInfo.group.toLowerCase() !== CLIENT && [
+                      {userInfo.group.toLowerCase() !== CLIENT && (
                         <div className="col">
                           <div className="form-group">
-                            <label htmlFor="exampleInputEmail1">
-                              Nom de l'agent Amexpert rattaché
-                            </label>
+                            <label htmlFor="exampleInputEmail1">Date</label>
+                            <input
+                              type="date"
+                              min={new Date().toISOString()}
+                              className={
+                                "form-control " +
+                                (errors.date && ` is-border-red`)
+                              }
+                              {...register("date")}
+                            />
+                            {errors.date && (
+                              <small className="form-text is-red">
+                                {errors.date.message}
+                              </small>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    <div className="row">
+                      {userInfo.group.toLowerCase() !== CLIENT_PARTICULIER && [
+                        <div className="col">
+                          <div className="form-group">
+                            <label htmlFor="exampleInputEmail1">Passeur</label>
                             <select
                               className={
                                 "form-control " +
-                                (errors.agent && ` is-border-red`)
+                                (errors.passeur && ` is-border-red`)
                               }
-                              {...register("agent")}
+                              {...register("passeur")}
                             >
-                              {!agentLoading &&
-                                agents.map((agent, idx) => (
-                                  <option key={idx} value={agent.id}>
-                                    {agent.user.prenom} {agent.user.nom}
+                              {!loadingPasseur &&
+                                passeurs.map((p, idx) => (
+                                  <option value={p?.id} key={idx}>
+                                    {p?.user?.prenom} {p?.user?.nom}
                                   </option>
                                 ))}
                             </select>
-                            {errors.agent && (
+                            {errors.passeur && (
                               <small className="form-text is-red">
-                                {errors.agent.message}
+                                {errors.passeur.message}
                               </small>
                             )}
                           </div>
                         </div>,
                       ]}
+                      {userInfo.group.toLowerCase() !== CLIENT_PARTICULIER &&
+                        userInfo.group.toLowerCase() !==
+                          CLIENT_PROFESSIONEL && [
+                          <div className="col">
+                            <div className="form-group">
+                              <label htmlFor="exampleInputEmail1">
+                                Nom de l'agent Amexpert rattaché
+                              </label>
+                              <select
+                                className={
+                                  "form-control " +
+                                  (errors.agent && ` is-border-red`)
+                                }
+                                {...register("agent")}
+                              >
+                                {!agentLoading &&
+                                  agents.map((agent, idx) => (
+                                    <option key={idx} value={agent.id}>
+                                      {agent.user.prenom} {agent.user.nom}
+                                    </option>
+                                  ))}
+                              </select>
+                              {errors.agent && (
+                                <small className="form-text is-red">
+                                  {errors.agent.message}
+                                </small>
+                              )}
+                            </div>
+                          </div>,
+                        ]}
                     </div>
 
                     <div className="row mt-2 mb-3">
@@ -539,6 +627,31 @@ const NewAppointment = ({ storeAppointment, appointments, user }) => {
                           )}
                         </div>
                       </div>
+                      {!interventionsLoading &&
+                        intervention?.toLowerCase() ===
+                          CONSTAT_SORTANT.toLocaleLowerCase() && (
+                          <div className="col">
+                            <div className="form-group">
+                              <label htmlFor="Date d’entrée du locataire">
+                                Date d’entrée du locataire
+                              </label>
+                              <input
+                                type="date"
+                                className={
+                                  "form-control " +
+                                  (errors.debut_du_bail_locataire &&
+                                    ` is-border-red`)
+                                }
+                                {...register("debut_du_bail_locataire")}
+                              />
+                              {errors.debut_du_bail_locataire && (
+                                <small className="form-text is-red">
+                                  {errors.debut_du_bail_locataire.message}
+                                </small>
+                              )}
+                            </div>
+                          </div>
+                        )}
                     </div>
 
                     <div className="row mt-2 mb-3">
@@ -579,11 +692,45 @@ const NewAppointment = ({ storeAppointment, appointments, user }) => {
                             }
                             {...register("type")}
                           >
-                            <option value="T1">F1</option>
-                            <option value="T2">F2</option>
-                            <option value="T3">F3</option>
-                            <option value="T4">F5</option>
-                            <option value="T5">F5</option>
+                            <option value="studio">STUDIO</option>
+                            <option value="studio meublé">STUDIO MEUBLE</option>
+                            <option value="F1">F1</option>
+                            <option value="F1 Bis">F1 Bis</option>
+                            <option value="F1 Bis Meublé">F1 Bis Meublé</option>
+                            <option value="F2">F2</option>
+                            <option value="F2 meuble">F2 Meublé</option>
+                            <option value="F3">F3</option>
+                            <option value="F3 meuble">F3 Meublé</option>
+                            <option value="F4">F4</option>
+                            <option value="F4 meuble">F4 Meublé</option>
+                            <option value="F5">F5</option>
+                            <option value="F5 meuble">F5 Meublé</option>
+                            <option value="F6">F6</option>
+                            <option value="F6 meuble">F6 Meublé</option>
+                            <option value="F7">F7</option>
+                            <option value="F7 meuble">F7 Meublé</option>
+                            <option value="F8">F8</option>
+                            <option value="F8 meuble">F8 Meublé</option>
+                            <option value="T1">T1</option>
+                            <option value="T1 meuble">T1 Meublé</option>
+                            <option value="T2">T2</option>
+                            <option value="T2 meuble">T2 Meublé</option>
+                            <option value="T3">T3</option>
+                            <option value="T3 meuble">T3 Meublé</option>
+                            <option value="T4">T4</option>
+                            <option value="T4 meuble">T4 Meublé</option>
+                            <option value="T5">T5</option>
+                            <option value="T5 meuble">T5 Meublé</option>
+                            <option value="T6">T6</option>
+                            <option value="T6 meuble">T6 Meublé</option>
+                            <option value="T7">T7</option>
+                            <option value="T7 meuble">T7 Meublé</option>
+                            <option value="T8">T8</option>
+                            <option value="T8 meuble">T8 Meublé</option>
+                            <option value="T9">T9</option>
+                            <option value="T9 meuble">T9 Meublé</option>
+                            <option value="T10">T10</option>
+                            <option value="T10 meuble">T10 Meublé</option>
                           </select>
                           {errors.type && (
                             <small className="form-text is-red">

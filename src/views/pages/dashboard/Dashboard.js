@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 // import styled from "styled-components";
 import AppCalendar from "../../../components/AppCalendar";
 import { parseData } from "../../../utils/transformer";
-import { ADMIN, AGENT, CLIENT } from "../../../utils/constant.js";
+import { ADMIN, AUDIT_PLANNEUR, CLIENT_PARTICULIER, CLIENT_PROFESSIONEL } from "../../../utils/constant.js";
 
 const Dashboard = ({ stats, auth }) => {
   const [statistics, setStatistics] = useState({});
@@ -45,12 +45,12 @@ const Dashboard = ({ stats, auth }) => {
       <section className="content">
         <div className="container-fluid">
           <div className="row">
-             {userInfo.group.toLowerCase() !== CLIENT &&
+             {(userInfo.group.toLowerCase() !== CLIENT_PROFESSIONEL && userInfo.group.toLowerCase() !== CLIENT_PARTICULIER && userInfo.group.toLowerCase() !== AUDIT_PLANNEUR) &&
             <div className="col">
               <div className="small-box bg-1" style={{ position: "relative" }}>
                 <div className="inner">
                   <h3>{!loadStatistics && statistics?.utilisateurs}</h3>
-                  <p>NOMBRE D’UTILISATEURS</p>
+                  <p><Link to="/utilisateurs" style={{color: `black`}}>NOMBRE D’UTILISATEURS</Link></p>
                 </div>
                 <div className="icon">
                   <i className="fas fa-users"></i>
@@ -70,7 +70,7 @@ const Dashboard = ({ stats, auth }) => {
               <div className="small-box bg-3" style={{ position: "relative" }}>
                 <div className="inner">
                   <h3>{!loadStatistics && statistics?.admin}</h3>
-                  <p>NOMBRE D'ADMINISTRATEURS</p>
+                  <p><Link to="/utilisateurs" style={{color: `white`}}>NOMBRE D'ADMINISTRATEURS</Link></p>
                 </div>
                 <div className="icon">
                   <i className="fas fa-users"></i>
@@ -87,12 +87,12 @@ const Dashboard = ({ stats, auth }) => {
             </div>}
 
             {/* ./col */}
-            {userInfo.group.toLowerCase() !== CLIENT &&
+            { (userInfo.group.toLowerCase() !== CLIENT_PROFESSIONEL && userInfo.group.toLowerCase() !== CLIENT_PARTICULIER && userInfo.group.toLowerCase() !== AUDIT_PLANNEUR) &&
             [<div className="col">
               <div className="small-box bg-4" style={{ position: "relative" }}>
                 <div className="inner">
                   <h3>{!loadStatistics && statistics?.agent}</h3>
-                  <p>NOMBRE D'AGENT</p>
+                  <p><Link to="/utilisateurs" style={{color: `white`}}>NOMBRE D'AGENT</Link></p>
                 </div>
                 <div className="icon">
                   <i className="fas fa-users"></i>
@@ -107,11 +107,13 @@ const Dashboard = ({ stats, auth }) => {
                 </span>
               </div>
             </div>,
-            <div className="col">
+            ]}
+            { (userInfo.group.toLowerCase() !== CLIENT_PROFESSIONEL && userInfo.group.toLowerCase() !== CLIENT_PARTICULIER) && [
+              <div className="col">
               <div className="small-box bg-5" style={{ position: "relative" }}>
                 <div className="inner">
                   <h3>{!loadStatistics && statistics?.client}</h3>
-                  <p>NOMBRE DE CLIENT</p>
+                  <p><Link to="/utilisateurs" style={{color: `white`}}>NOMBRE DE CLIENT</Link></p>
                 </div>
                 <div className="icon">
                   <i className="fas fa-users"></i>
@@ -125,13 +127,14 @@ const Dashboard = ({ stats, auth }) => {
                   {/* Plus d'info <i className="fas fa-arrow-circle-right"></i> */}
                 </span>
               </div>
-            </div>]}
+            </div>
+            ]}
+            { (userInfo.group.toLowerCase() === CLIENT_PROFESSIONEL) && 
             <div className="col">
-              <div className="small-box bg-2">
+              <div className="small-box bg-3">
                 <div className="inner">
-                  <h3>{!loadStatistics && statistics?.rdv}</h3>
-
-                  <p>NOMBRE DE RENDEZ-VOUS</p>
+                  <h3>{!loadStatistics && statistics?.salarie}</h3>
+                  <p><Link to="/utilisateurs" style={{color: `white`}}>NOMBRE DE SALARIE</Link></p>
                 </div>
                 <div className="icon">
                   <i className="ion ion-stats-bars"></i>
@@ -140,57 +143,26 @@ const Dashboard = ({ stats, auth }) => {
                   {/* Plus d'info <i className="fas fa-arrow-circle-right"></i> */}
                 </span>
               </div>
-            </div>
+            </div>}
+            { (userInfo.group.toLowerCase() !== AUDIT_PLANNEUR) &&
+            <div className="col">
+              <div className="small-box bg-2">
+                <div className="inner">
+                  <h3>{!loadStatistics && statistics?.rdv}</h3>
+                  <p><Link to="/rendez-vous" style={{color: `white`}}>NOMBRE DE RENDEZ-VOUS</Link></p>
+                </div>
+                <div className="icon">
+                  <i className="ion ion-stats-bars"></i>
+                </div>
+                <span className="small-box-footer cursor">
+                  {/* Plus d'info <i className="fas fa-arrow-circle-right"></i> */}
+                </span>
+              </div>
+            </div>}
             {/* ./col */}
-            {/* <div className="col-lg-3 col-6">
-              <div className="small-box bg-3">
-                <div className="inner">
-                  <h3>{!loadStatistics && statistics.rdv}</h3>
-                  <p>RENDEZ-VOUS ANNULÉ</p>
-                </div>
-                <div className="icon">
-                  <i className="ion ion-person-add"></i>
-                </div>
-                <span className="small-box-footer cursor">
-                 
-                </span>
-              </div>
-            </div>
-            <div className="col-lg-3 col-6">
-              <div className="small-box bg-4">
-                <div className="inner">
-                  <h3>0</h3>
-                  <p>MOYENNE DE RDV REALISES/(JOURS)</p>
-                </div>
-                <div className="icon">
-                  <i className="ion ion-pie-graph"></i>
-                </div>
-                <span className="small-box-footer cursor">
-                 
-                </span>
-              </div>
-            </div> */}
           </div>
 
           {/* /.row */}
-          {/* {stats.loading &&
-                        <div className="container-fluid">
-                            <DashboardCardLoaderBox>
-                                <div>
-                                    <DashboardCardLoader />
-                                </div>
-                                <div>
-                                    <DashboardCardLoader />
-                                </div>
-                                <div>
-                                    <DashboardCardLoader />
-                                </div>
-                                <div>
-                                    <DashboardCardLoader />
-                                </div>
-                            </DashboardCardLoaderBox>
-                        </div>
-                    } */}
 
           <div className="row">
             <div className="col">
@@ -199,7 +171,6 @@ const Dashboard = ({ stats, auth }) => {
                   <h3 className="card-title">
                     <i className="fas fa-calendar-alt"></i> &nbsp; Rendez-vous
                   </h3>
-
                   <div className="card-tools">
                     <button
                       type="button"

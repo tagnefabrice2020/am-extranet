@@ -13,7 +13,7 @@ import { Link } from "react-router-dom";
 const AppCalendar = () => {
   //const events = [{ title: "today's event", date: new Date() }];
 
-  const getEvents = (fetchInfo: any, callback: any) => {
+  const getEvents = (fetchInfo, callback) => {
     retrieveEvents(fetchInfo.startStr, fetchInfo.endStr, callback);
   };
 
@@ -29,16 +29,15 @@ const AppCalendar = () => {
     return [year, month, day].join("-");
   }
 
-  const retrieveEvents = async (from: Date, to: Date, callback: any) => {
+  const retrieveEvents = async (from, to, callback) => {
     try {
       const response = await axios.get(
         API_URL +
-          `/rdv_app/rdv/date?debut=${formatDate(from)}&fin=${formatDate(to)}`
+          `/rdv_app/rdv?debut=${formatDate(from)}&fin=${formatDate(to)}`
       );
       const events = response.data.results;
       callback(
         events.map((e) => {
-          console.log(e)
           return {
             start: e.date,
             title: JSON.stringify({
@@ -63,6 +62,8 @@ const AppCalendar = () => {
   function renderEventContent(eventInfo) {
     let backgroundColor, textColor;
     const title = JSON.parse(eventInfo.event.title);
+    const {tenant_first_name, tenant_last_name} = JSON.parse(eventInfo.event.title);
+    // const nom = JSON.parse(eventInfo.event.tenant_last_name);
     const lowerCaseTitle = title.title.toLowerCase();
     if (lowerCaseTitle === "constat sortant") {
       backgroundColor = "#9b30ff";
@@ -86,8 +87,8 @@ const AppCalendar = () => {
       backgroundColor = "#bf9053";
       textColor = "#fff";
     } else {
-        backgroundColor = "#bb9";
-        textColor = "#fff";
+      backgroundColor = "#bb9";
+      textColor = "#fff";
     }
     return (
       <Link
@@ -96,7 +97,7 @@ const AppCalendar = () => {
       >
         <Event bg={backgroundColor}>
           <b style={{ color: `${textColor}` }}>{eventInfo.timeText}</b> &nbsp;
-          <i style={{ color: `${textColor}` }}>{title.title}</i>
+          <i style={{ color: `${textColor}` }}>{`${tenant_last_name} ${tenant_first_name}`}</i>
           <EventDetails>
             <p>
               <span className="">

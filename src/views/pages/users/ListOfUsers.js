@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 import Pagination from "../../../components/Pagination";
 import TableLoader from "../../../components/TableLoader";
+import axios from "axios";
 import {
   fetchUsers,
   searching,
@@ -12,7 +13,19 @@ import {
   setUsersPerPage,
   switchUserStatus,
   changeBulkStatus,
+  fetchUsersSuccess,
 } from "../../../redux/User/UserActionCreators";
+import {
+  ADMIN,
+  AGENT_CONSTAT,
+  AGENT_SECTEUR,
+  AUDIT_PLANNEUR,
+  CLIENT_PARTICULIER,
+  CLIENT_PROFESSIONEL,
+  SALARIE,
+} from "../../../utils/constant";
+import { API_URL } from "../../../config";
+import { toast } from "react-toastify";
 
 const ListOfUsers = ({
   fetchUsers,
@@ -22,7 +35,8 @@ const ListOfUsers = ({
   setPage,
   searching,
   switchUserStatus,
-  selectUsers
+  selectUsers,
+  fetchUsersSuccess,
 }) => {
   useEffect(() => {
     if (users.searchValue.length > 0) {
@@ -54,6 +68,58 @@ const ListOfUsers = ({
     switchUserStatus(uuid);
   };
 
+  const roleUrl = (role) => {
+    let roleName;
+    if (role === ADMIN) roleName = "administrateur";
+    else if (role === CLIENT_PARTICULIER || role === CLIENT_PROFESSIONEL)
+      roleName = "client";
+    else if (
+      role === AGENT_SECTEUR ||
+      role === AGENT_CONSTAT ||
+      role === AUDIT_PLANNEUR
+    )
+      roleName = "agent";
+    else if (role === SALARIE) roleName = "salarie";
+    return roleName;
+  };
+
+  const getUserId = (user) => {
+    let userId;
+    let role = user.groups[0].group.toLowerCase();
+
+    if (role === ADMIN) userId = user.administrateur;
+    else if (role === CLIENT_PARTICULIER || role === CLIENT_PROFESSIONEL)
+      userId = user.client;
+    else if (
+      role === AGENT_SECTEUR ||
+      role === AGENT_CONSTAT ||
+      role === AUDIT_PLANNEUR
+    )
+      userId = user.agent;
+    else if (role === SALARIE) userId = user.salarie;
+    return userId;
+  };
+
+  const changeStatus = async (id, status) => {
+    const action = status === true ? `désactiver` : `activer`;
+    if (window.confirm(`Voulez-vous ${action} cette utilisateur?`)) {
+      await axios
+        .get(`${API_URL}/admin_app/users/active?id=${id}`)
+        .then((r) => {
+          if (r.status === 200) {
+            toast.success(`Vous avez ${action} cet utilisateur avec succès.`);
+            const newUsers = users.users.map((user) =>
+              user.id === id ? { ...user, is_active: !user.is_active } : user
+            );
+            fetchUsersSuccess(newUsers);
+          }
+        })
+        .catch((e) => {
+          toast.error("Son statut n'a été modifier.");
+        });
+    }
+  };
+
   return (
     <div className="content-wrapper">
       <div className="content-header">
@@ -77,9 +143,7 @@ const ListOfUsers = ({
             <div className="col-12">
               <div className="card">
                 <div className="card-header">
-                  <h3 className="card-title">
-                    
-                  </h3>
+                  <h3 className="card-title"></h3>
 
                   <div className="card-tools">
                     <div
@@ -91,8 +155,8 @@ const ListOfUsers = ({
                         name="table_search"
                         className="form-control float-right"
                         placeholder="Recherche"
-                        onChange={async (event) => {
-                          searching(event.target.value);
+                        onChange={async (e) => {
+                          searching(e.target.value);
                           setPage(1);
                         }}
                       />
@@ -116,6 +180,7 @@ const ListOfUsers = ({
                   {users.loading && <TableLoader />}
                   {!users.loading && users.users.length > 0 && (
                     <table className="table table-head-fixed text-nowrap">
+                      {console.log(users.users)}
                       <thead>
                         <tr>
                           {/* <th></th> */}
@@ -125,6 +190,7 @@ const ListOfUsers = ({
                           </th>
                           <th>Email</th>
                           <th className="text-center">Role</th>
+                          <th></th>
                           <th></th>
                           {/* <th></th> */}
                         </tr>
@@ -151,7 +217,7 @@ const ListOfUsers = ({
                                     </span>
                                   );
                                 }
-                                if (role === "agent") {
+                                if (role === "agent secteur") {
                                   return (
                                     <span
                                       key={`${idx}-role`}
@@ -161,11 +227,21 @@ const ListOfUsers = ({
                                     </span>
                                   );
                                 }
-                                if (role === "client") {
+                                if (role === "client pro") {
                                   return (
                                     <span
                                       key={`${idx}-role`}
                                       className={`badge badge-success`}
+                                    >
+                                      {group.group.toLowerCase()}
+                                    </span>
+                                  );
+                                }
+                                if (role === "client par") {
+                                  return (
+                                    <span
+                                      key={`${idx}-role`}
+                                      className={`badge badge-dark`}
                                     >
                                       {group.group.toLowerCase()}
                                     </span>
@@ -181,48 +257,74 @@ const ListOfUsers = ({
                                     </span>
                                   );
                                 }
+                                if (role === "audit planneur") {
+                                  return (
+                                    <span
+                                      key={`${idx}-role`}
+                                      className={`badge badge-info`}
+                                    >
+                                      {group.group.toLowerCase()}
+                                    </span>
+                                  );
+                                }
+                                if (role === "agent constat") {
+                                  return (
+                                    <span
+                                      key={`${idx}-role`}
+                                      className={`badge badge-error`}
+                                    >
+                                      {group.group.toLowerCase()}
+                                    </span>
+                                  );
+                                }
+                                if (role === "client particulier") {
+                                  return (
+                                    <span
+                                      key={`${idx}-role`}
+                                      className={`badge badge-success`}
+                                    >
+                                      {group.group.toLowerCase()}
+                                    </span>
+                                  );
+                                }
                                 return null;
                               })}
                             </td>
                             <td>
+                              {user.is_active ? (
+                                <span
+                                  className={`badge badge-success`}
+                                  onClick={() => changeStatus(user.id, user.is_active)}
+                                  style={{cursor: 'pointer', textDecoration: `underline`, borderRadius: `4px`}}
+                                >
+                                  activer
+                                </span>
+                              ) : (
+                                <span
+                                  className={`badge badge-danger`}
+                                  onClick={() => changeStatus(user.id, user.is_active)}
+                                  style={{cursor: 'pointer', textDecoration: `underline`, borderRadius: `4px`}}
+                                >
+                                  désactiver
+                                </span>
+                              )}
+                            </td>
+                            <td>
                               <Link
-                                to={`/modifier/${
-                                  user.groups[0].group.toLowerCase() ===
-                                  "administrateur"
-                                    ? user.administrateur
-                                    : user.groups[0].group.toLowerCase() ===
-                                      "agent"
-                                    ? user.agent
-                                    : user.groups[0].group.toLowerCase() ===
-                                      "client"
-                                    ? user.client
-                                    : user.groups[0].group.toLowerCase() ===
-                                      "salarie"
-                                    ? user.salarie
-                                    : null
-                                }/${user.groups[0].group.toLowerCase()}/utilisateur`}
+                                to={`/modifier/${getUserId(user)}/${roleUrl(
+                                  user.groups[0].group.toLowerCase()
+                                )}/utilisateur`}
                               >
                                 <i
                                   className="bi bi-pencil-square"
                                   style={{ color: `#000` }}
                                 ></i>
-                              </Link> &nbsp;
+                              </Link>{" "}
+                              &nbsp;
                               <Link
-                                to={`/voir/${
-                                  user.groups[0].group.toLowerCase() ===
-                                  "administrateur"
-                                    ? user.administrateur
-                                    : user.groups[0].group.toLowerCase() ===
-                                      "agent"
-                                    ? user.agent
-                                    : user.groups[0].group.toLowerCase() ===
-                                      "client"
-                                    ? user.client
-                                    : user.groups[0].group.toLowerCase() ===
-                                      "salarie"
-                                    ? user.salarie
-                                    : null
-                                }/${user.groups[0].group.toLowerCase()}/utilisateur`}
+                                to={`/voir/${getUserId(user)}/${roleUrl(
+                                  user.groups[0].group.toLowerCase()
+                                )}/utilisateur`}
                               >
                                 <i
                                   className="bi bi-eye"
@@ -305,10 +407,12 @@ const mapDispatchToProps = (dispatch) => {
     setUsersPerPage: (perPage) => dispatch(setUsersPerPage(perPage)),
     setPage: (page) => dispatch(setPage(page)),
     searching: (value) => dispatch(searching(value)),
-    searchUsers: (currentPage, perPage) => dispatch(searchUsers(currentPage, perPage)),
+    searchUsers: (currentPage, perPage) =>
+      dispatch(searchUsers(currentPage, perPage)),
     switchUserStatus: (uuid) => dispatch(switchUserStatus(uuid)),
     selectUsers: (uuid) => dispatch(selectUsers(uuid)),
     changeBulkStatus: (status) => dispatch(changeBulkStatus(status)),
+    fetchUsersSuccess: (users) => dispatch(fetchUsersSuccess(users)),
   };
 };
 
